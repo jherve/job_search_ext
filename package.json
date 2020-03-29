@@ -1,0 +1,28 @@
+{
+  "name": "web-extension-ps-example",
+  "version": "0.1.0",
+  "description": "Firefox extension written in PureScript",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "parcel": "parcel",
+    "dev": "concurrently --kill-others \"spago build --watch\" \"parcel watch src/background.js src/content.js --dist-dir extension/\"",
+    "build": "spago build && parcel build src/background.js src/content.js -d extension/",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "clean": "rm -rf .cache .psci_modules modules dist extension/background.js extension/background.js.map extension/content.js extension/content.js.map",
+    "start:firefox": "web-ext run --source-dir ./extension",
+    "sign": "web-ext sign --source-dir ./extension"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^5.2.0",
+    "parcel": "^2.11.0",
+    "spago": "^0.21.0",
+    "web-ext": "^7.10.0"
+  },
+  "resolutions": {
+    "@babel/preset-env": "7.13.8"
+  }
+}

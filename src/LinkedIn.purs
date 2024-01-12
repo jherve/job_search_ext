@@ -37,23 +37,26 @@ queryAll selector doc = do
 
 -- First pass of naming ; from here we know what we are looking for
 
-data LinkedInUIElement =
-  ArtDecoCardRaw Node
-  | ArtDecoTabRaw Node
+data LinkedInUIElementType = LinkedInUIArtDecoCard | LinkedInUIArtDecoTab
+
+instance Show LinkedInUIElementType where
+  show LinkedInUIArtDecoCard = "ArtDecoCard"
+  show LinkedInUIArtDecoTab = "ArtDecoTab"
+
+data LinkedInUIElement = LinkedInUIElement LinkedInUIElementType Node
 
 instance Show LinkedInUIElement where
-  show (ArtDecoCardRaw n) = "ArtDecoCardRaw(" <> nodeName n <> ")"
-  show (ArtDecoTabRaw n) = "ArtDecoTabRaw(" <> nodeName n <> ")"
+  show (LinkedInUIElement typ n) = "LinkedInUIElement(" <> show typ <> ", " <> nodeName n <> ")"
 
 getArtDecoCards ∷ Document → Effect (Maybe (NonEmptyList LinkedInUIElement))
-getArtDecoCards = queryAll' ArtDecoCardRaw "section.artdeco-card > div ~ div > div > div > ul > li"
+getArtDecoCards = queryAll' LinkedInUIArtDecoCard "section.artdeco-card > div ~ div > div > div > ul > li"
 
 getArtDecoTabs ∷ Document → Effect (Maybe (NonEmptyList LinkedInUIElement))
-getArtDecoTabs = queryAll' ArtDecoTabRaw "div.artdeco-tabs > div > div > div > div > ul > li"
+getArtDecoTabs = queryAll' LinkedInUIArtDecoTab "div.artdeco-tabs > div > div > div > div > ul > li"
 
-queryAll' ∷ ∀ b. (Node → b) → String → Document → Effect (Maybe (NonEmptyList b))
+queryAll' ∷ LinkedInUIElementType → String → Document → Effect (Maybe (NonEmptyList LinkedInUIElement))
 queryAll' constructor selector doc = do
   nodes <- queryAll selector doc
   pure case nodes of
     Nothing -> Nothing
-    Just cards -> Just $ map constructor cards
+    Just cards -> Just $ map (LinkedInUIElement constructor) cards

@@ -12,9 +12,9 @@ import LinkedIn
 main :: Effect Unit
 main = do
   dom <- fromDocument <$> getBrowserDom
-  el1 <- queryOne "h2" dom
-  els <- queryAll "h2" dom
+  artDecoCards <- getArtDecoCards dom
+  artDecoTabs <- getArtDecoTabs dom
 
   log "[content] starting up"
-  logShow el1
-  logShow els
+  logShow artDecoCards
+  logShow artDecoTabs

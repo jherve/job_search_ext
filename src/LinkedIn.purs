@@ -16,6 +16,8 @@ import Web.DOM.NodeList as NL
 import Web.DOM.NodeType (NodeType(..))
 import Web.DOM.ParentNode (QuerySelector(..), querySelector, querySelectorAll)
 
+-- A light abstraction layer above the DOM manipulation API
+
 data LinkedInNode =
   LinkedInDocument Document
   | LinkedInElement Element
@@ -50,3 +52,26 @@ queryAll selector node = do
   pure case nodeList of
     Nothing -> Nothing
     Just list -> Just $ map (unsafePartial fromNode) list
+
+-- First pass of naming ; from here we know what we are looking for
+
+data LinkedInRaw =
+  ArtDecoCardRaw LinkedInNode
+  | ArtDecoTabRaw LinkedInNode
+
+instance Show LinkedInRaw where
+  show (ArtDecoCardRaw n) = "ArtDecoCardRaw(" <> show n <> ")"
+  show (ArtDecoTabRaw n) = "ArtDecoTabRaw(" <> show n <> ")"
+
+getArtDecoCards ∷ LinkedInNode → Effect (Maybe (NonEmptyList LinkedInRaw))
+getArtDecoCards = queryAll' ArtDecoCardRaw "section.artdeco-card > div ~ div > div > div > ul > li"
+
+getArtDecoTabs ∷ LinkedInNode → Effect (Maybe (NonEmptyList LinkedInRaw))
+getArtDecoTabs = queryAll' ArtDecoTabRaw "div.artdeco-tabs > div > div > div > div > ul > li"
+
+queryAll' ∷ ∀ b. (LinkedInNode → b) → String → LinkedInNode → Effect (Maybe (NonEmptyList b))
+queryAll' constructor selector root = do
+  nodes <- queryAll selector root
+  pure case nodes of
+    Nothing -> Nothing
+    Just cards -> Just $ map constructor cards

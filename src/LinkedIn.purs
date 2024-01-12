@@ -3,13 +3,16 @@ module LinkedIn where
 import Prelude
 import Yoga.Tree
 
+import Control.Comonad.Cofree (head, tail)
+import Data.Array as A
 import Data.List.NonEmpty as NEL
 import Data.List.Types (NonEmptyList)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(..), fromJust)
 import Data.Traversable (sequence)
+import Data.String as S
 import Effect (Effect)
 import Partial.Unsafe (unsafePartial)
-import Web.DOM (Document, Node)
+import Web.DOM (Document, Element, Node)
 import Web.DOM.Document as D
 import Web.DOM.Element as E
 import Web.DOM.Node (nodeName, nodeType, textContent)
@@ -62,12 +65,12 @@ queryAll' constructor selector doc = do
     Just cards -> Just $ map (LinkedInUIElement constructor) cards
 
 data DetachedNode =
-  DetachedElement Node
+  DetachedElement {tag :: String, content :: String}
   | DetachedComment String
   | DetachedText String
 
 instance Show DetachedNode where
-  show (DetachedElement n) = "DetachedElement(" <> nodeName n <> ")"
+  show (DetachedElement n) = "DetachedElement(" <> n.tag <> ")"
   show (DetachedComment c) = "DetachedComment(" <> c <> ")"
   show (DetachedText t) = "DetachedText(" <> t <> ")"
 
@@ -89,10 +92,14 @@ asTree' n = do
 toDetached :: Node -> Effect DetachedNode
 toDetached node = unsafePartial $ toDetached' (nodeType node) node where
   toDetached' :: Partial => NodeType -> Node -> Effect DetachedNode
-  toDetached' ElementNode n = pure $ DetachedElement n
+  toDetached' ElementNode n = do
+    txt <- textContent n
+    let
+      el = unsafePartial $ fromJust $ E.fromNode n
+    pure $ DetachedElement {tag: E.tagName el, content: S.trim txt}
   toDetached' CommentNode n = do
     txt <- textContent n
-    pure $ DetachedComment txt
+    pure $ DetachedComment $ S.trim txt
   toDetached' TextNode n = do
     txt <- textContent n
-    pure $ DetachedText txt
+    pure $ DetachedText $ S.trim txt

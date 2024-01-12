@@ -5,11 +5,15 @@ import Yoga.Tree
 
 import Control.Comonad.Cofree (head, tail)
 import Data.Array as A
+import Data.List (List(..), (:))
 import Data.List.NonEmpty as NEL
 import Data.List.Types (NonEmptyList)
 import Data.Maybe (Maybe(..), fromJust)
-import Data.Traversable (sequence)
+import Data.String (Pattern(..), joinWith)
 import Data.String as S
+import Data.String.CodeUnits (fromCharArray, toCharArray)
+import Data.Traversable (sequence)
+import Debug (trace)
 import Effect (Effect)
 import Partial.Unsafe (unsafePartial)
 import Web.DOM (Document, Element, Node)
@@ -65,12 +69,17 @@ queryAll' constructor selector doc = do
     Just cards -> Just $ map (LinkedInUIElement constructor) cards
 
 data DetachedNode =
-  DetachedElement {tag :: String, content :: String}
+  DetachedElement {tag :: String, content :: String, id :: Maybe String, classes :: List String}
   | DetachedComment String
   | DetachedText String
 
 instance Show DetachedNode where
-  show (DetachedElement n) = "DetachedElement(" <> n.tag <> ")"
+  show (DetachedElement n) = "DetachedElement(" <> n.tag <> id' <> classes' <> ")"
+    where
+      id' = case n.id of
+        Nothing -> ""
+        Just i -> "#" <> i
+      classes' = joinWith " " $ A.fromFoldable (map (\c -> "." <> c) n.classes)
   show (DetachedComment c) = "DetachedComment(" <> c <> ")"
   show (DetachedText t) = "DetachedText(" <> t <> ")"
 
@@ -96,10 +105,38 @@ toDetached node = unsafePartial $ toDetached' (nodeType node) node where
     txt <- textContent n
     let
       el = unsafePartial $ fromJust $ E.fromNode n
-    pure $ DetachedElement {tag: E.tagName el, content: S.trim txt}
+      tag = E.tagName el
+    id <- E.id el
+    -- On SVG elements "className" returns a weird "SVGString" type that cannot be trimmed
+    classStr <- if tag /= "svg" && tag /= "use" then E.className el else pure $ ""
+
+    pure $ DetachedElement {
+      tag: E.tagName el,
+      content: normalize txt,
+      id: if S.null id then Nothing else Just id,
+      classes: A.toUnfoldable $ S.split (Pattern " ") (normalize classStr)
+    }
+
   toDetached' CommentNode n = do
     txt <- textContent n
-    pure $ DetachedComment $ S.trim txt
+    pure $ DetachedComment $ normalize txt
   toDetached' TextNode n = do
     txt <- textContent n
-    pure $ DetachedText $ S.trim txt
+    pure $ DetachedText $ normalize txt
+
+normalize :: String -> String
+normalize = normaliseSpace >>> S.trim
+
+normaliseSpace :: String -> String
+normaliseSpace s = fromCharArray $ A.fromFoldable $ normaliseSpace' $ A.toUnfoldable $ toCharArray s
+  where
+    badSequence ' ' ' ' = true
+    badSequence ' ' '\n' = true
+    badSequence '\n' '\n' = true
+    badSequence '\n' ' ' = true
+    badSequence _ _ = false
+
+    normaliseSpace':: List Char -> List Char
+    normaliseSpace' Nil = Nil
+    normaliseSpace' (c1 : xs@(c2 : _)) | badSequence c1 c2 = normaliseSpace' xs
+    normaliseSpace' (x:xs) = x : normaliseSpace' xs

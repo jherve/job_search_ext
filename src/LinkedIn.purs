@@ -12,7 +12,7 @@ import Partial.Unsafe (unsafePartial)
 import Web.DOM (Document, Node)
 import Web.DOM.Document as D
 import Web.DOM.Element as E
-import Web.DOM.Node (nodeName, nodeType)
+import Web.DOM.Node (nodeName, nodeType, textContent)
 import Web.DOM.Node as N
 import Web.DOM.NodeList as NL
 import Web.DOM.NodeType (NodeType(..))
@@ -60,3 +60,39 @@ queryAll' constructor selector doc = do
   pure case nodes of
     Nothing -> Nothing
     Just cards -> Just $ map (LinkedInUIElement constructor) cards
+
+data DetachedNode =
+  DetachedElement Node
+  | DetachedComment String
+  | DetachedText String
+
+instance Show DetachedNode where
+  show (DetachedElement n) = "DetachedElement(" <> nodeName n <> ")"
+  show (DetachedComment c) = "DetachedComment(" <> c <> ")"
+  show (DetachedText t) = "DetachedText(" <> t <> ")"
+
+asTree :: LinkedInUIElement -> Effect (Tree DetachedNode)
+asTree (LinkedInUIElement _ n) = asTree' n
+
+asTree' :: Node -> Effect (Tree DetachedNode)
+asTree' n = do
+  children <- N.childNodes n
+  childArray <- NL.toArray children :: Effect (Array Node)
+  detached <- toDetached n
+
+  case childArray of
+    [] -> pure $ leaf detached
+    arr -> do
+      a <- sequence (map asTree' arr) :: Effect (Array (Tree DetachedNode))
+      pure $ mkTree detached a
+
+toDetached :: Node -> Effect DetachedNode
+toDetached node = unsafePartial $ toDetached' (nodeType node) node where
+  toDetached' :: Partial => NodeType -> Node -> Effect DetachedNode
+  toDetached' ElementNode n = pure $ DetachedElement n
+  toDetached' CommentNode n = do
+    txt <- textContent n
+    pure $ DetachedComment txt
+  toDetached' TextNode n = do
+    txt <- textContent n
+    pure $ DetachedText txt

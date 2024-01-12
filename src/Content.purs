@@ -24,5 +24,5 @@ main = do
   case artDecoCards of 
     Nothing -> log "no card found"
     Just cards -> do
-      tree <- detach $ head cards
-      log "I have a tree"
+      tree <- asTree $ head cards
+      log $ showTree tree

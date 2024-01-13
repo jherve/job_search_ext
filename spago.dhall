@@ -4,12 +4,20 @@ You can edit this file as you like.
 -}
 { name = "web-extension"
 , dependencies =
-  [ "console"
+  [ "arrays"
+  , "console"
   , "control"
   , "effect"
+  , "foldable-traversable"
+  , "free"
+  , "lists"
+  , "maybe"
   , "node-buffer"
   , "node-fs"
+  , "partial"
   , "prelude"
+  , "strings"
+  , "tuples"
   , "web-dom"
   , "yoga-tree"
   ]

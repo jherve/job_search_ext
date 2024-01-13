@@ -16,13 +16,23 @@ main = do
   dom <- getBrowserDom
   artDecoCards <- getArtDecoCards dom
   artDecoTabs <- getArtDecoTabs dom
+  jobsUnifiedTopCard <- getJobsUnifiedTopCard dom
 
   log "[content] starting up"
-  logShow artDecoCards
-  logShow artDecoTabs
 
-  case artDecoCards of 
-    Nothing -> log "no card found"
+  sCards <- maybeShow "no card found" artDecoCards
+  log sCards
+
+  sTabs <- maybeShow "no tabs found" artDecoTabs
+  log sTabs
+
+  sTopCards <- maybeShow "no top card found" jobsUnifiedTopCard
+  log sTopCards
+
+maybeShow ∷ String → Maybe (NonEmptyList LinkedInUIElement) → Effect String
+maybeShow errorMsg els =
+  case els of
+    Nothing -> pure errorMsg
     Just cards -> do
       tree <- asTree $ head cards
-      log $ showTree tree
+      pure $ showTree $ cutBranches filterEmpty tree

@@ -13,7 +13,7 @@ import Data.String (Pattern(..), joinWith)
 import Data.String as S
 import Data.String.CodeUnits (fromCharArray, toCharArray)
 import Data.Traversable (sequence)
-import Debug (trace)
+import Data.Tuple (Tuple(..))
 import Effect (Effect)
 import Partial.Unsafe (unsafePartial)
 import Web.DOM (Document, Element, Node)
@@ -44,11 +44,12 @@ queryAll selector doc = do
 
 -- First pass of naming ; from here we know what we are looking for
 
-data LinkedInUIElementType = LinkedInUIArtDecoCard | LinkedInUIArtDecoTab
+data LinkedInUIElementType = LinkedInUIArtDecoCard | LinkedInUIArtDecoTab | LinkedInUIJobsUnifiedTopCard
 
 instance Show LinkedInUIElementType where
   show LinkedInUIArtDecoCard = "ArtDecoCard"
   show LinkedInUIArtDecoTab = "ArtDecoTab"
+  show LinkedInUIJobsUnifiedTopCard = "JobsUnifiedTopCard"
 
 data LinkedInUIElement = LinkedInUIElement LinkedInUIElementType Node
 
@@ -60,6 +61,9 @@ getArtDecoCards = queryAll' LinkedInUIArtDecoCard "section.artdeco-card > div ~ 
 
 getArtDecoTabs ∷ Document → Effect (Maybe (NonEmptyList LinkedInUIElement))
 getArtDecoTabs = queryAll' LinkedInUIArtDecoTab "div.artdeco-tabs > div > div > div > div > ul > li"
+
+getJobsUnifiedTopCard ∷ Document → Effect (Maybe (NonEmptyList LinkedInUIElement))
+getJobsUnifiedTopCard = queryAll' LinkedInUIJobsUnifiedTopCard "div.jobs-unified-top-card"
 
 queryAll' ∷ LinkedInUIElementType → String → Document → Effect (Maybe (NonEmptyList LinkedInUIElement))
 queryAll' constructor selector doc = do
@@ -108,7 +112,7 @@ toDetached node = unsafePartial $ toDetached' (nodeType node) node where
       tag = E.tagName el
     id <- E.id el
     -- On SVG elements "className" returns a weird "SVGString" type that cannot be trimmed
-    classStr <- if tag /= "svg" && tag /= "use" then E.className el else pure $ ""
+    classStr <- if tag /= "svg" && tag /= "use" && tag /= "path" then E.className el else pure $ ""
 
     pure $ DetachedElement {
       tag: E.tagName el,
@@ -140,3 +144,19 @@ normaliseSpace s = fromCharArray $ A.fromFoldable $ normaliseSpace' $ A.toUnfold
     normaliseSpace' Nil = Nil
     normaliseSpace' (c1 : xs@(c2 : _)) | badSequence c1 c2 = normaliseSpace' xs
     normaliseSpace' (x:xs) = x : normaliseSpace' xs
+
+cutBranches :: forall a. (Tree a -> Boolean) -> Tree a -> Tree a
+cutBranches filterIn tree = case head tree, tail tree of
+  h, [] -> mkTree h []
+
+  h, t ->
+    mkTree h (A.filter filterIn tail) where
+      tail = map (cutBranches filterIn) t :: Array (Tree a)
+
+filterEmpty ∷ Tree DetachedNode → Boolean
+filterEmpty t = case head t of
+  DetachedComment _ -> false
+  DetachedText "" -> false
+  DetachedElement {tag, content: ""} | tag /= "BR" -> false
+  DetachedElement {classes} -> L.all (_ /= "visually-hidden") classes
+  _ -> true

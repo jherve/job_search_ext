@@ -160,8 +160,9 @@ filterEmpty ∷ Tree DetachedNode → Boolean
 filterEmpty t = case head t of
   DetachedComment _ -> false
   DetachedText "" -> false
-  DetachedElement {tag, content: ""} | tag /= "BR" -> false
-  DetachedElement {classes} -> L.all (_ /= "visually-hidden") classes
+  DetachedElement {tag: "SPAN", classes}
+    | L.any (_ == "white-space-pre") classes  -> false
+  DetachedElement {classes} -> L.all (\c -> c /= "visually-hidden" && c /= "a11y-text") classes
   _ -> true
 
 asPrunedTrees :: Maybe (NonEmptyList LinkedInUIElement) → Effect (Maybe (NonEmptyList (Tree DetachedNode)))

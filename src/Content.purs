@@ -5,10 +5,12 @@ import LinkedIn
 import Prelude
 
 import Browser.DOM (getBrowserDom)
+import Data.List as L
 import Data.Maybe (Maybe(..))
 import Effect (Effect)
 import Effect.Console (log)
 import Yoga.Tree (showTree)
+import Yoga.Tree.Zipper as Z
 
 main :: Effect Unit
 main = do
@@ -19,19 +21,27 @@ main = do
 
   log "[content] starting up"
 
-  sCards <- maybeShow "no card found" artDecoCards
-  log sCards
+  maybeShowTree artDecoCards >>= log
 
-  sTabs <- maybeShow "no tabs found" artDecoTabs
-  log sTabs
+  maybeShowPruned "no card found" artDecoCards >>= log
+  maybeShowPruned "no tabs found" artDecoTabs >>= log
+  maybeShowPruned "no top card found" jobsUnifiedTopCard >>= log
 
-  sTopCards <- maybeShow "no top card found" jobsUnifiedTopCard
-  log sTopCards
 
-maybeShow ∷ String → Maybe (NonEmptyList LinkedInUIElement) → Effect String
-maybeShow errorMsg els = do
+maybeShowTree ∷ Maybe (NonEmptyList LinkedInUIElement) → Effect String
+maybeShowTree Nothing = pure "nope"
+maybeShowTree (Just nel) = do
+  tree <- asTree $ head nel
+  pure $ showTree tree
+
+maybeShowPruned ∷ String → Maybe (NonEmptyList LinkedInUIElement) → Effect String
+maybeShowPruned errorMsg els = do
   trees <- asPrunedTrees els
   case trees of
     Nothing -> pure errorMsg
     Just ts -> do
       pure $ showTree $ head ts
+      --pure $ showMaybeTree $ zipperTest $ head ts
+
+showMaybeTree Nothing = "No tree"
+showMaybeTree (Just t) = showTree t

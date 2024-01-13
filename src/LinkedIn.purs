@@ -6,17 +6,19 @@ import Yoga.Tree
 import Control.Comonad.Cofree (head, tail)
 import Data.Array as A
 import Data.List (List(..), (:))
+import Data.List as L
 import Data.List.NonEmpty as NEL
 import Data.List.Types (NonEmptyList)
 import Data.Maybe (Maybe(..), fromJust)
 import Data.String (Pattern(..), joinWith)
 import Data.String as S
 import Data.String.CodeUnits (fromCharArray, toCharArray)
-import Data.Traversable (sequence)
+import Data.Traversable (sequence, traverse)
 import Data.Tuple (Tuple(..))
 import Effect (Effect)
 import Partial.Unsafe (unsafePartial)
 import Web.DOM (Document, Element, Node)
+import Web.DOM.Document (origin)
 import Web.DOM.Document as D
 import Web.DOM.Element as E
 import Web.DOM.Node (nodeName, nodeType, textContent)
@@ -24,6 +26,7 @@ import Web.DOM.Node as N
 import Web.DOM.NodeList as NL
 import Web.DOM.NodeType (NodeType(..))
 import Web.DOM.ParentNode (QuerySelector(..), querySelector, querySelectorAll)
+import Yoga.Tree.Zipper as Z
 
 -- A light abstraction layer above the DOM manipulation API
 
@@ -160,3 +163,16 @@ filterEmpty t = case head t of
   DetachedElement {tag, content: ""} | tag /= "BR" -> false
   DetachedElement {classes} -> L.all (_ /= "visually-hidden") classes
   _ -> true
+
+asPrunedTrees :: Maybe (NonEmptyList LinkedInUIElement) → Effect (Maybe (NonEmptyList (Tree DetachedNode)))
+asPrunedTrees =
+  case _ of
+    Nothing -> pure Nothing
+    Just els -> do
+      trees <- traverse asPrunedTree els
+      pure $ Just $ trees
+
+asPrunedTree :: LinkedInUIElement → Effect (Tree DetachedNode)
+asPrunedTree el =  do
+  tree <- asTree el
+  pure $ cutBranches filterEmpty tree

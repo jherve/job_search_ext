@@ -7,7 +7,6 @@ import Prelude
 import Browser.DOM (getBrowserDom)
 import Data.Maybe (Maybe(..))
 import Effect (Effect)
-import Effect.Class.Console (logShow)
 import Effect.Console (log)
 import Yoga.Tree (showTree)
 
@@ -30,9 +29,9 @@ main = do
   log sTopCards
 
 maybeShow ∷ String → Maybe (NonEmptyList LinkedInUIElement) → Effect String
-maybeShow errorMsg els =
-  case els of
+maybeShow errorMsg els = do
+  trees <- asPrunedTrees els
+  case trees of
     Nothing -> pure errorMsg
-    Just cards -> do
-      tree <- asTree $ head cards
-      pure $ showTree $ cutBranches filterEmpty tree
+    Just ts -> do
+      pure $ showTree $ head ts

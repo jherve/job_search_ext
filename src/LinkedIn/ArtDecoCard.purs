@@ -38,6 +38,21 @@ queryAndDetachMany selector n = do
       nodes <- traverse toDetached nodes
       pure $ Just nodes
 
+data ArtDecoPvsEntitySubComponents = ArtDecoPvsEntitySubComponents (Maybe (NonEmptyList DetachedNode))
+derive instance Generic ArtDecoPvsEntitySubComponents _
+instance Show ArtDecoPvsEntitySubComponents where
+  show = genericShow
+
+data ArtDecoCenterContent = ArtDecoCenterContent (Maybe (NonEmptyList DetachedNode))
+derive instance Generic ArtDecoCenterContent _
+instance Show ArtDecoCenterContent where
+  show = genericShow
+
+parseArtDecoCenterContent ∷ Node → Effect (Either String ArtDecoCenterContent)
+parseArtDecoCenterContent n = do
+  list <- queryAndDetachMany ":scope .pvs-entity__sub-components" n
+  pure $ Right (ArtDecoCenterContent list)
+
 data ArtDecoCenterHeader = ArtDecoCenterHeader {
   bold :: DetachedNode,
   normal :: Maybe DetachedNode,
@@ -60,7 +75,7 @@ parseArtDecoCenterHeader n = do
 
 data ArtDecoCenter = ArtDecoCenter {
   header :: ArtDecoCenterHeader,
-  content :: Unit
+  content :: ArtDecoCenterContent
 }
 
 derive instance Generic ArtDecoCenter _
@@ -78,10 +93,12 @@ queryOneAndParse selector parser n = do
 parseArtDecoCenter :: Node -> Effect (Either String ArtDecoCenter)
 parseArtDecoCenter n = do
   header <- queryOneAndParse ":scope > div" parseArtDecoCenterHeader n
+  content <- queryOneAndParse ":scope > div ~ div" parseArtDecoCenterContent n
 
-  pure $ case header of
-    Left l -> Left l
-    Right header -> Right (ArtDecoCenter {header: header, content: unit})
+  pure $ case header, content of
+    Left l, _ -> Left l
+    _, Left l -> Left l
+    Right header, Right content -> Right (ArtDecoCenter {header: header, content: content})
 
 data ArtDecoPvsEntity = ArtDecoPvsEntity {
   side :: Unit,

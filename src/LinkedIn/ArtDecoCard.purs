@@ -32,7 +32,7 @@ instance Show ArtDecoCenterContent where
 
 parseArtDecoCenterContent ∷ Node → Effect (Either String ArtDecoCenterContent)
 parseArtDecoCenterContent n = do
-  list <- queryAndDetachMany ":scope .pvs-entity__sub-components" n
+  list <- queryAndDetachMany ":scope > ul > li" n
   pure $ Right (ArtDecoCenterContent (hush list))
 
 data ArtDecoCenterHeader = ArtDecoCenterHeader {

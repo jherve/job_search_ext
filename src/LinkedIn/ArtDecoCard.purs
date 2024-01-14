@@ -67,16 +67,21 @@ derive instance Generic ArtDecoCenter _
 instance Show ArtDecoCenter where
   show = genericShow
 
+queryOneAndParse ∷ ∀ a. String → (Node → Effect (Either String a)) → Node → Effect (Either String a)
+queryOneAndParse selector parser n = do
+  node <- queryOne selector n
+
+  case node of
+    Nothing -> pure $ Left $ "Could not find node with selector " <> selector
+    Just node -> parser node
+
 parseArtDecoCenter :: Node -> Effect (Either String ArtDecoCenter)
 parseArtDecoCenter n = do
-  header <- queryOne ":scope > div" n
-  case header of
-    Nothing -> pure $ Left "Could not parse ArtDecoCenter"
-    Just header -> do
-      header <- parseArtDecoCenterHeader header :: Effect (Either String ArtDecoCenterHeader)
-      pure $ case header of
-        Left l -> Left l
-        Right header -> Right (ArtDecoCenter {header: header, content: unit})
+  header <- queryOneAndParse ":scope > div" parseArtDecoCenterHeader n
+
+  pure $ case header of
+    Left l -> Left l
+    Right header -> Right (ArtDecoCenter {header: header, content: unit})
 
 data ArtDecoPvsEntity = ArtDecoPvsEntity {
   side :: Unit,

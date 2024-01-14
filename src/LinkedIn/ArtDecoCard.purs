@@ -69,9 +69,9 @@ parseArtDecoCenterHeader n = do
   normal <- queryAndDetachOne ":scope span.t-normal:not(t-black--light) > span[aria-hidden=true]" n
   light <- queryAndDetachMany ":scope span.t-black--light > span[aria-hidden=true]" n
 
-  pure $ case bold of
-    Left l -> Left l
-    Right bold -> Right (ArtDecoCenterHeader {bold: bold, normal: hush normal, light: hush light})
+  pure $ ado
+    b <- bold
+  in ArtDecoCenterHeader {bold: b, normal: hush normal, light: hush light}
 
 data ArtDecoCenter = ArtDecoCenter {
   header :: ArtDecoCenterHeader,
@@ -95,10 +95,10 @@ parseArtDecoCenter n = do
   header <- queryOneAndParse ":scope > div" parseArtDecoCenterHeader n
   content <- queryOneAndParse ":scope > div ~ div" parseArtDecoCenterContent n
 
-  pure $ case header, content of
-    Left l, _ -> Left l
-    _, Left l -> Left l
-    Right header, Right content -> Right (ArtDecoCenter {header: header, content: content})
+  pure $ ado
+    h <- header
+    c <- content
+  in ArtDecoCenter {header: h, content: c}
 
 data ArtDecoPvsEntity = ArtDecoPvsEntity {
   side :: Unit,
@@ -112,9 +112,10 @@ instance Show ArtDecoPvsEntity where
 parseArtDecoPvsEntity :: Node -> Effect (Either String ArtDecoPvsEntity)
 parseArtDecoPvsEntity n = do
   center <- queryOneAndParse ":scope > div.display-flex" parseArtDecoCenter n
-  pure $ case center of
-    Left l -> Left l
-    Right center -> Right $ ArtDecoPvsEntity {side: unit, center: center}
+
+  pure $ ado
+    c <- center
+  in ArtDecoPvsEntity {side: unit, center: c}
 
 data ArtDecoCardElement = ArtDecoCardElement {
   pvs_entity :: ArtDecoPvsEntity
@@ -127,9 +128,10 @@ instance Show ArtDecoCardElement where
 parseArtDecoCard :: Node -> Effect (Either String ArtDecoCardElement)
 parseArtDecoCard n = do
   pvs <- queryOneAndParse ":scope div.pvs-entity--padded" parseArtDecoPvsEntity n
-  pure $ case pvs of
-    Left l -> Left l
-    Right entity -> Right $ ArtDecoCardElement {pvs_entity: entity}
+
+  pure $ ado
+    p <- pvs
+  in ArtDecoCardElement {pvs_entity: p}
 
 toParentNode' :: Node -> ParentNode
 toParentNode' n =

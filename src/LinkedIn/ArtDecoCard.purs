@@ -21,12 +21,14 @@ import Web.DOM.Element as E
 import Web.DOM.NodeList as NL
 import Web.DOM.ParentNode (QuerySelector(..), querySelector, querySelectorAll)
 
+type Parser a = Node → Effect (Either String a)
+
 data ArtDecoPvsEntitySubComponent = ArtDecoPvsEntitySubComponent DetachedNode
 derive instance Generic ArtDecoPvsEntitySubComponent _
 instance Show ArtDecoPvsEntitySubComponent where
   show = genericShow
 
-parseArtDecoPvsEntitySubComponent ∷ Node → Effect (Either String ArtDecoPvsEntitySubComponent)
+parseArtDecoPvsEntitySubComponent ∷ Parser ArtDecoPvsEntitySubComponent
 parseArtDecoPvsEntitySubComponent n = do
   content <- queryAndDetachOne "span[aria-hidden=true]" n
   pure $ ado
@@ -38,7 +40,7 @@ derive instance Generic ArtDecoCenterContent _
 instance Show ArtDecoCenterContent where
   show = genericShow
 
-parseArtDecoCenterContent ∷ Node → Effect (Either String ArtDecoCenterContent)
+parseArtDecoCenterContent ∷ Parser ArtDecoCenterContent
 parseArtDecoCenterContent n = do
   list <- queryManyAndParse ":scope > ul > li" parseArtDecoPvsEntitySubComponent n
   pure $ ado
@@ -55,7 +57,7 @@ derive instance Generic ArtDecoCenterHeader _
 instance Show ArtDecoCenterHeader where
   show = genericShow
 
-parseArtDecoCenterHeader :: Node -> Effect (Either String ArtDecoCenterHeader)
+parseArtDecoCenterHeader :: Parser ArtDecoCenterHeader
 parseArtDecoCenterHeader n = do
   bold <- queryAndDetachOne ":scope div.t-bold > span[aria-hidden=true]" n
   normal <- queryAndDetachOne ":scope span.t-normal:not(t-black--light) > span[aria-hidden=true]" n
@@ -74,7 +76,7 @@ derive instance Generic ArtDecoCenter _
 instance Show ArtDecoCenter where
   show = genericShow
 
-parseArtDecoCenter :: Node -> Effect (Either String ArtDecoCenter)
+parseArtDecoCenter :: Parser ArtDecoCenter
 parseArtDecoCenter n = do
   header <- queryOneAndParse ":scope > div" parseArtDecoCenterHeader n
   content <- queryOneAndParse ":scope > div ~ div" parseArtDecoCenterContent n
@@ -93,7 +95,7 @@ derive instance Generic ArtDecoPvsEntity _
 instance Show ArtDecoPvsEntity where
   show = genericShow
 
-parseArtDecoPvsEntity :: Node -> Effect (Either String ArtDecoPvsEntity)
+parseArtDecoPvsEntity :: Parser ArtDecoPvsEntity
 parseArtDecoPvsEntity n = do
   center <- queryOneAndParse ":scope > div.display-flex" parseArtDecoCenter n
 
@@ -109,7 +111,7 @@ derive instance Generic ArtDecoCardElement _
 instance Show ArtDecoCardElement where
   show = genericShow
 
-parseArtDecoCard :: Node -> Effect (Either String ArtDecoCardElement)
+parseArtDecoCard :: Parser ArtDecoCardElement
 parseArtDecoCard n = do
   pvs <- queryOneAndParse ":scope div.pvs-entity--padded" parseArtDecoPvsEntity n
 
@@ -137,7 +139,7 @@ queryAll selector n = do
   found <- querySelectorAll (QuerySelector selector) $ toParentNode' n
   liftA1 NEL.fromFoldable $ NL.toArray found
 
-queryAndDetachOne ∷ String -> Node → Effect (Either String DetachedNode)
+queryAndDetachOne ∷ String -> Parser DetachedNode
 queryAndDetachOne selector n = do
   node <- queryOne selector n
   case node of
@@ -146,7 +148,7 @@ queryAndDetachOne selector n = do
       node <- toDetached node
       pure $ Right node
 
-queryAndDetachMany ∷ String -> Node → Effect (Either String (NonEmptyList DetachedNode))
+queryAndDetachMany ∷ String -> Parser (NonEmptyList DetachedNode)
 queryAndDetachMany selector n = do
   nodes <- queryAll selector n
   case nodes of
@@ -155,7 +157,7 @@ queryAndDetachMany selector n = do
       nodes <- traverse toDetached nodes
       pure $ Right nodes
 
-queryOneAndParse ∷ ∀ a. String → (Node → Effect (Either String a)) → Node → Effect (Either String a)
+queryOneAndParse ∷ ∀ a. String → Parser a → Parser a
 queryOneAndParse selector parser n = do
   node <- queryOne selector n
 
@@ -163,7 +165,7 @@ queryOneAndParse selector parser n = do
     Nothing -> pure $ Left $ "Could not find node with selector " <> selector
     Just node -> parser node
 
-queryManyAndParse ∷ ∀ a. String → (Node → Effect (Either String a)) → Node → Effect (Either String (NonEmptyList a))
+queryManyAndParse ∷ ∀ a. String → Parser a → Parser (NonEmptyList a)
 queryManyAndParse selector parser n = do
   nodes <- queryAll selector n
   case nodes of

@@ -20,24 +20,6 @@ import Web.DOM.Element as E
 import Web.DOM.NodeList as NL
 import Web.DOM.ParentNode (QuerySelector(..), querySelector, querySelectorAll)
 
-queryAndDetachOne ∷ String -> Node → Effect (Either String DetachedNode)
-queryAndDetachOne selector n = do
-  node <- queryOne selector n
-  case node of
-    Nothing -> pure $ Left $ "Could not find node with selector " <> selector
-    Just node -> do
-      node <- toDetached node
-      pure $ Right node
-
-queryAndDetachMany ∷ String -> Node → Effect (Either String (NonEmptyList DetachedNode))
-queryAndDetachMany selector n = do
-  nodes <- queryAll selector n
-  case nodes of
-    Nothing -> pure $ Left $ "Did not find any node with selector " <> selector
-    Just nodes -> do
-      nodes <- traverse toDetached nodes
-      pure $ Right nodes
-
 data ArtDecoPvsEntitySubComponents = ArtDecoPvsEntitySubComponents (Maybe (NonEmptyList DetachedNode))
 derive instance Generic ArtDecoPvsEntitySubComponents _
 instance Show ArtDecoPvsEntitySubComponents where
@@ -81,14 +63,6 @@ data ArtDecoCenter = ArtDecoCenter {
 derive instance Generic ArtDecoCenter _
 instance Show ArtDecoCenter where
   show = genericShow
-
-queryOneAndParse ∷ ∀ a. String → (Node → Effect (Either String a)) → Node → Effect (Either String a)
-queryOneAndParse selector parser n = do
-  node <- queryOne selector n
-
-  case node of
-    Nothing -> pure $ Left $ "Could not find node with selector " <> selector
-    Just node -> parser node
 
 parseArtDecoCenter :: Node -> Effect (Either String ArtDecoCenter)
 parseArtDecoCenter n = do
@@ -152,3 +126,29 @@ queryAll :: String -> Node -> Effect (Maybe (NonEmptyList Node))
 queryAll selector n = do
   found <- querySelectorAll (QuerySelector selector) $ toParentNode' n
   liftA1 NEL.fromFoldable $ NL.toArray found
+
+queryAndDetachOne ∷ String -> Node → Effect (Either String DetachedNode)
+queryAndDetachOne selector n = do
+  node <- queryOne selector n
+  case node of
+    Nothing -> pure $ Left $ "Could not find node with selector " <> selector
+    Just node -> do
+      node <- toDetached node
+      pure $ Right node
+
+queryAndDetachMany ∷ String -> Node → Effect (Either String (NonEmptyList DetachedNode))
+queryAndDetachMany selector n = do
+  nodes <- queryAll selector n
+  case nodes of
+    Nothing -> pure $ Left $ "Did not find any node with selector " <> selector
+    Just nodes -> do
+      nodes <- traverse toDetached nodes
+      pure $ Right nodes
+
+queryOneAndParse ∷ ∀ a. String → (Node → Effect (Either String a)) → Node → Effect (Either String a)
+queryOneAndParse selector parser n = do
+  node <- queryOne selector n
+
+  case node of
+    Nothing -> pure $ Left $ "Could not find node with selector " <> selector
+    Just node -> parser node

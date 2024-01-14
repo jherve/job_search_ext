@@ -111,14 +111,10 @@ instance Show ArtDecoPvsEntity where
 
 parseArtDecoPvsEntity :: Node -> Effect (Either String ArtDecoPvsEntity)
 parseArtDecoPvsEntity n = do
-  center <- queryOne ":scope > div.display-flex" n
-  case center of
-    Nothing -> pure $ Left "Could not parse ArtDecoPvsEntity"
-    Just center -> do
-      center <- parseArtDecoCenter center :: Effect (Either String ArtDecoCenter)
-      pure $ case center of
-        Left l -> Left l
-        Right center -> Right $ ArtDecoPvsEntity {side: unit, center: center}
+  center <- queryOneAndParse ":scope > div.display-flex" parseArtDecoCenter n
+  pure $ case center of
+    Left l -> Left l
+    Right center -> Right $ ArtDecoPvsEntity {side: unit, center: center}
 
 data ArtDecoCardElement = ArtDecoCardElement {
   pvs_entity :: ArtDecoPvsEntity
@@ -130,14 +126,10 @@ instance Show ArtDecoCardElement where
 
 parseArtDecoCard :: Node -> Effect (Either String ArtDecoCardElement)
 parseArtDecoCard n = do
-  pvs <- queryOne ":scope div.pvs-entity--padded" n
-  case pvs of
-    Nothing -> pure $  Left "Could not parse entity"
-    Just pvs -> do
-      entity <- parseArtDecoPvsEntity pvs :: Effect (Either String ArtDecoPvsEntity)
-      pure $ case entity of
-        Left l -> Left l
-        Right entity -> Right $ ArtDecoCardElement {pvs_entity: entity}
+  pvs <- queryOneAndParse ":scope div.pvs-entity--padded" parseArtDecoPvsEntity n
+  pure $ case pvs of
+    Left l -> Left l
+    Right entity -> Right $ ArtDecoCardElement {pvs_entity: entity}
 
 toParentNode' :: Node -> ParentNode
 toParentNode' n =

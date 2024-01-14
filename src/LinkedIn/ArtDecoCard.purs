@@ -5,11 +5,12 @@ import Prelude
 import Control.Monad.Maybe.Trans (MaybeT)
 import Data.Either (Either(..), hush)
 import Data.Generic.Rep (class Generic)
+import Data.List.NonEmpty (NonEmptyList)
 import Data.List.NonEmpty as NEL
-import Data.List.Types (NonEmptyList)
+import Data.List.Types (List, NonEmptyList)
 import Data.Maybe (Maybe(..), fromJust)
 import Data.Show.Generic (genericShow)
-import Data.Traversable (traverse)
+import Data.Traversable (sequence, traverse)
 import Debug (trace)
 import Effect (Effect)
 import Effect.Exception (try)
@@ -20,20 +21,29 @@ import Web.DOM.Element as E
 import Web.DOM.NodeList as NL
 import Web.DOM.ParentNode (QuerySelector(..), querySelector, querySelectorAll)
 
-data ArtDecoPvsEntitySubComponents = ArtDecoPvsEntitySubComponents (Maybe (NonEmptyList DetachedNode))
-derive instance Generic ArtDecoPvsEntitySubComponents _
-instance Show ArtDecoPvsEntitySubComponents where
+data ArtDecoPvsEntitySubComponent = ArtDecoPvsEntitySubComponent DetachedNode
+derive instance Generic ArtDecoPvsEntitySubComponent _
+instance Show ArtDecoPvsEntitySubComponent where
   show = genericShow
 
-data ArtDecoCenterContent = ArtDecoCenterContent (Maybe (NonEmptyList DetachedNode))
+parseArtDecoPvsEntitySubComponent ∷ Node → Effect (Either String ArtDecoPvsEntitySubComponent)
+parseArtDecoPvsEntitySubComponent n = do
+  content <- queryAndDetachOne "span[aria-hidden=true]" n
+  pure $ ado
+    c <- content
+  in ArtDecoPvsEntitySubComponent c
+
+data ArtDecoCenterContent = ArtDecoCenterContent (NonEmptyList ArtDecoPvsEntitySubComponent)
 derive instance Generic ArtDecoCenterContent _
 instance Show ArtDecoCenterContent where
   show = genericShow
 
 parseArtDecoCenterContent ∷ Node → Effect (Either String ArtDecoCenterContent)
 parseArtDecoCenterContent n = do
-  list <- queryAndDetachMany ":scope > ul > li" n
-  pure $ Right (ArtDecoCenterContent (hush list))
+  list <- queryManyAndParse ":scope > ul > li" parseArtDecoPvsEntitySubComponent n
+  pure $ ado
+    l <- list
+  in ArtDecoCenterContent l
 
 data ArtDecoCenterHeader = ArtDecoCenterHeader {
   bold :: DetachedNode,
@@ -152,3 +162,12 @@ queryOneAndParse selector parser n = do
   case node of
     Nothing -> pure $ Left $ "Could not find node with selector " <> selector
     Just node -> parser node
+
+queryManyAndParse ∷ ∀ a. String → (Node → Effect (Either String a)) → Node → Effect (Either String (NonEmptyList a))
+queryManyAndParse selector parser n = do
+  nodes <- queryAll selector n
+  case nodes of
+    Nothing -> pure $ Left $ "Did not find any node with selector " <> selector
+    Just nodes -> do
+      nodes <- sequence $ map parser nodes :: Effect (NonEmptyList((Either String a)))
+      pure $ sequence nodes

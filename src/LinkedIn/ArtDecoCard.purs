@@ -3,7 +3,7 @@ module LinkedIn.ArtDecoCard where
 import Prelude
 
 import Control.Monad.Maybe.Trans (MaybeT)
-import Data.Either (Either(..))
+import Data.Either (Either(..), hush)
 import Data.Generic.Rep (class Generic)
 import Data.List.NonEmpty as NEL
 import Data.List.Types (NonEmptyList)
@@ -20,23 +20,23 @@ import Web.DOM.Element as E
 import Web.DOM.NodeList as NL
 import Web.DOM.ParentNode (QuerySelector(..), querySelector, querySelectorAll)
 
-queryAndDetachOne ∷ String -> Node → Effect (Maybe DetachedNode)
+queryAndDetachOne ∷ String -> Node → Effect (Either String DetachedNode)
 queryAndDetachOne selector n = do
   node <- queryOne selector n
   case node of
-    Nothing -> pure $ Nothing
+    Nothing -> pure $ Left $ "Could not find node with selector " <> selector
     Just node -> do
       node <- toDetached node
-      pure $ Just node
+      pure $ Right node
 
-queryAndDetachMany ∷ String -> Node → Effect (Maybe (NonEmptyList DetachedNode))
+queryAndDetachMany ∷ String -> Node → Effect (Either String (NonEmptyList DetachedNode))
 queryAndDetachMany selector n = do
   nodes <- queryAll selector n
   case nodes of
-    Nothing -> pure $ Nothing
+    Nothing -> pure $ Left $ "Did not find any node with selector " <> selector
     Just nodes -> do
       nodes <- traverse toDetached nodes
-      pure $ Just nodes
+      pure $ Right nodes
 
 data ArtDecoPvsEntitySubComponents = ArtDecoPvsEntitySubComponents (Maybe (NonEmptyList DetachedNode))
 derive instance Generic ArtDecoPvsEntitySubComponents _
@@ -51,7 +51,7 @@ instance Show ArtDecoCenterContent where
 parseArtDecoCenterContent ∷ Node → Effect (Either String ArtDecoCenterContent)
 parseArtDecoCenterContent n = do
   list <- queryAndDetachMany ":scope .pvs-entity__sub-components" n
-  pure $ Right (ArtDecoCenterContent list)
+  pure $ Right (ArtDecoCenterContent (hush list))
 
 data ArtDecoCenterHeader = ArtDecoCenterHeader {
   bold :: DetachedNode,
@@ -70,8 +70,8 @@ parseArtDecoCenterHeader n = do
   light <- queryAndDetachMany ":scope span.t-black--light > span[aria-hidden=true]" n
 
   pure $ case bold of
-    Nothing -> Left "Could not parse ArtDecoCenterHeader"
-    Just bold -> Right (ArtDecoCenterHeader {bold: bold, normal: normal, light: light})
+    Left l -> Left l
+    Right bold -> Right (ArtDecoCenterHeader {bold: bold, normal: hush normal, light: hush light})
 
 data ArtDecoCenter = ArtDecoCenter {
   header :: ArtDecoCenterHeader,

@@ -9,6 +9,7 @@ import Data.List.NonEmpty as NEL
 import Data.List.Types (NonEmptyList)
 import Data.Maybe (Maybe(..), fromJust)
 import Data.Show.Generic (genericShow)
+import Data.Traversable (traverse)
 import Debug (trace)
 import Effect (Effect)
 import Effect.Exception (try)
@@ -19,10 +20,28 @@ import Web.DOM.Element as E
 import Web.DOM.NodeList as NL
 import Web.DOM.ParentNode (QuerySelector(..), querySelector, querySelectorAll)
 
+queryAndDetachOne ∷ String -> Node → Effect (Maybe DetachedNode)
+queryAndDetachOne selector n = do
+  node <- queryOne selector n
+  case node of
+    Nothing -> pure $ Nothing
+    Just node -> do
+      node <- toDetached node
+      pure $ Just node
+
+queryAndDetachMany ∷ String -> Node → Effect (Maybe (NonEmptyList DetachedNode))
+queryAndDetachMany selector n = do
+  nodes <- queryAll selector n
+  case nodes of
+    Nothing -> pure $ Nothing
+    Just nodes -> do
+      nodes <- traverse toDetached nodes
+      pure $ Just nodes
+
 data ArtDecoCenterHeader = ArtDecoCenterHeader {
   bold :: DetachedNode,
-  normal :: Unit,
-  light :: Array Unit
+  normal :: Maybe DetachedNode,
+  light :: Maybe (NonEmptyList DetachedNode)
 }
 
 derive instance Generic ArtDecoCenterHeader _
@@ -31,12 +50,13 @@ instance Show ArtDecoCenterHeader where
 
 parseArtDecoCenterHeader :: Node -> Effect (Either String ArtDecoCenterHeader)
 parseArtDecoCenterHeader n = do
-  bold <- queryOne ":scope div.t-bold > span[aria-hidden=true]" n
-  case bold of
-    Nothing -> pure $ Left "Could not parse ArtDecoCenterHeader"
-    Just bold -> do
-      bold <- toDetached bold
-      pure $ Right (ArtDecoCenterHeader {bold: bold, normal: unit, light: [unit]})
+  bold <- queryAndDetachOne ":scope div.t-bold > span[aria-hidden=true]" n
+  normal <- queryAndDetachOne ":scope span.t-normal:not(t-black--light) > span[aria-hidden=true]" n
+  light <- queryAndDetachMany ":scope span.t-black--light > span[aria-hidden=true]" n
+
+  pure $ case bold of
+    Nothing -> Left "Could not parse ArtDecoCenterHeader"
+    Just bold -> Right (ArtDecoCenterHeader {bold: bold, normal: normal, light: light})
 
 data ArtDecoCenter = ArtDecoCenter {
   header :: ArtDecoCenterHeader,

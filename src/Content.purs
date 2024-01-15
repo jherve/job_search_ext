@@ -4,6 +4,7 @@ import LinkedIn
 import Prelude
 
 import Browser.DOM (getBrowserDom)
+import Data.Either (Either(..))
 import Data.List.NonEmpty (NonEmptyList)
 import Data.List.NonEmpty as NEL
 import Data.Maybe (Maybe(..))
@@ -11,6 +12,7 @@ import Effect (Effect)
 import Effect.Class.Console (logShow)
 import Effect.Console (log)
 import LinkedIn.ArtDecoCard (parseArtDecoCard)
+import LinkedIn.Profile.WorkExperience (fromUI)
 import Yoga.Tree (Tree, showTree)
 
 main :: Effect Unit
@@ -33,6 +35,9 @@ main = do
     Just l -> do
       parsed <- (\(LinkedInUIElement _ n) -> parseArtDecoCard n) $ NEL.head l
       logShow parsed
+      case parsed of
+        Left l -> logShow l
+        Right p -> logShow $ fromUI p
 
 
 maybeShowTree ∷ Maybe (NonEmptyList LinkedInUIElement) → Effect String

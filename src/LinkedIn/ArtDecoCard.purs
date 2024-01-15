@@ -8,7 +8,7 @@ import Data.List.NonEmpty (NonEmptyList)
 import Data.List.NonEmpty as NEL
 import Data.Maybe (Maybe(..), fromJust)
 import Data.Show.Generic (genericShow)
-import Data.Traversable (sequence, traverse)
+import Data.Traversable (sequence)
 import Effect (Effect)
 import LinkedIn (DetachedNode, toDetached)
 import Partial.Unsafe (unsafePartial)
@@ -143,23 +143,16 @@ queryAll selector n = do
   found <- querySelectorAll (QuerySelector selector) $ toParentNode' n
   liftA1 NEL.fromFoldable $ NL.toArray found
 
+parseDetachedNode :: Parser DetachedNode
+parseDetachedNode node = do
+  node' <- toDetached node
+  pure $ Right node'
+
 queryAndDetachOne ∷ String -> Parser DetachedNode
-queryAndDetachOne selector n = do
-  selected <- queryOne selector n
-  case selected of
-    Nothing -> pure $ Left $ NodeNotFoundError selector
-    Just node -> do
-      node' <- toDetached node
-      pure $ Right node'
+queryAndDetachOne selector n = queryOneAndParse selector parseDetachedNode n
 
 queryAndDetachMany ∷ String -> Parser (NonEmptyList DetachedNode)
-queryAndDetachMany selector n = do
-  selected <- queryAll selector n
-  case selected of
-    Nothing -> pure $ Left $ NodeListNotFoundError selector
-    Just nodes -> do
-      nodes' <- traverse toDetached nodes
-      pure $ Right nodes'
+queryAndDetachMany selector n = queryManyAndParse selector parseDetachedNode n
 
 queryOneAndParse ∷ ∀ a. String → Parser a → Parser a
 queryOneAndParse selector parser n = do

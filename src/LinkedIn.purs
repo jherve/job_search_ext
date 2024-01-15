@@ -14,11 +14,9 @@ import Data.String (Pattern(..), joinWith)
 import Data.String as S
 import Data.String.CodeUnits (fromCharArray, toCharArray)
 import Data.Traversable (sequence, traverse)
-import Data.Tuple (Tuple(..))
 import Effect (Effect)
 import Partial.Unsafe (unsafePartial)
-import Web.DOM (Document, Element, Node)
-import Web.DOM.Document (origin)
+import Web.DOM (Document, Node)
 import Web.DOM.Document as D
 import Web.DOM.Element as E
 import Web.DOM.Node (nodeName, nodeType, textContent)
@@ -26,7 +24,6 @@ import Web.DOM.Node as N
 import Web.DOM.NodeList as NL
 import Web.DOM.NodeType (NodeType(..))
 import Web.DOM.ParentNode (QuerySelector(..), querySelector, querySelectorAll)
-import Yoga.Tree.Zipper as Z
 
 -- A light abstraction layer above the DOM manipulation API
 

@@ -1,21 +1,17 @@
 module ExampleWebExt.Content where
 
-import Data.List.NonEmpty
 import LinkedIn
 import Prelude
 
 import Browser.DOM (getBrowserDom)
-import Data.List ((:))
-import Data.List as L
+import Data.List.NonEmpty (NonEmptyList)
 import Data.List.NonEmpty as NEL
 import Data.Maybe (Maybe(..))
-import Data.NonEmpty (NonEmpty, (:|))
 import Effect (Effect)
 import Effect.Class.Console (logShow)
 import Effect.Console (log)
 import LinkedIn.ArtDecoCard (parseArtDecoCard)
-import Yoga.Tree (showTree)
-import Yoga.Tree.Zipper as Z
+import Yoga.Tree (Tree, showTree)
 
 main :: Effect Unit
 main = do
@@ -42,7 +38,7 @@ main = do
 maybeShowTree ∷ Maybe (NonEmptyList LinkedInUIElement) → Effect String
 maybeShowTree Nothing = pure "nope"
 maybeShowTree (Just nel) = do
-  tree <- asTree $ head nel
+  tree <- asTree $ NEL.head nel
   pure $ showTree tree
 
 maybeShowPruned ∷ String → Maybe (NonEmptyList LinkedInUIElement) → Effect String
@@ -51,8 +47,9 @@ maybeShowPruned errorMsg els = do
   case trees of
     Nothing -> pure errorMsg
     Just ts -> do
-      pure $ showTree $ head ts
+      pure $ showTree $ NEL.head ts
       --pure $ showMaybeTree $ zipperTest $ head ts
 
+showMaybeTree ∷ ∀ (a ∷ Type). Show a ⇒ Maybe (Tree a) → String
 showMaybeTree Nothing = "No tree"
 showMaybeTree (Just t) = showTree t

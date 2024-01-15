@@ -2,20 +2,17 @@ module LinkedIn.ArtDecoCard where
 
 import Prelude
 
-import Control.Monad.Maybe.Trans (MaybeT)
 import Data.Either (Either(..), hush)
 import Data.Generic.Rep (class Generic)
 import Data.List.NonEmpty (NonEmptyList)
 import Data.List.NonEmpty as NEL
-import Data.List.Types (List, NonEmptyList)
 import Data.Maybe (Maybe(..), fromJust)
 import Data.Show.Generic (genericShow)
 import Data.Traversable (sequence, traverse)
 import Effect (Effect)
-import Effect.Exception (try)
 import LinkedIn (DetachedNode, toDetached)
 import Partial.Unsafe (unsafePartial)
-import Web.DOM (Node, NodeList, ParentNode)
+import Web.DOM (Node, ParentNode)
 import Web.DOM.Element as E
 import Web.DOM.NodeList as NL
 import Web.DOM.ParentNode (QuerySelector(..), querySelector, querySelectorAll)
@@ -148,35 +145,35 @@ queryAll selector n = do
 
 queryAndDetachOne ∷ String -> Parser DetachedNode
 queryAndDetachOne selector n = do
-  node <- queryOne selector n
-  case node of
+  selected <- queryOne selector n
+  case selected of
     Nothing -> pure $ Left $ NodeNotFoundError selector
     Just node -> do
-      node <- toDetached node
-      pure $ Right node
+      node' <- toDetached node
+      pure $ Right node'
 
 queryAndDetachMany ∷ String -> Parser (NonEmptyList DetachedNode)
 queryAndDetachMany selector n = do
-  nodes <- queryAll selector n
-  case nodes of
+  selected <- queryAll selector n
+  case selected of
     Nothing -> pure $ Left $ NodeListNotFoundError selector
     Just nodes -> do
-      nodes <- traverse toDetached nodes
-      pure $ Right nodes
+      nodes' <- traverse toDetached nodes
+      pure $ Right nodes'
 
 queryOneAndParse ∷ ∀ a. String → Parser a → Parser a
 queryOneAndParse selector parser n = do
-  node <- queryOne selector n
+  selected <- queryOne selector n
 
-  case node of
+  case selected of
     Nothing -> pure $ Left $ NodeNotFoundError selector
     Just node -> parser node
 
 queryManyAndParse ∷ ∀ a. String → Parser a → Parser (NonEmptyList a)
 queryManyAndParse selector parser n = do
-  nodes <- queryAll selector n
-  case nodes of
+  selected <- queryAll selector n
+  case selected of
     Nothing -> pure $ Left $ NodeListNotFoundError selector
     Just nodes -> do
-      nodes <- sequence $ map parser nodes :: Effect (NonEmptyList((Either ParseError a)))
-      pure $ sequence nodes
+      nodes' <- sequence $ map parser nodes :: Effect (NonEmptyList((Either ParseError a)))
+      pure $ sequence nodes'

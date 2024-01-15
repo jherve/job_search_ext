@@ -11,17 +11,24 @@ import Data.List.Types (List, NonEmptyList)
 import Data.Maybe (Maybe(..), fromJust)
 import Data.Show.Generic (genericShow)
 import Data.Traversable (sequence, traverse)
-import Debug (trace)
 import Effect (Effect)
 import Effect.Exception (try)
 import LinkedIn (DetachedNode, toDetached)
 import Partial.Unsafe (unsafePartial)
-import Web.DOM (Node, ParentNode)
+import Web.DOM (Node, NodeList, ParentNode)
 import Web.DOM.Element as E
 import Web.DOM.NodeList as NL
 import Web.DOM.ParentNode (QuerySelector(..), querySelector, querySelectorAll)
 
-type Parser a = Node → Effect (Either String a)
+data ParseError =
+  NodeNotFoundError String
+  | NodeListNotFoundError String
+
+derive instance Generic ParseError _
+instance Show ParseError where
+  show = genericShow
+
+type Parser a = Node → Effect (Either ParseError a)
 
 data ArtDecoPvsEntitySubComponent = ArtDecoPvsEntitySubComponent DetachedNode
 derive instance Generic ArtDecoPvsEntitySubComponent _
@@ -143,7 +150,7 @@ queryAndDetachOne ∷ String -> Parser DetachedNode
 queryAndDetachOne selector n = do
   node <- queryOne selector n
   case node of
-    Nothing -> pure $ Left $ "Could not find node with selector " <> selector
+    Nothing -> pure $ Left $ NodeNotFoundError selector
     Just node -> do
       node <- toDetached node
       pure $ Right node
@@ -152,7 +159,7 @@ queryAndDetachMany ∷ String -> Parser (NonEmptyList DetachedNode)
 queryAndDetachMany selector n = do
   nodes <- queryAll selector n
   case nodes of
-    Nothing -> pure $ Left $ "Did not find any node with selector " <> selector
+    Nothing -> pure $ Left $ NodeListNotFoundError selector
     Just nodes -> do
       nodes <- traverse toDetached nodes
       pure $ Right nodes
@@ -162,14 +169,14 @@ queryOneAndParse selector parser n = do
   node <- queryOne selector n
 
   case node of
-    Nothing -> pure $ Left $ "Could not find node with selector " <> selector
+    Nothing -> pure $ Left $ NodeNotFoundError selector
     Just node -> parser node
 
 queryManyAndParse ∷ ∀ a. String → Parser a → Parser (NonEmptyList a)
 queryManyAndParse selector parser n = do
   nodes <- queryAll selector n
   case nodes of
-    Nothing -> pure $ Left $ "Did not find any node with selector " <> selector
+    Nothing -> pure $ Left $ NodeListNotFoundError selector
     Just nodes -> do
-      nodes <- sequence $ map parser nodes :: Effect (NonEmptyList((Either String a)))
+      nodes <- sequence $ map parser nodes :: Effect (NonEmptyList((Either ParseError a)))
       pure $ sequence nodes

@@ -22,6 +22,7 @@ data ParseError =
   | NodeListNotFoundError String
 
 derive instance Generic ParseError _
+derive instance Eq ParseError
 instance Show ParseError where
   show = genericShow
 
@@ -29,6 +30,7 @@ type Parser a = Node → Effect (Either ParseError a)
 
 data ArtDecoPvsEntitySubComponent = ArtDecoPvsEntitySubComponent DetachedNode
 derive instance Generic ArtDecoPvsEntitySubComponent _
+derive instance Eq ArtDecoPvsEntitySubComponent
 instance Show ArtDecoPvsEntitySubComponent where
   show = genericShow
 
@@ -41,6 +43,7 @@ parseArtDecoPvsEntitySubComponent n = do
 
 data ArtDecoCenterContent = ArtDecoCenterContent (NonEmptyList ArtDecoPvsEntitySubComponent)
 derive instance Generic ArtDecoCenterContent _
+derive instance Eq ArtDecoCenterContent
 instance Show ArtDecoCenterContent where
   show = genericShow
 
@@ -58,6 +61,7 @@ data ArtDecoCenterHeader = ArtDecoCenterHeader {
 }
 
 derive instance Generic ArtDecoCenterHeader _
+derive instance Eq ArtDecoCenterHeader
 instance Show ArtDecoCenterHeader where
   show = genericShow
 
@@ -77,6 +81,7 @@ data ArtDecoCenter = ArtDecoCenter {
 }
 
 derive instance Generic ArtDecoCenter _
+derive instance Eq ArtDecoCenter
 instance Show ArtDecoCenter where
   show = genericShow
 
@@ -96,6 +101,7 @@ data ArtDecoPvsEntity = ArtDecoPvsEntity {
 }
 
 derive instance Generic ArtDecoPvsEntity _
+derive instance Eq ArtDecoPvsEntity
 instance Show ArtDecoPvsEntity where
   show = genericShow
 
@@ -112,6 +118,7 @@ data ArtDecoCardElement = ArtDecoCardElement {
 }
 
 derive instance Generic ArtDecoCardElement _
+derive instance Eq ArtDecoCardElement
 instance Show ArtDecoCardElement where
   show = genericShow
 

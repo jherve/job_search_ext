@@ -5,11 +5,13 @@ import Yoga.Tree
 
 import Control.Comonad.Cofree (head, tail)
 import Data.Array as A
+import Data.Generic.Rep (class Generic)
 import Data.List (List(..), (:))
 import Data.List as L
 import Data.List.NonEmpty as NEL
 import Data.List.Types (NonEmptyList)
 import Data.Maybe (Maybe(..), fromJust)
+import Data.Show.Generic (genericShow)
 import Data.String (Pattern(..), joinWith)
 import Data.String as S
 import Data.String.CodeUnits (fromCharArray, toCharArray)
@@ -77,15 +79,11 @@ data DetachedNode =
   | DetachedComment String
   | DetachedText String
 
+derive instance Generic DetachedNode _
+derive instance Eq DetachedNode
 instance Show DetachedNode where
-  show (DetachedElement n) = "DetachedElement(" <> n.tag <> id' <> classes' <> ")"
-    where
-      id' = case n.id of
-        Nothing -> ""
-        Just i -> "#" <> i
-      classes' = joinWith " " $ A.fromFoldable (map (\c -> "." <> c) n.classes)
-  show (DetachedComment c) = "DetachedComment(" <> c <> ")"
-  show (DetachedText t) = "DetachedText(" <> t <> ")"
+  show = genericShow
+
 
 asTree :: LinkedInUIElement -> Effect (Tree DetachedNode)
 asTree (LinkedInUIElement _ n) = asTree' n

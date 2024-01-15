@@ -83,7 +83,7 @@ instance Show ArtDecoCenter where
 parseArtDecoCenter :: Parser ArtDecoCenter
 parseArtDecoCenter n = do
   header <- queryOneAndParse ":scope > div" parseArtDecoCenterHeader n
-  content <- queryOneAndParse ":scope > div ~ div" parseArtDecoCenterContent n
+  content <- queryOneAndParse ":scope > div.pvs-entity__sub-components" parseArtDecoCenterContent n
 
   pure $ ado
     h <- header

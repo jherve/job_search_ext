@@ -11,11 +11,62 @@ import LinkedIn (DetachedNode)
 import LinkedIn.Types (Parser)
 import LinkedIn.Utils (queryAndDetachMany, queryAndDetachOne, queryManyAndParse, queryOneAndParse)
 
+
+data ArtDecoCardElement = ArtDecoCardElement {
+  pvs_entity :: ArtDecoPvsEntity
+}
+
+data ArtDecoPvsEntity = ArtDecoPvsEntity {
+  side :: Unit,
+  center :: ArtDecoCenter
+}
+
+data ArtDecoCenter = ArtDecoCenter {
+  header :: ArtDecoCenterHeader,
+  content :: ArtDecoCenterContent
+}
+
+data ArtDecoCenterHeader = ArtDecoCenterHeader {
+  bold :: DetachedNode,
+  normal :: Maybe DetachedNode,
+  light :: Maybe (NonEmptyList DetachedNode)
+}
+
+data ArtDecoCenterContent = ArtDecoCenterContent (NonEmptyList ArtDecoPvsEntitySubComponent)
+
 data ArtDecoPvsEntitySubComponent = ArtDecoPvsEntitySubComponent DetachedNode
+
+
 derive instance Generic ArtDecoPvsEntitySubComponent _
 derive instance Eq ArtDecoPvsEntitySubComponent
 instance Show ArtDecoPvsEntitySubComponent where
   show = genericShow
+
+derive instance Generic ArtDecoCenterContent _
+derive instance Eq ArtDecoCenterContent
+instance Show ArtDecoCenterContent where
+  show = genericShow
+
+derive instance Generic ArtDecoCenterHeader _
+derive instance Eq ArtDecoCenterHeader
+instance Show ArtDecoCenterHeader where
+  show = genericShow
+
+derive instance Generic ArtDecoCenter _
+derive instance Eq ArtDecoCenter
+instance Show ArtDecoCenter where
+  show = genericShow
+
+derive instance Generic ArtDecoPvsEntity _
+derive instance Eq ArtDecoPvsEntity
+instance Show ArtDecoPvsEntity where
+  show = genericShow
+
+derive instance Generic ArtDecoCardElement _
+derive instance Eq ArtDecoCardElement
+instance Show ArtDecoCardElement where
+  show = genericShow
+
 
 parseArtDecoPvsEntitySubComponent ∷ Parser ArtDecoPvsEntitySubComponent
 parseArtDecoPvsEntitySubComponent n = do
@@ -24,29 +75,12 @@ parseArtDecoPvsEntitySubComponent n = do
     c <- content
   in ArtDecoPvsEntitySubComponent c
 
-data ArtDecoCenterContent = ArtDecoCenterContent (NonEmptyList ArtDecoPvsEntitySubComponent)
-derive instance Generic ArtDecoCenterContent _
-derive instance Eq ArtDecoCenterContent
-instance Show ArtDecoCenterContent where
-  show = genericShow
-
 parseArtDecoCenterContent ∷ Parser ArtDecoCenterContent
 parseArtDecoCenterContent n = do
   list <- queryManyAndParse ":scope > ul > li" parseArtDecoPvsEntitySubComponent n
   pure $ ado
     l <- list
   in ArtDecoCenterContent l
-
-data ArtDecoCenterHeader = ArtDecoCenterHeader {
-  bold :: DetachedNode,
-  normal :: Maybe DetachedNode,
-  light :: Maybe (NonEmptyList DetachedNode)
-}
-
-derive instance Generic ArtDecoCenterHeader _
-derive instance Eq ArtDecoCenterHeader
-instance Show ArtDecoCenterHeader where
-  show = genericShow
 
 parseArtDecoCenterHeader :: Parser ArtDecoCenterHeader
 parseArtDecoCenterHeader n = do
@@ -58,16 +92,6 @@ parseArtDecoCenterHeader n = do
     b <- bold
   in ArtDecoCenterHeader {bold: b, normal: hush normal, light: hush light}
 
-data ArtDecoCenter = ArtDecoCenter {
-  header :: ArtDecoCenterHeader,
-  content :: ArtDecoCenterContent
-}
-
-derive instance Generic ArtDecoCenter _
-derive instance Eq ArtDecoCenter
-instance Show ArtDecoCenter where
-  show = genericShow
-
 parseArtDecoCenter :: Parser ArtDecoCenter
 parseArtDecoCenter n = do
   header <- queryOneAndParse ":scope > div" parseArtDecoCenterHeader n
@@ -78,16 +102,6 @@ parseArtDecoCenter n = do
     c <- content
   in ArtDecoCenter {header: h, content: c}
 
-data ArtDecoPvsEntity = ArtDecoPvsEntity {
-  side :: Unit,
-  center :: ArtDecoCenter
-}
-
-derive instance Generic ArtDecoPvsEntity _
-derive instance Eq ArtDecoPvsEntity
-instance Show ArtDecoPvsEntity where
-  show = genericShow
-
 parseArtDecoPvsEntity :: Parser ArtDecoPvsEntity
 parseArtDecoPvsEntity n = do
   center <- queryOneAndParse ":scope > div.display-flex" parseArtDecoCenter n
@@ -95,15 +109,6 @@ parseArtDecoPvsEntity n = do
   pure $ ado
     c <- center
   in ArtDecoPvsEntity {side: unit, center: c}
-
-data ArtDecoCardElement = ArtDecoCardElement {
-  pvs_entity :: ArtDecoPvsEntity
-}
-
-derive instance Generic ArtDecoCardElement _
-derive instance Eq ArtDecoCardElement
-instance Show ArtDecoCardElement where
-  show = genericShow
 
 parseArtDecoCard :: Parser ArtDecoCardElement
 parseArtDecoCard n = do

@@ -17,6 +17,7 @@ import Parsing (ParseError, runParser)
 data WorkExperience = WorkExperience {
   position :: String,
   company :: Maybe String,
+  contractType :: Maybe String,
   timeSpan :: Maybe TimeSpan,
   duration :: Maybe Duration,
   description :: Maybe String
@@ -44,6 +45,7 @@ fromUI (ArtDecoCardElement {
     WorkExperience {
     position,
     company: hush $ extractCompany normal',
+    contractType: hush $ extractContractType normal',
     timeSpan: hush $ extractTimeSpan light',
     duration: hush $ extractDuration light',
     description: hush $ extractDescription content'
@@ -68,6 +70,11 @@ extractCompany ∷ Maybe (Either ParseError UIElement) → Either String String
 extractCompany normal = case normal of
   Just (Right (UIPlainText str)) -> Right str
   Just (Right (UIDotSeparated (UIPlainText str) _)) -> Right str
+  _ -> Left "No company"
+
+extractContractType ∷ Maybe (Either ParseError UIElement) → Either String String
+extractContractType normal = case normal of
+  Just (Right (UIDotSeparated _ (UIPlainText str))) -> Right str
   _ -> Left "No company"
 
 extractTimeSpan ∷ Maybe (NonEmptyList (Either ParseError UIElement)) → Either String TimeSpan

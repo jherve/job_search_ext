@@ -42,5 +42,5 @@ data UIElement =
 
 derive instance Generic UIElement _
 instance Show UIElement where
-  show (UIDotSeparated ui1 ui2) = "(UIDotSeparated " <> genericShow ui1 <> genericShow ui2 <> ")"
+  show (UIDotSeparated ui1 ui2) = "(UIDotSeparated " <> show ui1 <> show ui2 <> ")"
   show u = genericShow u

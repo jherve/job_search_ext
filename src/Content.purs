@@ -30,15 +30,15 @@ main = do
   maybeShowPruned "no tabs found" artDecoTabs >>= log
   maybeShowPruned "no top card found" jobsUnifiedTopCard >>= log
 
-  case artDecoCards of 
+  case artDecoCards of
     Nothing -> log "nothing"
     Just l -> do
       parsed <- (\(LinkedInUIElement _ n) -> parseArtDecoCard n) $ NEL.head l
       logShow parsed
       case parsed of
         Left l -> logShow l
-        Right p -> logShow $ fromUI p
-
+        Right p -> do
+          logShow $ fromUI p
 
 maybeShowTree ∷ Maybe (NonEmptyList LinkedInUIElement) → Effect String
 maybeShowTree Nothing = pure "nope"

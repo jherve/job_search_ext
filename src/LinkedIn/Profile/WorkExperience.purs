@@ -5,6 +5,8 @@ import Prelude
 
 import Data.Either (Either(..), hush, note)
 import Data.Generic.Rep (class Generic)
+import Data.List (List(..))
+import Data.List as L
 import Data.List.NonEmpty (NonEmptyList)
 import Data.List.NonEmpty as NEL
 import Data.Maybe (Maybe(..))
@@ -52,8 +54,9 @@ fromUI (ArtDecoCardElement {
   } where
   bold' = toUIElement bold
 
-  content' :: NonEmptyList (Either ParseError UIElement)
-  content' = map (\(ArtDecoPvsEntitySubComponent c) -> toUIElement c) subComponents
+  content' :: List (Either ParseError UIElement)
+  content' = map toUIElement subC
+    where subC = NEL.catMaybes $ map (\(ArtDecoPvsEntitySubComponent c) -> c) subComponents :: List (DetachedNode)
 
   normal' :: Maybe (Either ParseError UIElement)
   normal' = toUIElement <$> normal
@@ -93,9 +96,10 @@ extractDuration light = case light of
     getDuration (Right (UIDotSeparated _ (UIDuration d))) = Just d
     getDuration _ = Nothing
 
-extractDescription ∷ NonEmptyList (Either ParseError UIElement) → Either String String
-extractDescription  content = case NEL.head content of
-    Right (UIPlainText d) -> Right d
+extractDescription ∷ List (Either ParseError UIElement) → Either String String
+extractDescription Nil = Left "no description"
+extractDescription cs = case L.head cs of
+    Just (Right (UIPlainText d)) -> Right d
     _ -> Left "No description"
 
 toUIElement ∷ DetachedNode → Either ParseError UIElement

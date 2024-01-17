@@ -2,7 +2,7 @@ module LinkedIn.ArtDecoCard where
 
 import Prelude
 
-import Data.Either (hush)
+import Data.Either (Either(..), hush)
 import Data.Generic.Rep (class Generic)
 import Data.List.NonEmpty (NonEmptyList)
 import Data.Maybe (Maybe)
@@ -34,7 +34,7 @@ data ArtDecoCenterHeader = ArtDecoCenterHeader {
 
 data ArtDecoCenterContent = ArtDecoCenterContent (NonEmptyList ArtDecoPvsEntitySubComponent)
 
-data ArtDecoPvsEntitySubComponent = ArtDecoPvsEntitySubComponent DetachedNode
+data ArtDecoPvsEntitySubComponent = ArtDecoPvsEntitySubComponent (Maybe DetachedNode)
 
 
 derive instance Generic ArtDecoPvsEntitySubComponent _
@@ -71,9 +71,7 @@ instance Show ArtDecoCardElement where
 parseArtDecoPvsEntitySubComponent ∷ Parser ArtDecoPvsEntitySubComponent
 parseArtDecoPvsEntitySubComponent n = do
   content <- queryAndDetachOne "span[aria-hidden=true]" n
-  pure $ ado
-    c <- content
-  in ArtDecoPvsEntitySubComponent c
+  pure $ Right $ ArtDecoPvsEntitySubComponent $ hush content
 
 parseArtDecoCenterContent ∷ Parser ArtDecoCenterContent
 parseArtDecoCenterContent n = do

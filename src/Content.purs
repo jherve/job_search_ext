@@ -12,7 +12,10 @@ import Effect (Effect)
 import Effect.Class.Console (logShow)
 import Effect.Console (log)
 import LinkedIn.ArtDecoCard (parseArtDecoCard)
-import LinkedIn.Profile.WorkExperience (fromUI)
+import LinkedIn.ArtDecoTab (parseArtDecoTab)
+import LinkedIn.Profile.Project as PP
+import LinkedIn.Profile.WorkExperience as PWE
+import LinkedIn.Profile.Skill as PS
 import Yoga.Tree (Tree, showTree)
 
 main :: Effect Unit
@@ -38,7 +41,17 @@ main = do
       case parsed of
         Left l -> logShow l
         Right p -> do
-          logShow $ fromUI p
+          logShow $ PWE.fromUI p
+          logShow $ PP.fromUI p
+  case artDecoTabs of
+    Nothing -> log "nothing"
+    Just l -> do
+      parsed <- (\(LinkedInUIElement _ n) -> parseArtDecoTab n) $ NEL.head l
+      logShow parsed
+      case parsed of
+        Left l -> logShow l
+        Right p -> do
+          logShow $ PS.fromUI p
 
 maybeShowTree ∷ Maybe (NonEmptyList LinkedInUIElement) → Effect String
 maybeShowTree Nothing = pure "nope"

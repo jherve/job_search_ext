@@ -46,8 +46,8 @@ fromUI (ArtDecoCardElement {
   in
     WorkExperience {
     position,
-    company: hush $ extractCompany normal',
-    contractType: hush $ extractContractType normal',
+    company: maybeExtractFromMaybe extractCompany normal',
+    contractType: maybeExtractFromMaybe extractContractType normal',
     timeSpan: hush $ extractTimeSpan light',
     duration: hush $ extractDuration light',
     description: hush $ extractDescription content'
@@ -69,15 +69,21 @@ extractPosition bold = case bold of
   Right (UIPlainText str) -> Right str
   _ -> Left "No position"
 
-extractCompany ∷ Maybe (Either ParseError UIElement) → Either String String
-extractCompany normal = case normal of
-  Just (Right (UIPlainText str)) -> Right str
-  Just (Right (UIDotSeparated (UIPlainText str) _)) -> Right str
+maybeExtractFromMaybe ∷
+  ∀ a. (Either ParseError UIElement → Either String a)
+  → Maybe (Either ParseError UIElement)
+  → Maybe a
+maybeExtractFromMaybe extract maybeNode = hush $ (extract <=< note "silent fail") maybeNode
+
+extractCompany ∷ Either ParseError UIElement → Either String String
+extractCompany = case _ of
+  Right (UIPlainText str) -> Right str
+  Right (UIDotSeparated (UIPlainText str) _) -> Right str
   _ -> Left "No company"
 
-extractContractType ∷ Maybe (Either ParseError UIElement) → Either String String
-extractContractType normal = case normal of
-  Just (Right (UIDotSeparated _ (UIPlainText str))) -> Right str
+extractContractType ∷ Either ParseError UIElement → Either String String
+extractContractType = case _ of
+  Right (UIDotSeparated _ (UIPlainText str)) -> Right str
   _ -> Left "No company"
 
 extractTimeSpan ∷ Maybe (NonEmptyList (Either ParseError UIElement)) → Either String TimeSpan

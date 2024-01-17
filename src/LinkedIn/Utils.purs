@@ -7,7 +7,6 @@ import Data.List.NonEmpty (NonEmptyList)
 import Data.List.NonEmpty as NEL
 import Data.Maybe (Maybe(..), fromJust)
 import Data.Traversable (sequence)
-import Debug (trace)
 import Effect (Effect)
 import LinkedIn (DetachedNode, toDetached)
 import LinkedIn.Types (ParseError(..), Parser)
@@ -27,7 +26,7 @@ toParentNode' n =
 
 queryOne :: String -> Node -> Effect (Maybe Node)
 queryOne selector n = do
-  found <- trace selector \_ -> querySelector (QuerySelector selector) $ toParentNode' n
+  found <- querySelector (QuerySelector selector) $ toParentNode' n
   pure case found of
     Nothing -> Nothing
     Just el -> Just $ E.toNode el

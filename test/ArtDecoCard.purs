@@ -4,18 +4,23 @@ import LinkedIn.ArtDeco
 import LinkedIn.ArtDecoCard
 import Prelude
 
+import Data.Date (Month(..))
 import Data.Either (Either(..))
+import Data.List (List(..), (:))
 import Data.List.NonEmpty (NonEmptyList(..))
 import Data.List.NonEmpty as NEL
-import Data.List (List(..), (:))
 import Data.Maybe (Maybe(..), isJust)
 import Data.NonEmpty (NonEmpty(..))
 import Effect (Effect)
 import LinkedIn (DetachedNode(..), LinkedInUIElement(..), getArtDecoCards)
+import LinkedIn.Profile.WorkExperience (WorkExperience(..))
+import LinkedIn.Profile.WorkExperience as PWE
 import LinkedIn.Types (ParseError)
+import LinkedIn.UIElements.Types (Duration(..), TimeSpan(..))
 import Node.JsDom (jsDomFromFile)
 import Partial.Unsafe (unsafePartial)
 import Test.Assert (assert, assertEqual)
+import Test.Utils (toMonthYear')
 
 testArtDecoCards :: Effect Unit
 testArtDecoCards = do
@@ -68,6 +73,22 @@ testArtDecoCards = do
       }
     )
   }
+
+  case headCard of
+    Left _ -> pure unit
+    Right card -> do
+      assertEqual {
+        actual: PWE.fromUI card,
+        expected:
+          Right (WorkExperience {
+            company: Just "DeepLearning.AI",
+            contractType: Nothing,
+            description: Just "DeepLearning.AI provides\ntechnical training on Generative AI, Machine Learning, Deep Learning,\nand other topics. We also offer a widely read newsletter, The Batch\n(thebatch.ai), that covers what matters in AI right now. Our courses are often created with industry-leading AI companies (AWS,\nGoogle, OpenAI, etc.), and we offer both short courses that can be\ncompleted in an hour, and longer courses and specializations hosted on\nCoursera that give you a solid foundation in some aspect of AI. These\ncourses are designed to offer hands-on practice with AI technologies,\nand you will gain practical, job-ready skills. Whether you are just starting out in AI or seeking to further an existing\ncareer, come see if we can help, at http://deeplearning.ai!",
+            duration: Just (YearsMonth 6 7),
+            position: "Founder",
+            timeSpan: Just (TimeSpanToToday (toMonthYear' June 2017))
+          })
+      }
 
 parseHeadCard ∷ Partial => Maybe (NonEmptyList LinkedInUIElement) → Effect (Either ParseError ArtDecoCardElement)
 parseHeadCard (Just l) = do

@@ -28,6 +28,7 @@ data WorkExperience = WorkExperience {
 }
 
 derive instance Generic WorkExperience _
+derive instance Eq WorkExperience
 instance Show WorkExperience where
   show = genericShow
 

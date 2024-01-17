@@ -3,10 +3,10 @@ module LinkedIn.Profile.WorkExperience where
 import LinkedIn.UIElements.Parser
 import Prelude
 
-import Data.Either (Either(..), hush, note)
+import Data.Either (Either, hush, note)
 import Data.Foldable (class Foldable, findMap)
 import Data.Generic.Rep (class Generic)
-import Data.List (List(..))
+import Data.List (List)
 import Data.List as L
 import Data.List.NonEmpty (NonEmptyList)
 import Data.List.NonEmpty as NEL
@@ -35,7 +35,7 @@ fromUI (ArtDecoCardElement {
   pvs_entity: ArtDecoPvsEntity {
     center: ArtDecoCenter {
       header: ArtDecoCenterHeader {
-        bold: bold,
+        bold,
         normal,
         light
       },
@@ -43,7 +43,7 @@ fromUI (ArtDecoCardElement {
     }
   }
 }) = ado
-    position <- extractPosition bold'
+    position <- note "No position found" $ findMap extractPosition bold'
   in
     WorkExperience {
     position,
@@ -51,7 +51,7 @@ fromUI (ArtDecoCardElement {
     contractType: maybeExtractFromMaybe extractContractType normal',
     timeSpan: maybeFindInMaybeNEL extractTimeSpan light',
     duration: maybeFindInMaybeNEL extractDuration light',
-    description: hush $ extractDescription content'
+    description: maybeGetInList extractDescription content' 0
   } where
   bold' = toUIElement bold
 
@@ -65,50 +65,58 @@ fromUI (ArtDecoCardElement {
   light' :: Maybe (NonEmptyList (Either ParseError UIElement))
   light' = (map toUIElement) <$> light
 
-extractPosition ∷ Either ParseError UIElement → Either String String
-extractPosition bold = case bold of
-  Right (UIPlainText str) -> Right str
-  _ -> Left "No position"
+maybeGetInList ::
+  ∀ a. (UIElement → Maybe a)
+  -> List (Either ParseError UIElement)
+  -> Int
+  -> Maybe a
+maybeGetInList extract idx list = L.index idx list >>= hush >>= extract
 
 maybeExtractFromMaybe ∷
-  ∀ a. (Either ParseError UIElement → Either String a)
+  ∀ a. (UIElement → Maybe a)
   → Maybe (Either ParseError UIElement)
   → Maybe a
-maybeExtractFromMaybe extract maybeNode = hush $ (extract <=< note "silent fail") maybeNode
+maybeExtractFromMaybe extract maybeNode = maybeNode >>= hush >>= extract
 
 maybeFindInMaybeNEL ∷
   ∀ a f. Foldable f ⇒
-  (Either ParseError UIElement → Either String a)
+  (UIElement → Maybe a)
   → Maybe (f (Either ParseError UIElement))
   → Maybe a
-maybeFindInMaybeNEL extract = hush <<< case _ of
-  Just nel -> note "silent fail" $ findMap (hush <<< extract) nel
-  Nothing -> Left "silent fail"
+maybeFindInMaybeNEL extract = case _ of
+  Just nel -> findMap (hush >>> (extract =<< _)) nel
+  Nothing -> Nothing
 
-extractCompany ∷ Either ParseError UIElement → Either String String
+extractPosition :: UIElement -> Maybe String
+extractPosition = case _ of
+  UIPlainText str -> Just str
+  _ -> Nothing
+
+extractCompany ∷ UIElement → Maybe String
 extractCompany = case _ of
-  Right (UIPlainText str) -> Right str
-  Right (UIDotSeparated (UIPlainText str) _) -> Right str
-  _ -> Left "No company"
+  UIPlainText str -> Just str
+  UIDotSeparated (UIPlainText str) _ -> Just str
+  _ -> Nothing
 
-extractContractType ∷ Either ParseError UIElement → Either String String
+extractContractType ∷ UIElement → Maybe String
 extractContractType = case _ of
-  Right (UIDotSeparated _ (UIPlainText str)) -> Right str
-  _ -> Left "No company"
+  UIDotSeparated _ (UIPlainText str) -> Just str
+  _ -> Nothing
 
-extractTimeSpan ∷ Either ParseError UIElement → Either String TimeSpan
-extractTimeSpan (Right (UIDotSeparated (UITimeSpan s) _)) = Right s
-extractTimeSpan _ = Left "no timespan"
+extractTimeSpan ∷ UIElement → Maybe TimeSpan
+extractTimeSpan = case _ of
+  UIDotSeparated (UITimeSpan s) _ -> Just s
+  _ -> Nothing
 
-extractDuration ∷ Either ParseError UIElement → Either String Duration
-extractDuration (Right (UIDotSeparated _ (UIDuration d))) = Right d
-extractDuration _ = Left "no duration"
+extractDuration ∷ UIElement → Maybe Duration
+extractDuration = case _ of
+  UIDotSeparated _ (UIDuration d) -> Just d
+  _ -> Nothing
 
-extractDescription ∷ List (Either ParseError UIElement) → Either String String
-extractDescription Nil = Left "no description"
-extractDescription cs = case L.head cs of
-    Just (Right (UIPlainText d)) -> Right d
-    _ -> Left "No description"
+extractDescription ∷ UIElement → Maybe String
+extractDescription = case _ of
+  UIPlainText d -> Just d
+  _ -> Nothing
 
 toUIElement ∷ DetachedNode → Either ParseError UIElement
 toUIElement (DetachedElement {content}) = runParser content uiElementP

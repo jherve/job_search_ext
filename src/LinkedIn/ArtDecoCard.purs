@@ -7,6 +7,7 @@ import Data.Show.Generic (genericShow)
 import LinkedIn.Types (Parser)
 import LinkedIn.Utils (queryOneAndParse)
 import LinkedIn.ArtDeco (ArtDecoPvsEntity, parseArtDecoPvsEntity)
+import LinkedIn.ArtDeco as AD
 
 
 data ArtDecoCardElement = ArtDecoCardElement {
@@ -25,3 +26,5 @@ parseArtDecoCard n = do
   pure $ ado
     p <- pvs
   in ArtDecoCardElement {pvs_entity: p}
+
+toUI (ArtDecoCardElement { pvs_entity}) = AD.toUI pvs_entity

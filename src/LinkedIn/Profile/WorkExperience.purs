@@ -1,22 +1,16 @@
 module LinkedIn.Profile.WorkExperience where
 
+import LinkedIn.Profile.Utils
 import LinkedIn.UIElements.Parser
 import Prelude
 
 import Data.Either (Either, note)
 import Data.Foldable (findMap)
 import Data.Generic.Rep (class Generic)
-import Data.List (List)
-import Data.List.NonEmpty (NonEmptyList)
-import Data.List.NonEmpty as NEL
 import Data.Maybe (Maybe(..))
 import Data.Show.Generic (genericShow)
-import LinkedIn (DetachedNode)
-import LinkedIn.ArtDecoCard (ArtDecoCardElement(..))
-import LinkedIn.ArtDeco (ArtDecoCenter(..), ArtDecoCenterContent(..), ArtDecoCenterHeader(..), ArtDecoPvsEntity(..), ArtDecoPvsEntitySubComponent(..))
+import LinkedIn.ArtDecoCard (ArtDecoCardElement, toUI)
 import LinkedIn.UIElements.Types (Duration, TimeSpan, UIElement(..))
-import LinkedIn.Profile.Utils
-import Parsing (ParseError)
 
 data WorkExperience = WorkExperience {
   position :: String,
@@ -33,18 +27,7 @@ instance Show WorkExperience where
   show = genericShow
 
 fromUI ∷ ArtDecoCardElement → Either String WorkExperience
-fromUI (ArtDecoCardElement {
-  pvs_entity: ArtDecoPvsEntity {
-    center: ArtDecoCenter {
-      header: ArtDecoCenterHeader {
-        bold,
-        normal,
-        light
-      },
-      content: ArtDecoCenterContent subComponents
-    }
-  }
-}) = ado
+fromUI (card) = ado
     position <- note "No position found" $ findMap extractPosition bold'
   in
     WorkExperience {
@@ -54,18 +37,9 @@ fromUI (ArtDecoCardElement {
     timeSpan: maybeFindInMaybeNEL extractTimeSpan light',
     duration: maybeFindInMaybeNEL extractDuration light',
     description: maybeGetInList extractDescription content' 0
-  } where
-  bold' = toUIElement bold
-
-  content' :: List (Either ParseError UIElement)
-  content' = map toUIElement subC
-    where subC = NEL.catMaybes $ map (\(ArtDecoPvsEntitySubComponent c) -> c) subComponents :: List (DetachedNode)
-
-  normal' :: Maybe (Either ParseError UIElement)
-  normal' = toUIElement <$> normal
-
-  light' :: Maybe (NonEmptyList (Either ParseError UIElement))
-  light' = (map toUIElement) <$> light
+  }
+  where
+    {bold', content', normal', light'} = toUI card
 
 extractPosition :: UIElement -> Maybe String
 extractPosition = case _ of

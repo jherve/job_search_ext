@@ -9,8 +9,7 @@ import Data.Foldable (findMap)
 import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe(..))
 import Data.Show.Generic (genericShow)
-import LinkedIn.ArtDecoTab (ArtDecoTabElement(..))
-import LinkedIn.ArtDeco (ArtDecoCenter(..), ArtDecoCenterHeader(..), ArtDecoPvsEntity(..))
+import LinkedIn.ArtDecoTab (ArtDecoTabElement, toUI)
 import LinkedIn.UIElements.Types (UIElement(..))
 
 data Skill = Skill {
@@ -22,17 +21,12 @@ instance Show Skill where
   show = genericShow
 
 fromUI ∷ ArtDecoTabElement → Either String Skill
-fromUI (ArtDecoTabElement {
-  pvs_entity: ArtDecoPvsEntity {
-    center: ArtDecoCenter {
-      header: ArtDecoCenterHeader { bold }
-    }
-  }
-}) = ado
+fromUI (tab) = ado
     name <- note "No position found" $ findMap extractName bold'
   in
-    Skill { name } where
-  bold' = toUIElement bold
+    Skill { name }
+  where
+    {bold'} = toUI tab
 
 extractName :: UIElement -> Maybe String
 extractName = case _ of

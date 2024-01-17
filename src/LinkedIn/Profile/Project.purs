@@ -12,10 +12,10 @@ import Data.List.NonEmpty (NonEmptyList)
 import Data.List.NonEmpty as NEL
 import Data.Maybe (Maybe(..))
 import Data.Show.Generic (genericShow)
-import Debug (trace)
 import LinkedIn (DetachedNode)
-import LinkedIn.ArtDecoCard (ArtDecoCardElement(..), ArtDecoCenter(..), ArtDecoCenterContent(..), ArtDecoCenterHeader(..), ArtDecoPvsEntity(..), ArtDecoPvsEntitySubComponent(..))
-import LinkedIn.UIElements.Types (Duration, TimeSpan, UIElement(..))
+import LinkedIn.ArtDecoCard (ArtDecoCardElement(..))
+import LinkedIn.ArtDeco (ArtDecoCenter(..), ArtDecoCenterContent(..), ArtDecoCenterHeader(..), ArtDecoPvsEntity(..), ArtDecoPvsEntitySubComponent(..))
+import LinkedIn.UIElements.Types (TimeSpan, UIElement(..))
 import Parsing (ParseError)
 
 data Project = Project {

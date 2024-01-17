@@ -9,7 +9,8 @@ import Data.Foldable (findMap)
 import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe(..))
 import Data.Show.Generic (genericShow)
-import LinkedIn.ArtDecoTab (ArtDecoTabElement(..), ArtDecoCenter(..), ArtDecoCenterHeader(..), ArtDecoPvsEntity(..))
+import LinkedIn.ArtDecoTab (ArtDecoTabElement(..))
+import LinkedIn.ArtDeco (ArtDecoCenter(..), ArtDecoCenterHeader(..), ArtDecoPvsEntity(..))
 import LinkedIn.UIElements.Types (UIElement(..))
 
 data Skill = Skill {

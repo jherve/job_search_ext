@@ -1,5 +1,6 @@
 module Test.ArtDecoCard where
 
+import LinkedIn.ArtDeco
 import LinkedIn.ArtDecoCard
 import Prelude
 

@@ -12,7 +12,8 @@ import Data.List.NonEmpty as NEL
 import Data.Maybe (Maybe(..))
 import Data.Show.Generic (genericShow)
 import LinkedIn (DetachedNode)
-import LinkedIn.ArtDecoCard (ArtDecoCardElement(..), ArtDecoCenter(..), ArtDecoCenterContent(..), ArtDecoCenterHeader(..), ArtDecoPvsEntity(..), ArtDecoPvsEntitySubComponent(..))
+import LinkedIn.ArtDecoCard (ArtDecoCardElement(..))
+import LinkedIn.ArtDeco (ArtDecoCenter(..), ArtDecoCenterContent(..), ArtDecoCenterHeader(..), ArtDecoPvsEntity(..), ArtDecoPvsEntitySubComponent(..))
 import LinkedIn.UIElements.Types (Duration, TimeSpan, UIElement(..))
 import LinkedIn.Profile.Utils
 import Parsing (ParseError)

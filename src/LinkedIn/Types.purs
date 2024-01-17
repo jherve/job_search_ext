@@ -11,6 +11,7 @@ import Web.DOM (Node)
 data ParseError =
   NodeNotFoundError String
   | NodeListNotFoundError String
+  | TextNotFoundError
 
 derive instance Generic ParseError _
 derive instance Eq ParseError

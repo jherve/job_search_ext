@@ -2,19 +2,22 @@ module LinkedIn.Utils where
 
 import Prelude
 
-import Data.Either (Either(..))
+import Data.Array as A
+import Data.Either (Either(..), note)
+import Data.List as L
 import Data.List.NonEmpty (NonEmptyList)
 import Data.List.NonEmpty as NEL
 import Data.Maybe (Maybe(..), fromJust)
-import Data.Traversable (sequence)
+import Data.Traversable (sequence, traverse)
 import Effect (Effect)
-import LinkedIn (DetachedNode, toDetached)
+import LinkedIn (DetachedNode(..), toDetached)
 import LinkedIn.Types (ParseError(..), Parser)
 import Partial.Unsafe (unsafePartial)
 import Web.DOM (Node, ParentNode)
 import Web.DOM.Element as E
+import Web.DOM.Node as N
 import Web.DOM.NodeList as NL
-import Web.DOM.ParentNode (QuerySelector(..), querySelector, querySelectorAll)
+import Web.DOM.ParentNode (QuerySelector(..), children, querySelector, querySelectorAll)
 
 toParentNode' :: Node -> ParentNode
 toParentNode' n =
@@ -63,3 +66,16 @@ queryManyAndParse selector parser n = do
     Just nodes -> do
       nodes' <- sequence $ map parser nodes :: Effect (NonEmptyList((Either ParseError a)))
       pure $ sequence nodes'
+
+detachNonEmptyTextChild :: Parser DetachedNode
+detachNonEmptyTextChild n = do
+  children <- N.childNodes n
+  childrenArr <- NL.toArray children
+  detached <- traverse parseDetachedNode childrenArr
+  
+  case A.find nonEmptyTextElement detached of
+    Nothing -> pure $ Left TextNotFoundError
+    Just c -> pure $ c
+  where 
+    nonEmptyTextElement (Right (DetachedText t)) | t /= "" = true
+    nonEmptyTextElement _ = false

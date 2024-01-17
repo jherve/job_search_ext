@@ -30,13 +30,13 @@ testArtDecoCards = do
           center: (ArtDecoCenter {
             content: (ArtDecoCenterContent
               (NonEmptyList (NonEmpty
-                (ArtDecoPvsEntitySubComponent (
+                (ArtDecoPvsEntitySubComponent (Just (
                   DetachedElement {
                     classes: ("" : Nil),
                     content: "DeepLearning.AI provides\ntechnical training on Generative AI, Machine Learning, Deep Learning,\nand other topics. We also offer a widely read newsletter, The Batch\n(thebatch.ai), that covers what matters in AI right now. Our courses are often created with industry-leading AI companies (AWS,\nGoogle, OpenAI, etc.), and we offer both short courses that can be\ncompleted in an hour, and longer courses and specializations hosted on\nCoursera that give you a solid foundation in some aspect of AI. These\ncourses are designed to offer hands-on practice with AI technologies,\nand you will gain practical, job-ready skills. Whether you are just starting out in AI or seeking to further an existing\ncareer, come see if we can help, at http://deeplearning.ai!",
                     id: Nothing,
                     tag: "SPAN"
-                    })) Nil))),
+                    }))) Nil))),
             header: (ArtDecoCenterHeader {
               bold: (DetachedElement {
                 classes: ("" : Nil),

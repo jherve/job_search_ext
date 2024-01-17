@@ -83,6 +83,7 @@ extractContractType = case _ of
 
 extractTimeSpan ∷ UIElement → Maybe TimeSpan
 extractTimeSpan = case _ of
+  UITimeSpan s -> Just s
   UIDotSeparated (UITimeSpan s) _ -> Just s
   _ -> Nothing
 

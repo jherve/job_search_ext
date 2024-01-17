@@ -4,6 +4,7 @@ import LinkedIn.UIElements.Parser
 import Prelude
 
 import Data.Either (Either(..), hush, note)
+import Data.Foldable (class Foldable, findMap)
 import Data.Generic.Rep (class Generic)
 import Data.List (List(..))
 import Data.List as L
@@ -48,8 +49,8 @@ fromUI (ArtDecoCardElement {
     position,
     company: maybeExtractFromMaybe extractCompany normal',
     contractType: maybeExtractFromMaybe extractContractType normal',
-    timeSpan: hush $ extractTimeSpan light',
-    duration: hush $ extractDuration light',
+    timeSpan: maybeFindInMaybeNEL extractTimeSpan light',
+    duration: maybeFindInMaybeNEL extractDuration light',
     description: hush $ extractDescription content'
   } where
   bold' = toUIElement bold
@@ -75,6 +76,15 @@ maybeExtractFromMaybe ∷
   → Maybe a
 maybeExtractFromMaybe extract maybeNode = hush $ (extract <=< note "silent fail") maybeNode
 
+maybeFindInMaybeNEL ∷
+  ∀ a f. Foldable f ⇒
+  (Either ParseError UIElement → Either String a)
+  → Maybe (f (Either ParseError UIElement))
+  → Maybe a
+maybeFindInMaybeNEL extract = hush <<< case _ of
+  Just nel -> note "silent fail" $ findMap (hush <<< extract) nel
+  Nothing -> Left "silent fail"
+
 extractCompany ∷ Either ParseError UIElement → Either String String
 extractCompany = case _ of
   Right (UIPlainText str) -> Right str
@@ -86,21 +96,13 @@ extractContractType = case _ of
   Right (UIDotSeparated _ (UIPlainText str)) -> Right str
   _ -> Left "No company"
 
-extractTimeSpan ∷ Maybe (NonEmptyList (Either ParseError UIElement)) → Either String TimeSpan
-extractTimeSpan light = case light of
-  Just l -> note "No timespan" $ NEL.findMap getTimeSpan l
-  Nothing -> Left "No timespan"
-  where
-    getTimeSpan (Right (UIDotSeparated (UITimeSpan s) _)) = Just s
-    getTimeSpan _ = Nothing
+extractTimeSpan ∷ Either ParseError UIElement → Either String TimeSpan
+extractTimeSpan (Right (UIDotSeparated (UITimeSpan s) _)) = Right s
+extractTimeSpan _ = Left "no timespan"
 
-extractDuration ∷ Maybe (NonEmptyList (Either ParseError UIElement)) → Either String Duration
-extractDuration light = case light of
-  Just l -> note "No duration" $ NEL.findMap getDuration l
-  Nothing -> Left "No duration"
-  where
-    getDuration (Right (UIDotSeparated _ (UIDuration d))) = Just d
-    getDuration _ = Nothing
+extractDuration ∷ Either ParseError UIElement → Either String Duration
+extractDuration (Right (UIDotSeparated _ (UIDuration d))) = Right d
+extractDuration _ = Left "no duration"
 
 extractDescription ∷ List (Either ParseError UIElement) → Either String String
 extractDescription Nil = Left "no description"

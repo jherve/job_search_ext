@@ -3,19 +3,19 @@ module LinkedIn.Profile.WorkExperience where
 import LinkedIn.UIElements.Parser
 import Prelude
 
-import Data.Either (Either, hush, note)
-import Data.Foldable (class Foldable, findMap)
+import Data.Either (Either, note)
+import Data.Foldable (findMap)
 import Data.Generic.Rep (class Generic)
 import Data.List (List)
-import Data.List as L
 import Data.List.NonEmpty (NonEmptyList)
 import Data.List.NonEmpty as NEL
 import Data.Maybe (Maybe(..))
 import Data.Show.Generic (genericShow)
-import LinkedIn (DetachedNode(..))
+import LinkedIn (DetachedNode)
 import LinkedIn.ArtDecoCard (ArtDecoCardElement(..), ArtDecoCenter(..), ArtDecoCenterContent(..), ArtDecoCenterHeader(..), ArtDecoPvsEntity(..), ArtDecoPvsEntitySubComponent(..))
 import LinkedIn.UIElements.Types (Duration, TimeSpan, UIElement(..))
-import Parsing (ParseError, runParser)
+import LinkedIn.Profile.Utils
+import Parsing (ParseError)
 
 data WorkExperience = WorkExperience {
   position :: String,
@@ -65,28 +65,6 @@ fromUI (ArtDecoCardElement {
   light' :: Maybe (NonEmptyList (Either ParseError UIElement))
   light' = (map toUIElement) <$> light
 
-maybeGetInList ::
-  ∀ a. (UIElement → Maybe a)
-  -> List (Either ParseError UIElement)
-  -> Int
-  -> Maybe a
-maybeGetInList extract idx list = L.index idx list >>= hush >>= extract
-
-maybeExtractFromMaybe ∷
-  ∀ a. (UIElement → Maybe a)
-  → Maybe (Either ParseError UIElement)
-  → Maybe a
-maybeExtractFromMaybe extract maybeNode = maybeNode >>= hush >>= extract
-
-maybeFindInMaybeNEL ∷
-  ∀ a f. Foldable f ⇒
-  (UIElement → Maybe a)
-  → Maybe (f (Either ParseError UIElement))
-  → Maybe a
-maybeFindInMaybeNEL extract = case _ of
-  Just nel -> findMap (hush >>> (extract =<< _)) nel
-  Nothing -> Nothing
-
 extractPosition :: UIElement -> Maybe String
 extractPosition = case _ of
   UIPlainText str -> Just str
@@ -117,8 +95,3 @@ extractDescription ∷ UIElement → Maybe String
 extractDescription = case _ of
   UIPlainText d -> Just d
   _ -> Nothing
-
-toUIElement ∷ DetachedNode → Either ParseError UIElement
-toUIElement (DetachedElement {content}) = runParser content uiElementP
-toUIElement (DetachedComment str) = runParser str uiElementP
-toUIElement (DetachedText str) = runParser str uiElementP

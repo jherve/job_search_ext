@@ -90,7 +90,7 @@ testArtDecoCards = do
           })
       }
 
-parseHeadCard ∷ Partial => Maybe (NonEmptyList LinkedInUIElement) → Effect (Either ParseError ArtDecoCardElement)
+parseHeadCard ∷ Partial => Maybe (NonEmptyList LinkedInUIElement) → Effect (Either ParseError (ArtDecoCardElement DetachedNode))
 parseHeadCard (Just l) = do
   parsed <- (\(LinkedInUIElement _ n) -> parseArtDecoCard n) $ NEL.head l
   pure $ parsed

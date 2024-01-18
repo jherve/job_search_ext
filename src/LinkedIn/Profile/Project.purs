@@ -7,8 +7,9 @@ import Data.Foldable (findMap)
 import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe(..))
 import Data.Show.Generic (genericShow)
+import LinkedIn (DetachedNode)
+import LinkedIn.ArtDecoCard (ArtDecoCardElement, toCenterContent, toHeaderBold, toHeaderNormal)
 import LinkedIn.Profile.Utils (maybeExtractFromMaybe, maybeGetInList)
-import LinkedIn.ArtDecoCard (ArtDecoCardElement,  toCenterContent, toHeaderBold, toHeaderNormal)
 import LinkedIn.UIElements.Types (TimeSpan, UIElement(..))
 
 data Project = Project {
@@ -21,7 +22,7 @@ derive instance Generic Project _
 instance Show Project where
   show = genericShow
 
-fromUI ∷ ArtDecoCardElement → Either String Project
+fromUI ∷ ArtDecoCardElement DetachedNode → Either String Project
 fromUI card = ado
     name <- note "No position found" $ findMap extractName bold
   in

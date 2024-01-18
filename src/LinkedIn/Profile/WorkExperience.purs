@@ -7,6 +7,7 @@ import Data.Foldable (findMap)
 import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe(..))
 import Data.Show.Generic (genericShow)
+import LinkedIn (DetachedNode)
 import LinkedIn.ArtDecoCard (ArtDecoCardElement, toCenterContent, toHeaderBold, toHeaderLight, toHeaderNormal)
 import LinkedIn.Profile.Utils (maybeExtractFromMaybe, maybeFindInMaybeNEL, maybeGetInList)
 import LinkedIn.UIElements.Types (Duration, TimeSpan, UIElement(..))
@@ -25,7 +26,7 @@ derive instance Eq WorkExperience
 instance Show WorkExperience where
   show = genericShow
 
-fromUI ∷ ArtDecoCardElement → Either String WorkExperience
+fromUI ∷ ArtDecoCardElement DetachedNode → Either String WorkExperience
 fromUI (card) = ado
     position <- note "No position found" $ findMap extractPosition bold
   in

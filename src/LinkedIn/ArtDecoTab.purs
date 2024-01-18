@@ -8,24 +8,25 @@ import Data.List (List)
 import Data.List.Types (NonEmptyList)
 import Data.Maybe (Maybe)
 import Data.Show.Generic (genericShow)
-import LinkedIn.Types (Parser)
-import LinkedIn.Utils (queryOneAndParse)
-import LinkedIn.UIElements.Types (UIElement)
+import LinkedIn (DetachedNode)
 import LinkedIn.ArtDeco (ArtDecoPvsEntity, parseArtDecoPvsEntity)
 import LinkedIn.ArtDeco as AD
+import LinkedIn.Types (Parser)
+import LinkedIn.UIElements.Types (UIElement)
+import LinkedIn.Utils (queryOneAndParse)
 import Parsing (ParseError)
 
 
-data ArtDecoTabElement = ArtDecoTabElement {
-  pvs_entity :: ArtDecoPvsEntity
+data ArtDecoTabElement a = ArtDecoTabElement {
+  pvs_entity :: ArtDecoPvsEntity a
 }
 
-derive instance Generic ArtDecoTabElement _
-derive instance Eq ArtDecoTabElement
-instance Show ArtDecoTabElement where
+derive instance Generic (ArtDecoTabElement a) _
+derive instance Eq a => Eq (ArtDecoTabElement a)
+instance Show a => Show (ArtDecoTabElement a) where
   show = genericShow
 
-parseArtDecoTab :: Parser ArtDecoTabElement
+parseArtDecoTab :: Parser (ArtDecoTabElement DetachedNode)
 parseArtDecoTab n = do
   pvs <- queryOneAndParse ":scope div.pvs-entity--padded" parseArtDecoPvsEntity n
 
@@ -33,17 +34,17 @@ parseArtDecoTab n = do
     p <- pvs
   in ArtDecoTabElement {pvs_entity: p}
 
-toCenterContent ∷ ArtDecoTabElement → List (Either ParseError UIElement)
+toCenterContent ∷ ArtDecoTabElement DetachedNode → List (Either ParseError UIElement)
 toCenterContent = toPvsEntity >>> AD.toCenterContent
 
-toHeaderBold ∷ ArtDecoTabElement → Either ParseError UIElement
+toHeaderBold ∷ ArtDecoTabElement DetachedNode → Either ParseError UIElement
 toHeaderBold = toPvsEntity >>> AD.toHeaderBold
 
-toHeaderLight ∷ ArtDecoTabElement → Maybe (NonEmptyList (Either ParseError UIElement))
+toHeaderLight ∷ ArtDecoTabElement DetachedNode → Maybe (NonEmptyList (Either ParseError UIElement))
 toHeaderLight = toPvsEntity >>> AD.toHeaderLight
 
-toHeaderNormal ∷ ArtDecoTabElement → Maybe (Either ParseError UIElement)
+toHeaderNormal ∷ ArtDecoTabElement DetachedNode → Maybe (Either ParseError UIElement)
 toHeaderNormal = toPvsEntity >>> AD.toHeaderNormal
 
-toPvsEntity ∷ ArtDecoTabElement → ArtDecoPvsEntity
+toPvsEntity ∷ forall a. ArtDecoTabElement a → ArtDecoPvsEntity a
 toPvsEntity (ArtDecoTabElement { pvs_entity }) = pvs_entity

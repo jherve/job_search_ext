@@ -8,6 +8,7 @@ import Data.List (List)
 import Data.List.Types (NonEmptyList)
 import Data.Maybe (Maybe)
 import Data.Show.Generic (genericShow)
+import LinkedIn (DetachedNode)
 import LinkedIn.ArtDeco (ArtDecoPvsEntity, parseArtDecoPvsEntity)
 import LinkedIn.ArtDeco as AD
 import LinkedIn.Types (Parser)
@@ -16,16 +17,16 @@ import LinkedIn.Utils (queryOneAndParse)
 import Parsing (ParseError)
 
 
-data ArtDecoCardElement = ArtDecoCardElement {
-  pvs_entity :: ArtDecoPvsEntity
+data ArtDecoCardElement a = ArtDecoCardElement {
+  pvs_entity :: ArtDecoPvsEntity a
 }
 
-derive instance Generic ArtDecoCardElement _
-derive instance Eq ArtDecoCardElement
-instance Show ArtDecoCardElement where
+derive instance Generic (ArtDecoCardElement a) _
+derive instance Eq a => Eq (ArtDecoCardElement a)
+instance Show a => Show (ArtDecoCardElement a) where
   show = genericShow
 
-parseArtDecoCard :: Parser ArtDecoCardElement
+parseArtDecoCard :: Parser (ArtDecoCardElement DetachedNode)
 parseArtDecoCard n = do
   pvs <- queryOneAndParse ":scope div.pvs-entity--padded" parseArtDecoPvsEntity n
 
@@ -33,17 +34,17 @@ parseArtDecoCard n = do
     p <- pvs
   in ArtDecoCardElement {pvs_entity: p}
 
-toCenterContent ∷ ArtDecoCardElement → List (Either ParseError UIElement)
+toCenterContent ∷ ArtDecoCardElement DetachedNode → List (Either ParseError UIElement)
 toCenterContent = toPvsEntity >>> AD.toCenterContent
 
-toHeaderBold ∷ ArtDecoCardElement → Either ParseError UIElement
+toHeaderBold ∷ ArtDecoCardElement DetachedNode → Either ParseError UIElement
 toHeaderBold = toPvsEntity >>> AD.toHeaderBold
 
-toHeaderLight ∷ ArtDecoCardElement → Maybe (NonEmptyList (Either ParseError UIElement))
+toHeaderLight ∷ ArtDecoCardElement DetachedNode → Maybe (NonEmptyList (Either ParseError UIElement))
 toHeaderLight = toPvsEntity >>> AD.toHeaderLight
 
-toHeaderNormal ∷ ArtDecoCardElement → Maybe (Either ParseError UIElement)
+toHeaderNormal ∷ ArtDecoCardElement DetachedNode → Maybe (Either ParseError UIElement)
 toHeaderNormal = toPvsEntity >>> AD.toHeaderNormal
 
-toPvsEntity ∷ ArtDecoCardElement → ArtDecoPvsEntity
+toPvsEntity ∷ forall a. ArtDecoCardElement a → ArtDecoPvsEntity a
 toPvsEntity (ArtDecoCardElement { pvs_entity }) = pvs_entity

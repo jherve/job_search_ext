@@ -17,66 +17,66 @@ import LinkedIn.Utils (queryAndDetachMany, queryAndDetachOne, queryManyAndParse,
 import Parsing (ParseError)
 
 
-data ArtDecoPvsEntity = ArtDecoPvsEntity {
+data ArtDecoPvsEntity a = ArtDecoPvsEntity {
   side :: Unit,
-  center :: ArtDecoCenter
+  center :: ArtDecoCenter a
 }
 
-data ArtDecoCenter = ArtDecoCenter {
-  header :: ArtDecoCenterHeader,
-  content :: ArtDecoCenterContent
+data ArtDecoCenter a = ArtDecoCenter {
+  header :: ArtDecoCenterHeader a,
+  content :: ArtDecoCenterContent a
 }
 
-data ArtDecoCenterHeader = ArtDecoCenterHeader {
-  bold :: DetachedNode,
-  normal :: Maybe DetachedNode,
-  light :: Maybe (NonEmptyList DetachedNode)
+data ArtDecoCenterHeader a = ArtDecoCenterHeader {
+  bold :: a,
+  normal :: Maybe a,
+  light :: Maybe (NonEmptyList a)
 }
 
-data ArtDecoCenterContent = ArtDecoCenterContent (NonEmptyList ArtDecoPvsEntitySubComponent)
+data ArtDecoCenterContent a = ArtDecoCenterContent (NonEmptyList (ArtDecoPvsEntitySubComponent a))
 
-data ArtDecoPvsEntitySubComponent = ArtDecoPvsEntitySubComponent (Maybe DetachedNode)
+data ArtDecoPvsEntitySubComponent a = ArtDecoPvsEntitySubComponent (Maybe a)
 
 
-derive instance Generic ArtDecoPvsEntitySubComponent _
-derive instance Eq ArtDecoPvsEntitySubComponent
-instance Show ArtDecoPvsEntitySubComponent where
+derive instance Generic (ArtDecoPvsEntitySubComponent a) _
+derive instance Eq a => Eq (ArtDecoPvsEntitySubComponent a)
+instance Show a => Show (ArtDecoPvsEntitySubComponent a) where
   show = genericShow
 
-derive instance Generic ArtDecoCenterContent _
-derive instance Eq ArtDecoCenterContent
-instance Show ArtDecoCenterContent where
+derive instance Generic (ArtDecoCenterContent a) _
+derive instance Eq a => Eq(ArtDecoCenterContent a)
+instance Show a => Show(ArtDecoCenterContent a) where
   show = genericShow
 
-derive instance Generic ArtDecoCenterHeader _
-derive instance Eq ArtDecoCenterHeader
-instance Show ArtDecoCenterHeader where
+derive instance Generic (ArtDecoCenterHeader a) _
+derive instance Eq a => Eq(ArtDecoCenterHeader a)
+instance Show a => Show(ArtDecoCenterHeader a) where
   show = genericShow
 
-derive instance Generic ArtDecoCenter _
-derive instance Eq ArtDecoCenter
-instance Show ArtDecoCenter where
+derive instance Generic (ArtDecoCenter a) _
+derive instance Eq a => Eq(ArtDecoCenter a)
+instance Show a => Show(ArtDecoCenter a) where
   show = genericShow
 
-derive instance Generic ArtDecoPvsEntity _
-derive instance Eq ArtDecoPvsEntity
-instance Show ArtDecoPvsEntity where
+derive instance Generic (ArtDecoPvsEntity a) _
+derive instance Eq a => Eq(ArtDecoPvsEntity a)
+instance Show a => Show(ArtDecoPvsEntity a) where
   show = genericShow
 
 
-parseArtDecoPvsEntitySubComponent ∷ Parser ArtDecoPvsEntitySubComponent
+parseArtDecoPvsEntitySubComponent ∷ Parser (ArtDecoPvsEntitySubComponent DetachedNode)
 parseArtDecoPvsEntitySubComponent n = do
   content <- queryAndDetachOne "span[aria-hidden=true]" n
   pure $ Right $ ArtDecoPvsEntitySubComponent $ hush content
 
-parseArtDecoCenterContent ∷ Parser ArtDecoCenterContent
+parseArtDecoCenterContent ∷ Parser (ArtDecoCenterContent DetachedNode)
 parseArtDecoCenterContent n = do
   list <- queryManyAndParse ":scope > ul > li" parseArtDecoPvsEntitySubComponent n
   pure $ ado
     l <- list
   in ArtDecoCenterContent l
 
-parseArtDecoCenterHeader :: Parser ArtDecoCenterHeader
+parseArtDecoCenterHeader :: Parser (ArtDecoCenterHeader DetachedNode)
 parseArtDecoCenterHeader n = do
   bold <- queryAndDetachOne ":scope div.t-bold > span[aria-hidden=true]" n
   normal <- queryAndDetachOne ":scope span.t-normal:not(t-black--light) > span[aria-hidden=true]" n
@@ -86,7 +86,7 @@ parseArtDecoCenterHeader n = do
     b <- bold
   in ArtDecoCenterHeader {bold: b, normal: hush normal, light: hush light}
 
-parseArtDecoCenter :: Parser ArtDecoCenter
+parseArtDecoCenter :: Parser (ArtDecoCenter DetachedNode)
 parseArtDecoCenter n = do
   header <- queryOneAndParse ":scope > div" parseArtDecoCenterHeader n
   content <- queryOneAndParse ":scope > div.pvs-entity__sub-components" parseArtDecoCenterContent n
@@ -96,7 +96,7 @@ parseArtDecoCenter n = do
     c <- content
   in ArtDecoCenter {header: h, content: c}
 
-parseArtDecoPvsEntity :: Parser ArtDecoPvsEntity
+parseArtDecoPvsEntity :: Parser (ArtDecoPvsEntity DetachedNode)
 parseArtDecoPvsEntity n = do
   center <- queryOneAndParse ":scope > div.display-flex" parseArtDecoCenter n
 
@@ -104,23 +104,23 @@ parseArtDecoPvsEntity n = do
     c <- center
   in ArtDecoPvsEntity {side: unit, center: c}
 
-toHeaderBold ∷ ArtDecoPvsEntity → Either ParseError UIElement
+toHeaderBold ∷ ArtDecoPvsEntity DetachedNode → Either ParseError UIElement
 toHeaderBold (ArtDecoPvsEntity {
     center: ArtDecoCenter { header: ArtDecoCenterHeader { bold }
   }
 }) = toUIElement bold
 
-toHeaderNormal ∷ ArtDecoPvsEntity → Maybe (Either ParseError UIElement)
+toHeaderNormal ∷ ArtDecoPvsEntity DetachedNode → Maybe (Either ParseError UIElement)
 toHeaderNormal (ArtDecoPvsEntity {
   center: ArtDecoCenter { header: ArtDecoCenterHeader { normal }}
 }) = toUIElement <$> normal
 
-toHeaderLight ∷ ArtDecoPvsEntity → Maybe (NonEmptyList (Either ParseError UIElement))
+toHeaderLight ∷ ArtDecoPvsEntity DetachedNode → Maybe (NonEmptyList (Either ParseError UIElement))
 toHeaderLight (ArtDecoPvsEntity {
   center: ArtDecoCenter { header: ArtDecoCenterHeader { light } }
 }) = (map toUIElement) <$> light
 
-toCenterContent ∷ ArtDecoPvsEntity → List (Either ParseError UIElement)
+toCenterContent ∷ ArtDecoPvsEntity DetachedNode → List (Either ParseError UIElement)
 toCenterContent (ArtDecoPvsEntity {
   center: ArtDecoCenter { content: ArtDecoCenterContent subComponents }
 }) = map toUIElement subC

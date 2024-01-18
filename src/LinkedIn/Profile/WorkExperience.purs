@@ -9,7 +9,7 @@ import Data.Maybe (Maybe(..))
 import Data.Show.Generic (genericShow)
 import LinkedIn (DetachedNode)
 import LinkedIn.ArtDecoCard (ArtDecoCardElement, toCenterContent, toHeaderBold, toHeaderLight, toHeaderNormal)
-import LinkedIn.Profile.Utils (maybeExtractFromMaybe, maybeFindInMaybeNEL, maybeGetInList)
+import LinkedIn.Profile.Utils (maybeExtractFromMaybe, maybeFindInMaybeNEL, maybeGetInList, toUIElement)
 import LinkedIn.UIElements.Types (Duration, TimeSpan, UIElement(..))
 
 data WorkExperience = WorkExperience {
@@ -39,10 +39,11 @@ fromUI (card) = ado
     description: maybeGetInList extractDescription content 0
   }
   where
-    normal = toHeaderNormal card
-    light = toHeaderLight card
-    content = toCenterContent card
-    bold = toHeaderBold card
+    asUI = toUIElement <$> card
+    normal = toHeaderNormal asUI
+    light = toHeaderLight asUI
+    content = toCenterContent asUI
+    bold = toHeaderBold asUI
 
 extractPosition :: UIElement -> Maybe String
 extractPosition = case _ of

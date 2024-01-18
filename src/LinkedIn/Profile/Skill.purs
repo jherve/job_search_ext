@@ -9,6 +9,7 @@ import Data.Maybe (Maybe(..))
 import Data.Show.Generic (genericShow)
 import LinkedIn (DetachedNode)
 import LinkedIn.ArtDecoTab (ArtDecoTabElement, toHeaderBold)
+import LinkedIn.Profile.Utils (toUIElement)
 import LinkedIn.UIElements.Types (UIElement(..))
 
 data Skill = Skill {
@@ -25,7 +26,8 @@ fromUI (tab) = ado
   in
     Skill { name }
   where
-    bold = toHeaderBold tab
+    asUI = toUIElement <$> tab
+    bold = toHeaderBold asUI
 
 extractName :: UIElement -> Maybe String
 extractName = case _ of

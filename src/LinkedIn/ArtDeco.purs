@@ -121,24 +121,22 @@ parseArtDecoPvsEntity n = do
     c <- center
   in ArtDecoPvsEntity {side: unit, center: c}
 
-toHeaderBold ∷ ArtDecoPvsEntity DetachedNode → Either ParseError UIElement
+toHeaderBold ∷ forall a. ArtDecoPvsEntity a → a
 toHeaderBold (ArtDecoPvsEntity {
-    center: ArtDecoCenter { header: ArtDecoCenterHeader { bold }
-  }
-}) = toUIElement bold
+  center: ArtDecoCenter { header: ArtDecoCenterHeader { bold }}
+}) = bold
 
-toHeaderNormal ∷ ArtDecoPvsEntity DetachedNode → Maybe (Either ParseError UIElement)
+toHeaderNormal ∷ forall a. ArtDecoPvsEntity a → Maybe (a)
 toHeaderNormal (ArtDecoPvsEntity {
   center: ArtDecoCenter { header: ArtDecoCenterHeader { normal }}
-}) = toUIElement <$> normal
+}) = normal
 
-toHeaderLight ∷ ArtDecoPvsEntity DetachedNode → Maybe (NonEmptyList (Either ParseError UIElement))
+toHeaderLight ∷ forall a. ArtDecoPvsEntity a → Maybe (NonEmptyList a)
 toHeaderLight (ArtDecoPvsEntity {
-  center: ArtDecoCenter { header: ArtDecoCenterHeader { light } }
-}) = (map toUIElement) <$> light
+  center: ArtDecoCenter { header: ArtDecoCenterHeader { light }}
+}) = light
 
-toCenterContent ∷ ArtDecoPvsEntity DetachedNode → List (Either ParseError UIElement)
+toCenterContent ∷ forall a. ArtDecoPvsEntity a → List a
 toCenterContent (ArtDecoPvsEntity {
   center: ArtDecoCenter { content: ArtDecoCenterContent subComponents }
-}) = map toUIElement subC
-  where subC = NEL.catMaybes $ map (\(ArtDecoPvsEntitySubComponent c) -> c) subComponents :: List (DetachedNode)
+}) = NEL.catMaybes $ map (\(ArtDecoPvsEntitySubComponent c) -> c) subComponents

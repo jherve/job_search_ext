@@ -16,6 +16,7 @@ import LinkedIn.ArtDecoTab (parseArtDecoTab)
 import LinkedIn.JobsUnifiedTopCard (parseJobsUnifiedTopCardElement)
 import LinkedIn.Profile.Project as PP
 import LinkedIn.Profile.Skill as PS
+import LinkedIn.Profile.Utils (toUIElement)
 import LinkedIn.Profile.WorkExperience as PWE
 import Yoga.Tree (Tree, showTree)
 
@@ -42,6 +43,7 @@ main = do
       case parsed of
         Left l -> logShow l
         Right p -> do
+          logShow $ toUIElement <$> p
           logShow $ PWE.fromUI p
           logShow $ PP.fromUI p
   case artDecoTabs of

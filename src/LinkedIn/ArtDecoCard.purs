@@ -25,6 +25,9 @@ derive instance Generic (ArtDecoCardElement a) _
 derive instance Eq a => Eq (ArtDecoCardElement a)
 instance Show a => Show (ArtDecoCardElement a) where
   show = genericShow
+instance Functor ArtDecoCardElement where
+  map f (ArtDecoCardElement {pvs_entity}) =
+    ArtDecoCardElement ({pvs_entity: map f pvs_entity})
 
 parseArtDecoCard :: Parser (ArtDecoCardElement DetachedNode)
 parseArtDecoCard n = do

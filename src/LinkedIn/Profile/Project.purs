@@ -1,7 +1,5 @@
 module LinkedIn.Profile.Project where
 
-import LinkedIn.Profile.Utils
-import LinkedIn.UIElements.Parser
 import Prelude
 
 import Data.Either (Either, note)
@@ -9,7 +7,8 @@ import Data.Foldable (findMap)
 import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe(..))
 import Data.Show.Generic (genericShow)
-import LinkedIn.ArtDecoCard (ArtDecoCardElement, toUI)
+import LinkedIn.Profile.Utils (maybeExtractFromMaybe, maybeGetInList)
+import LinkedIn.ArtDecoCard (ArtDecoCardElement,  toCenterContent, toHeaderBold, toHeaderNormal)
 import LinkedIn.UIElements.Types (TimeSpan, UIElement(..))
 
 data Project = Project {
@@ -24,15 +23,17 @@ instance Show Project where
 
 fromUI ∷ ArtDecoCardElement → Either String Project
 fromUI card = ado
-    name <- note "No position found" $ findMap extractName bold'
+    name <- note "No position found" $ findMap extractName bold
   in
     Project {
     name,
-    timeSpan: maybeExtractFromMaybe extractTimeSpan normal',
-    description: maybeGetInList extractDescription content' 0
+    timeSpan: maybeExtractFromMaybe extractTimeSpan normal,
+    description: maybeGetInList extractDescription content 0
   }
   where
-    {bold', content', normal'} = toUI card
+    normal = toHeaderNormal card
+    content = toCenterContent card
+    bold = toHeaderBold card
 
 extractName :: UIElement -> Maybe String
 extractName = case _ of

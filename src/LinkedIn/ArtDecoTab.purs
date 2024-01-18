@@ -2,12 +2,18 @@ module LinkedIn.ArtDecoTab where
 
 import Prelude
 
+import Data.Either (Either)
 import Data.Generic.Rep (class Generic)
+import Data.List (List)
+import Data.List.Types (NonEmptyList)
+import Data.Maybe (Maybe)
 import Data.Show.Generic (genericShow)
 import LinkedIn.Types (Parser)
 import LinkedIn.Utils (queryOneAndParse)
+import LinkedIn.UIElements.Types (UIElement)
 import LinkedIn.ArtDeco (ArtDecoPvsEntity, parseArtDecoPvsEntity)
 import LinkedIn.ArtDeco as AD
+import Parsing (ParseError)
 
 
 data ArtDecoTabElement = ArtDecoTabElement {
@@ -27,4 +33,17 @@ parseArtDecoTab n = do
     p <- pvs
   in ArtDecoTabElement {pvs_entity: p}
 
-toUI (ArtDecoTabElement { pvs_entity }) = AD.toUI pvs_entity
+toCenterContent ∷ ArtDecoTabElement → List (Either ParseError UIElement)
+toCenterContent = toPvsEntity >>> AD.toCenterContent
+
+toHeaderBold ∷ ArtDecoTabElement → Either ParseError UIElement
+toHeaderBold = toPvsEntity >>> AD.toHeaderBold
+
+toHeaderLight ∷ ArtDecoTabElement → Maybe (NonEmptyList (Either ParseError UIElement))
+toHeaderLight = toPvsEntity >>> AD.toHeaderLight
+
+toHeaderNormal ∷ ArtDecoTabElement → Maybe (Either ParseError UIElement)
+toHeaderNormal = toPvsEntity >>> AD.toHeaderNormal
+
+toPvsEntity ∷ ArtDecoTabElement → ArtDecoPvsEntity
+toPvsEntity (ArtDecoTabElement { pvs_entity }) = pvs_entity

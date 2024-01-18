@@ -104,32 +104,24 @@ parseArtDecoPvsEntity n = do
     c <- center
   in ArtDecoPvsEntity {side: unit, center: c}
 
-toUI ∷
-  ArtDecoPvsEntity
-  → {
-    bold' ∷ Either ParseError UIElement ,
-    content' ∷ List (Either ParseError UIElement) ,
-    light' ∷ Maybe (NonEmptyList (Either ParseError UIElement)) ,
-    normal' ∷ Maybe (Either ParseError UIElement)
+toHeaderBold ∷ ArtDecoPvsEntity → Either ParseError UIElement
+toHeaderBold (ArtDecoPvsEntity {
+    center: ArtDecoCenter { header: ArtDecoCenterHeader { bold }
   }
-toUI (ArtDecoPvsEntity {
-    center: ArtDecoCenter {
-      header: ArtDecoCenterHeader {
-        bold,
-        normal,
-        light
-      },
-      content: ArtDecoCenterContent subComponents
-    }
-  }) = {bold', content', normal', light'} where
-  bold' = toUIElement bold
+}) = toUIElement bold
 
-  content' :: List (Either ParseError UIElement)
-  content' = map toUIElement subC
-    where subC = NEL.catMaybes $ map (\(ArtDecoPvsEntitySubComponent c) -> c) subComponents :: List (DetachedNode)
+toHeaderNormal ∷ ArtDecoPvsEntity → Maybe (Either ParseError UIElement)
+toHeaderNormal (ArtDecoPvsEntity {
+  center: ArtDecoCenter { header: ArtDecoCenterHeader { normal }}
+}) = toUIElement <$> normal
 
-  normal' :: Maybe (Either ParseError UIElement)
-  normal' = toUIElement <$> normal
+toHeaderLight ∷ ArtDecoPvsEntity → Maybe (NonEmptyList (Either ParseError UIElement))
+toHeaderLight (ArtDecoPvsEntity {
+  center: ArtDecoCenter { header: ArtDecoCenterHeader { light } }
+}) = (map toUIElement) <$> light
 
-  light' :: Maybe (NonEmptyList (Either ParseError UIElement))
-  light' = (map toUIElement) <$> light
+toCenterContent ∷ ArtDecoPvsEntity → List (Either ParseError UIElement)
+toCenterContent (ArtDecoPvsEntity {
+  center: ArtDecoCenter { content: ArtDecoCenterContent subComponents }
+}) = map toUIElement subC
+  where subC = NEL.catMaybes $ map (\(ArtDecoPvsEntitySubComponent c) -> c) subComponents :: List (DetachedNode)

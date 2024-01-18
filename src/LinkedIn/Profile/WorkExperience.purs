@@ -1,7 +1,5 @@
 module LinkedIn.Profile.WorkExperience where
 
-import LinkedIn.Profile.Utils
-import LinkedIn.UIElements.Parser
 import Prelude
 
 import Data.Either (Either, note)
@@ -9,7 +7,8 @@ import Data.Foldable (findMap)
 import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe(..))
 import Data.Show.Generic (genericShow)
-import LinkedIn.ArtDecoCard (ArtDecoCardElement, toUI)
+import LinkedIn.ArtDecoCard (ArtDecoCardElement, toCenterContent, toHeaderBold, toHeaderLight, toHeaderNormal)
+import LinkedIn.Profile.Utils (maybeExtractFromMaybe, maybeFindInMaybeNEL, maybeGetInList)
 import LinkedIn.UIElements.Types (Duration, TimeSpan, UIElement(..))
 
 data WorkExperience = WorkExperience {
@@ -28,18 +27,21 @@ instance Show WorkExperience where
 
 fromUI ∷ ArtDecoCardElement → Either String WorkExperience
 fromUI (card) = ado
-    position <- note "No position found" $ findMap extractPosition bold'
+    position <- note "No position found" $ findMap extractPosition bold
   in
     WorkExperience {
     position,
-    company: maybeExtractFromMaybe extractCompany normal',
-    contractType: maybeExtractFromMaybe extractContractType normal',
-    timeSpan: maybeFindInMaybeNEL extractTimeSpan light',
-    duration: maybeFindInMaybeNEL extractDuration light',
-    description: maybeGetInList extractDescription content' 0
+    company: maybeExtractFromMaybe extractCompany normal,
+    contractType: maybeExtractFromMaybe extractContractType normal,
+    timeSpan: maybeFindInMaybeNEL extractTimeSpan light,
+    duration: maybeFindInMaybeNEL extractDuration light,
+    description: maybeGetInList extractDescription content 0
   }
   where
-    {bold', content', normal', light'} = toUI card
+    normal = toHeaderNormal card
+    light = toHeaderLight card
+    content = toCenterContent card
+    bold = toHeaderBold card
 
 extractPosition :: UIElement -> Maybe String
 extractPosition = case _ of

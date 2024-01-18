@@ -2,12 +2,18 @@ module LinkedIn.ArtDecoCard where
 
 import Prelude
 
+import Data.Either (Either)
 import Data.Generic.Rep (class Generic)
+import Data.List (List)
+import Data.List.Types (NonEmptyList)
+import Data.Maybe (Maybe)
 import Data.Show.Generic (genericShow)
-import LinkedIn.Types (Parser)
-import LinkedIn.Utils (queryOneAndParse)
 import LinkedIn.ArtDeco (ArtDecoPvsEntity, parseArtDecoPvsEntity)
 import LinkedIn.ArtDeco as AD
+import LinkedIn.Types (Parser)
+import LinkedIn.UIElements.Types (UIElement)
+import LinkedIn.Utils (queryOneAndParse)
+import Parsing (ParseError)
 
 
 data ArtDecoCardElement = ArtDecoCardElement {
@@ -27,4 +33,17 @@ parseArtDecoCard n = do
     p <- pvs
   in ArtDecoCardElement {pvs_entity: p}
 
-toUI (ArtDecoCardElement { pvs_entity}) = AD.toUI pvs_entity
+toCenterContent ∷ ArtDecoCardElement → List (Either ParseError UIElement)
+toCenterContent = toPvsEntity >>> AD.toCenterContent
+
+toHeaderBold ∷ ArtDecoCardElement → Either ParseError UIElement
+toHeaderBold = toPvsEntity >>> AD.toHeaderBold
+
+toHeaderLight ∷ ArtDecoCardElement → Maybe (NonEmptyList (Either ParseError UIElement))
+toHeaderLight = toPvsEntity >>> AD.toHeaderLight
+
+toHeaderNormal ∷ ArtDecoCardElement → Maybe (Either ParseError UIElement)
+toHeaderNormal = toPvsEntity >>> AD.toHeaderNormal
+
+toPvsEntity ∷ ArtDecoCardElement → ArtDecoPvsEntity
+toPvsEntity (ArtDecoCardElement { pvs_entity }) = pvs_entity

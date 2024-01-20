@@ -42,44 +42,31 @@ derive instance Generic (ArtDecoPvsEntitySubComponent a) _
 derive instance Eq a => Eq (ArtDecoPvsEntitySubComponent a)
 instance Show a => Show (ArtDecoPvsEntitySubComponent a) where
   show = genericShow
-instance Functor ArtDecoPvsEntitySubComponent where
-  map f (ArtDecoPvsEntitySubComponent c) = ArtDecoPvsEntitySubComponent (map f c)
+derive instance Functor ArtDecoPvsEntitySubComponent
 
 derive instance Generic (ArtDecoCenterContent a) _
 derive instance Eq a => Eq(ArtDecoCenterContent a)
 instance Show a => Show(ArtDecoCenterContent a) where
   show = genericShow
-instance Functor ArtDecoCenterContent where
-  map f (ArtDecoCenterContent nel) = ArtDecoCenterContent (map (map f) nel)
+derive instance Functor ArtDecoCenterContent
 
 derive instance Generic (ArtDecoCenterHeader a) _
 derive instance Eq a => Eq(ArtDecoCenterHeader a)
 instance Show a => Show(ArtDecoCenterHeader a) where
   show = genericShow
-instance Functor ArtDecoCenterHeader where
-  map f (ArtDecoCenterHeader {bold, normal, light}) =
-    ArtDecoCenterHeader ({
-      bold: f bold,
-      normal: map f normal,
-      light: map (map f) light
-    })
+derive instance Functor ArtDecoCenterHeader
 
 derive instance Generic (ArtDecoCenter a) _
 derive instance Eq a => Eq(ArtDecoCenter a)
 instance Show a => Show(ArtDecoCenter a) where
   show = genericShow
-instance Functor ArtDecoCenter where
-  map f (ArtDecoCenter {content, header}) =
-    ArtDecoCenter ({content: map f content, header: map f header})
+derive instance Functor ArtDecoCenter 
 
 derive instance Generic (ArtDecoPvsEntity a) _
 derive instance Eq a => Eq(ArtDecoPvsEntity a)
 instance Show a => Show(ArtDecoPvsEntity a) where
   show = genericShow
-instance Functor ArtDecoPvsEntity where
-  map f (ArtDecoPvsEntity {side, center}) =
-    ArtDecoPvsEntity ({side, center: map f center})
-
+derive instance Functor ArtDecoPvsEntity
 
 parseArtDecoPvsEntitySubComponent ∷ Parser (ArtDecoPvsEntitySubComponent DetachedNode)
 parseArtDecoPvsEntitySubComponent n = do

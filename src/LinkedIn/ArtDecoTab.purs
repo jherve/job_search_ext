@@ -22,9 +22,7 @@ derive instance Generic (ArtDecoTabElement a) _
 derive instance Eq a => Eq (ArtDecoTabElement a)
 instance Show a => Show (ArtDecoTabElement a) where
   show = genericShow
-instance Functor ArtDecoTabElement where
-  map f (ArtDecoTabElement {pvs_entity}) =
-    ArtDecoTabElement ({pvs_entity: map f pvs_entity})
+derive instance Functor ArtDecoTabElement
 
 parseArtDecoTab :: Parser (ArtDecoTabElement DetachedNode)
 parseArtDecoTab n = do

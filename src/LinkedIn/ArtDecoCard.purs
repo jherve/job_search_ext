@@ -12,6 +12,7 @@ import LinkedIn.ArtDeco (ArtDecoPvsEntity, parseArtDecoPvsEntity)
 import LinkedIn.ArtDeco as AD
 import LinkedIn.Types (Parser)
 import LinkedIn.Utils (queryOneAndParse)
+import LinkedIn.QueryRunner (QueryRunner, ignoreNotFound, queryAll, queryOne)
 
 
 data ArtDecoCardElement a = ArtDecoCardElement {
@@ -22,9 +23,7 @@ derive instance Generic (ArtDecoCardElement a) _
 derive instance Eq a => Eq (ArtDecoCardElement a)
 instance Show a => Show (ArtDecoCardElement a) where
   show = genericShow
-instance Functor ArtDecoCardElement where
-  map f (ArtDecoCardElement {pvs_entity}) =
-    ArtDecoCardElement ({pvs_entity: map f pvs_entity})
+derive instance Functor ArtDecoCardElement
 
 parseArtDecoCard :: Parser (ArtDecoCardElement DetachedNode)
 parseArtDecoCard n = do

@@ -11,11 +11,12 @@ import Data.List.NonEmpty (NonEmptyList(..))
 import Data.List.NonEmpty as NEL
 import Data.Maybe (Maybe(..), isJust)
 import Data.NonEmpty (NonEmpty(..))
+import Data.Traversable (traverse)
 import Effect (Effect)
-import LinkedIn (DetachedNode(..), LinkedInUIElement(..), getArtDecoCards)
+import LinkedIn (DetachedNode(..), LinkedInUIElement(..), getArtDecoCards, toDetached)
 import LinkedIn.Profile.WorkExperience (WorkExperience(..))
 import LinkedIn.Profile.WorkExperience as PWE
-import LinkedIn.Types (ParseError)
+import LinkedIn.QueryRunner (QueryError, runQuery)
 import LinkedIn.UIElements.Types (Duration(..), TimeSpan(..))
 import Node.JsDom (jsDomFromFile)
 import Partial.Unsafe (unsafePartial)
@@ -90,10 +91,14 @@ testArtDecoCards = do
           })
       }
 
-parseHeadCard ∷ Partial => Maybe (NonEmptyList LinkedInUIElement) → Effect (Either ParseError (ArtDecoCardElement DetachedNode))
+parseHeadCard ∷ Partial => Maybe (NonEmptyList LinkedInUIElement) → Effect (Either QueryError (ArtDecoCardElement DetachedNode))
 parseHeadCard (Just l) = do
-  parsed <- (\(LinkedInUIElement _ n) -> parseArtDecoCard n) $ NEL.head l
-  pure $ parsed
+  queried <- (\(LinkedInUIElement _ n) -> runQuery $ queryArtDecoCard n) $ NEL.head l
+  case queried of
+    Left l -> pure $ Left l
+    Right q -> do
+      parsed <- traverse toDetached q
+      pure $ Right parsed
 
 testArtDecoCard :: Effect Unit
 testArtDecoCard = do

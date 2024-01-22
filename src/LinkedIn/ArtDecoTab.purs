@@ -2,16 +2,17 @@ module LinkedIn.ArtDecoTab where
 
 import Prelude
 
+import Data.Foldable (class Foldable, foldMap, foldlDefault, foldrDefault)
 import Data.Generic.Rep (class Generic)
 import Data.List (List)
 import Data.List.Types (NonEmptyList)
 import Data.Maybe (Maybe)
 import Data.Show.Generic (genericShow)
-import LinkedIn (DetachedNode)
-import LinkedIn.ArtDeco (ArtDecoPvsEntity, parseArtDecoPvsEntity)
+import Data.Traversable (class Traversable, sequence, traverseDefault)
+import LinkedIn.ArtDeco (ArtDecoPvsEntity, queryArtDecoPvsEntity)
 import LinkedIn.ArtDeco as AD
-import LinkedIn.Types (Parser)
-import LinkedIn.Utils (queryOneAndParse)
+import LinkedIn.QueryRunner (QueryRunner, subQueryOne)
+import Web.DOM (Node)
 
 
 data ArtDecoTabElement a = ArtDecoTabElement {
@@ -24,13 +25,23 @@ instance Show a => Show (ArtDecoTabElement a) where
   show = genericShow
 derive instance Functor ArtDecoTabElement
 
-parseArtDecoTab :: Parser (ArtDecoTabElement DetachedNode)
-parseArtDecoTab n = do
-  pvs <- queryOneAndParse ":scope div.pvs-entity--padded" parseArtDecoPvsEntity n
+instance Foldable ArtDecoTabElement where
+  foldMap f (ArtDecoTabElement {pvs_entity}) = foldMap f pvs_entity
 
-  pure $ ado
-    p <- pvs
+  foldl = \x -> foldlDefault x
+  foldr = \x -> foldrDefault x
+
+instance Traversable ArtDecoTabElement where
+  sequence (ArtDecoTabElement {pvs_entity}) = ado
+    p <- sequence pvs_entity
   in ArtDecoTabElement {pvs_entity: p}
+
+  traverse = \x -> traverseDefault x
+
+queryArtDecoTab :: QueryRunner (ArtDecoTabElement Node)
+queryArtDecoTab n = do
+  pvs_entity <- subQueryOne queryArtDecoPvsEntity ":scope div.pvs-entity--padded" n
+  pure $ ArtDecoTabElement {pvs_entity}
 
 toCenterContent ∷ forall a. ArtDecoTabElement a → List a
 toCenterContent = toPvsEntity >>> AD.toCenterContent

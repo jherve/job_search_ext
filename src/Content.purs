@@ -8,16 +8,19 @@ import Data.Either (Either(..))
 import Data.List.NonEmpty (NonEmptyList)
 import Data.List.NonEmpty as NEL
 import Data.Maybe (Maybe(..))
+import Data.Traversable (traverse)
 import Effect (Effect)
 import Effect.Class.Console (logShow)
 import Effect.Console (log)
-import LinkedIn.ArtDecoCard (parseArtDecoCard)
-import LinkedIn.ArtDecoTab (parseArtDecoTab)
+import LinkedIn.ArtDecoCard (queryArtDecoCard)
+import LinkedIn.ArtDecoTab (queryArtDecoTab)
 import LinkedIn.JobsUnifiedTopCard (parseJobsUnifiedTopCardElement)
 import LinkedIn.Profile.Project as PP
 import LinkedIn.Profile.Skill as PS
 import LinkedIn.Profile.Utils (toUIElement)
 import LinkedIn.Profile.WorkExperience as PWE
+import LinkedIn.QueryRunner (runQuery)
+import Web.DOM (Node)
 import Yoga.Tree (Tree, showTree)
 
 main :: Effect Unit
@@ -38,23 +41,25 @@ main = do
   case artDecoCards of
     Nothing -> log "nothing"
     Just l -> do
-      parsed <- (\(LinkedInUIElement _ n) -> parseArtDecoCard n) $ NEL.head l
-      logShow parsed
-      case parsed of
+      queried <- (\(LinkedInUIElement _ n) -> runQuery $ queryArtDecoCard n) $ NEL.head l
+      case queried of
         Left l -> logShow l
         Right p -> do
-          logShow $ toUIElement <$> p
-          logShow $ PWE.fromUI p
-          logShow $ PP.fromUI p
+          detached <- traverse toDetached p
+          logShow detached
+          logShow $ PWE.fromUI detached
+          logShow $ PP.fromUI detached
+
   case artDecoTabs of
     Nothing -> log "nothing"
     Just l -> do
-      parsed <- (\(LinkedInUIElement _ n) -> parseArtDecoTab n) $ NEL.head l
-      logShow parsed
-      case parsed of
+      queried <- (\(LinkedInUIElement _ n) -> runQuery $ queryArtDecoTab n) $ NEL.head l
+      case queried of
         Left l -> logShow l
         Right p -> do
-          logShow $ PS.fromUI p
+          detached <- traverse toDetached p
+          logShow detached
+          logShow $ PS.fromUI detached
 
   case jobsUnifiedTopCard of
     Nothing -> log "nothing"

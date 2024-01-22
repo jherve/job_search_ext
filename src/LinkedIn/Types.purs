@@ -1,10 +1,11 @@
 module LinkedIn.Types where
 
 import Prelude
+
 import Data.Either (Either)
-import Effect (Effect)
 import Data.Generic.Rep (class Generic)
 import Data.Show.Generic (genericShow)
+import Effect (Effect)
 import Web.DOM (Node)
 
 

@@ -25,6 +25,7 @@ You can edit this file as you like.
   , "partial"
   , "prelude"
   , "strings"
+  , "transformers"
   , "tuples"
   , "web-dom"
   , "yoga-tree"

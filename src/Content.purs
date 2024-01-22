@@ -14,7 +14,7 @@ import Effect.Class.Console (logShow)
 import Effect.Console (log)
 import LinkedIn.ArtDecoCard (queryArtDecoCard)
 import LinkedIn.ArtDecoTab (queryArtDecoTab)
-import LinkedIn.JobsUnifiedTopCard (parseJobsUnifiedTopCardElement)
+import LinkedIn.JobsUnifiedTopCard (queryJobsUnifiedTopCardElement)
 import LinkedIn.Profile.Project as PP
 import LinkedIn.Profile.Skill as PS
 import LinkedIn.Profile.Utils (toUIElement)
@@ -64,8 +64,13 @@ main = do
   case jobsUnifiedTopCard of
     Nothing -> log "nothing"
     Just l -> do
-      parsed <- (\(LinkedInUIElement _ n) -> parseJobsUnifiedTopCardElement n) $ NEL.head l
-      logShow parsed
+      queried <- (\(LinkedInUIElement _ n) -> runQuery $ queryJobsUnifiedTopCardElement n) $ NEL.head l
+      case queried of
+        Left l -> logShow l
+        Right p -> do
+          detached <- traverse toDetached p
+          log "parsed OK"
+          logShow detached
 
 maybeShowTree ∷ Maybe (NonEmptyList LinkedInUIElement) → Effect String
 maybeShowTree Nothing = pure "nope"

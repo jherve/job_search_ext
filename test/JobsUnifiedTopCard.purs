@@ -10,10 +10,12 @@ import Data.List.NonEmpty (NonEmptyList(..))
 import Data.List.NonEmpty as NEL
 import Data.Maybe (Maybe(..), isJust)
 import Data.NonEmpty (NonEmpty(..))
+import Data.Traversable (traverse)
 import Effect (Effect)
-import LinkedIn (DetachedNode(..), LinkedInUIElement(..), getJobsUnifiedTopCard)
+import LinkedIn (DetachedNode(..), LinkedInUIElement(..), getJobsUnifiedTopCard, toDetached)
 import LinkedIn.Profile.WorkExperience (WorkExperience(..))
 import LinkedIn.Profile.WorkExperience as PWE
+import LinkedIn.QueryRunner (QueryError, runQuery)
 import LinkedIn.Types (ParseError(..))
 import LinkedIn.UIElements.Types (Duration(..), TimeSpan(..))
 import Node.JsDom (jsDomFromFile)
@@ -123,7 +125,7 @@ testJobsUnifiedTopCard = do
                 tag: "svg"
               })
             }) : Nil)))),
-      primaryDescription: (Just (TopCardPrimaryDescription {
+      primaryDescription: (TopCardPrimaryDescription {
         link: (DetachedElement {
           classes: ("app-aware-link" : Nil),
           content: "LINCOLN",
@@ -149,13 +151,17 @@ testJobsUnifiedTopCard = do
           }) : Nil
           ))
         ))
-      }))
+      })
     })
   }
 
 
-parseHeadCard ∷ Partial => Maybe (NonEmptyList LinkedInUIElement) → Effect (Either ParseError JobsUnifiedTopCardElement)
+parseHeadCard ∷ Partial ⇒ Maybe (NonEmptyList LinkedInUIElement) → Effect (Either QueryError (JobsUnifiedTopCardElement DetachedNode))
 parseHeadCard (Just l) = do
-  parsed <- (\(LinkedInUIElement _ n) -> parseJobsUnifiedTopCardElement n) $ NEL.head l
-  pure $ parsed
+  queried <- (\(LinkedInUIElement _ n) -> runQuery $ queryJobsUnifiedTopCardElement n) $ NEL.head l
+  case queried of
+    Left l -> pure $ Left l
+    Right q -> do
+      parsed <- traverse toDetached q
+      pure $ Right parsed
 

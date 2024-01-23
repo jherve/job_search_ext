@@ -121,14 +121,18 @@ toDetached node = unsafePartial $ toDetached' (nodeType node) node where
   elementToDetached el tag text = do
     id <- E.id el
     -- On SVG elements "className" returns a weird "SVGString" type that cannot be trimmed
-    classStr <- if tag /= "svg" && tag /= "use" && tag /= "path" then E.className el else pure $ ""
+    classes <- if tag /= "svg" && tag /= "use" && tag /= "path" then getClassList el else pure $ Nil
 
     pure $ DetachedElement {
       tag: E.tagName el,
       content: normalize text,
       id: if S.null id then Nothing else Just id,
-      classes: A.toUnfoldable $ S.split (Pattern " ") (normalize classStr)
+      classes
     }
+
+  getClassList el = do
+    classStr <- E.className el
+    pure $ A.toUnfoldable $ S.split (Pattern " ") (normalize classStr)
 
 normalize :: String -> String
 normalize = normaliseSpace >>> S.trim

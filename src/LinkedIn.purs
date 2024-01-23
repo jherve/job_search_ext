@@ -103,28 +103,32 @@ asTree' n = do
 toDetached :: Node -> Effect DetachedNode
 toDetached node = unsafePartial $ toDetached' (nodeType node) node where
   toDetached' :: Partial => NodeType -> Node -> Effect DetachedNode
+  toDetached' CommentNode n = do
+    txt <- textContent n
+    pure $ DetachedComment $ normalize txt
+
+  toDetached' TextNode n = do
+    txt <- textContent n
+    pure $ DetachedText $ normalize txt
+
   toDetached' ElementNode n = do
     txt <- textContent n
     let
       el = unsafePartial $ fromJust $ E.fromNode n
       tag = E.tagName el
+    elementToDetached el tag txt
+
+  elementToDetached el tag text = do
     id <- E.id el
     -- On SVG elements "className" returns a weird "SVGString" type that cannot be trimmed
     classStr <- if tag /= "svg" && tag /= "use" && tag /= "path" then E.className el else pure $ ""
 
     pure $ DetachedElement {
       tag: E.tagName el,
-      content: normalize txt,
+      content: normalize text,
       id: if S.null id then Nothing else Just id,
       classes: A.toUnfoldable $ S.split (Pattern " ") (normalize classStr)
     }
-
-  toDetached' CommentNode n = do
-    txt <- textContent n
-    pure $ DetachedComment $ normalize txt
-  toDetached' TextNode n = do
-    txt <- textContent n
-    pure $ DetachedText $ normalize txt
 
 normalize :: String -> String
 normalize = normaliseSpace >>> S.trim

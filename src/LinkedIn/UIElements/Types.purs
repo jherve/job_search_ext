@@ -39,6 +39,7 @@ data UIElement =
   | UITimeSpan TimeSpan
   | UIPlainText String
   | UIDotSeparated UIElement UIElement
+  | UILink String UIElement
 
 derive instance Generic UIElement _
 instance Show UIElement where

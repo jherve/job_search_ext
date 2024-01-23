@@ -9,7 +9,7 @@ import Data.List as L
 import Data.Maybe (Maybe(..))
 import LinkedIn (DetachedNode(..))
 import LinkedIn.UIElements.Parser (uiElementP)
-import LinkedIn.UIElements.Types (UIElement)
+import LinkedIn.UIElements.Types (UIElement(..))
 import Parsing (runParser, ParseError)
 
 maybeGetInList ::
@@ -38,3 +38,5 @@ toUIElement ∷ DetachedNode → Either ParseError UIElement
 toUIElement (DetachedElement {content}) = runParser content uiElementP
 toUIElement (DetachedComment str) = runParser str uiElementP
 toUIElement (DetachedText str) = runParser str uiElementP
+toUIElement (DetachedA {content, href}) = map toLink $ runParser content uiElementP
+  where toLink ui = UILink href ui

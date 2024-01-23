@@ -20,6 +20,7 @@ import Effect (Effect)
 import Partial.Unsafe (unsafePartial)
 import Web.DOM (Document, Node)
 import Web.DOM.Document as D
+import Web.DOM.Element (getAttribute)
 import Web.DOM.Element as E
 import Web.DOM.Node (nodeName, nodeType, textContent)
 import Web.DOM.Node as N
@@ -76,6 +77,7 @@ queryAll' constructor selector doc = do
 
 data DetachedNode =
   DetachedElement {tag :: String, content :: String, id :: Maybe String, classes :: List String}
+  | DetachedA {content :: String, href :: String}
   | DetachedComment String
   | DetachedText String
 
@@ -117,6 +119,14 @@ toDetached node = unsafePartial $ toDetached' (nodeType node) node where
       el = unsafePartial $ fromJust $ E.fromNode n
       tag = E.tagName el
     elementToDetached el tag txt
+
+  elementToDetached el "A" text = do
+    href <- getAttribute "href" el
+
+    pure $ DetachedA {
+      content: normalize text,
+      href: unsafePartial $ fromJust href
+    }
 
   elementToDetached el tag text = do
     id <- E.id el

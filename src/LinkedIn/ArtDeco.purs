@@ -4,13 +4,18 @@ import Prelude
 
 import Data.Foldable (class Foldable, foldMap, foldlDefault, foldrDefault)
 import Data.Generic.Rep (class Generic)
+import Data.Lens (Lens', Traversal', lens', toListOf, traversed, view)
+import Data.Lens.Record (prop)
 import Data.List (List)
+import Data.List as L
 import Data.List.NonEmpty (NonEmptyList)
 import Data.List.NonEmpty as NEL
 import Data.Maybe (Maybe)
 import Data.Show.Generic (genericShow)
 import Data.Traversable (class Traversable, sequence, traverseDefault)
+import Data.Tuple (Tuple(..))
 import LinkedIn.QueryRunner (QueryRunner, ignoreNotFound, queryAll, queryOne, subQueryMany, subQueryOne)
+import Type.Proxy (Proxy(..))
 import Web.DOM (Node)
 
 
@@ -98,7 +103,7 @@ derive instance Generic (ArtDecoCenter a) _
 derive instance Eq a => Eq(ArtDecoCenter a)
 instance Show a => Show(ArtDecoCenter a) where
   show = genericShow
-derive instance Functor ArtDecoCenter 
+derive instance Functor ArtDecoCenter
 
 instance Foldable ArtDecoCenter where
   foldMap f (ArtDecoCenter {header, content}) = foldMap f header <> foldMap f content
@@ -169,9 +174,7 @@ queryArtDecoPvsEntity n = do
   pure $ ArtDecoPvsEntity {side: unit, center}
 
 toHeaderBold ∷ forall a. ArtDecoPvsEntity a → a
-toHeaderBold (ArtDecoPvsEntity {
-  center: ArtDecoCenter { header: ArtDecoCenterHeader { bold }}
-}) = bold
+toHeaderBold = view $ _pvs_to_header <<< prop (Proxy :: Proxy "bold")
 
 toHeaderNormal ∷ forall a. ArtDecoPvsEntity a → Maybe (a)
 toHeaderNormal (ArtDecoPvsEntity {
@@ -182,6 +185,57 @@ toHeaderLight ∷ forall a. ArtDecoPvsEntity a → Maybe (NonEmptyList a)
 toHeaderLight (ArtDecoPvsEntity {
   center: ArtDecoCenter { header: ArtDecoCenterHeader { light }}
 }) = light
+
+_pvs_entity :: forall a. Lens' (ArtDecoPvsEntity a) { center ∷ ArtDecoCenter a , side ∷ Unit }
+_pvs_entity = lens'
+  \(ArtDecoPvsEntity pvs) -> Tuple pvs \pvs' -> ArtDecoPvsEntity pvs'
+
+_center :: forall a. Lens' (ArtDecoCenter a) { content ∷ ArtDecoCenterContent a , header ∷ ArtDecoCenterHeader a }
+_center = lens'
+  \(ArtDecoCenter center) -> Tuple center \center' -> ArtDecoCenter center'
+
+_header :: forall a. Lens' (ArtDecoCenterHeader a) { bold ∷ a , light ∷ Maybe (NonEmptyList a) , normal ∷ Maybe a }
+_header = lens' \(ArtDecoCenterHeader h) -> Tuple h \h' -> ArtDecoCenterHeader h'
+
+_content :: forall a. Lens' (ArtDecoCenterContent a) (NonEmptyList (ArtDecoPvsEntitySubComponent a))
+_content = lens' \(ArtDecoCenterContent cs) -> Tuple cs \cs' -> ArtDecoCenterContent cs'
+
+_sub_component :: forall a. Lens' (ArtDecoPvsEntitySubComponent a) (Maybe a)
+_sub_component = lens' \(ArtDecoPvsEntitySubComponent s) -> Tuple s \s' -> ArtDecoPvsEntitySubComponent s'
+
+_pvs_to_header :: forall a. Lens' (ArtDecoPvsEntity a) { bold ∷ a , light ∷ Maybe (NonEmptyList a) , normal ∷ Maybe a }
+_pvs_to_header = _pvs_entity
+  <<< prop (Proxy :: Proxy "center")
+  <<< _center
+  <<< prop (Proxy :: Proxy "header")
+  <<< _header
+
+_pvs_to_subcomponents ∷ ∀ a. Traversal' (ArtDecoPvsEntity a) (Maybe a)
+_pvs_to_subcomponents = _pvs_entity
+  <<< prop (Proxy :: Proxy "center")
+  <<< _center
+  <<< prop (Proxy :: Proxy "content")
+  <<< _content
+  <<< traversed
+  <<< _sub_component
+
+toHeaderBold' ∷ ∀ a. ArtDecoPvsEntity a → a
+toHeaderBold' = view $ _pvs_to_header <<< prop (Proxy :: Proxy "bold")
+
+toHeaderNormal' ∷ ∀ a. ArtDecoPvsEntity a → Maybe a
+toHeaderNormal' = view $ _pvs_to_header <<< prop (Proxy :: Proxy "normal")
+
+toHeaderLight' ∷ ∀ a. ArtDecoPvsEntity a → Maybe (NonEmptyList a)
+toHeaderLight' = view $ _pvs_to_header <<< prop (Proxy :: Proxy "light")
+
+toCenterContent' ∷ ∀ a. ArtDecoPvsEntity a → List (Maybe a)
+toCenterContent' = toListOf $ _pvs_entity
+  <<< prop (Proxy :: Proxy "center")
+  <<< _center
+  <<< prop (Proxy :: Proxy "content")
+  <<< _content
+  <<< traversed
+  <<< _sub_component
 
 toCenterContent ∷ forall a. ArtDecoPvsEntity a → List a
 toCenterContent (ArtDecoPvsEntity {

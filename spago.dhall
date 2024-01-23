@@ -24,6 +24,7 @@ You can edit this file as you like.
   , "parsing"
   , "partial"
   , "prelude"
+  , "profunctor-lenses"
   , "strings"
   , "transformers"
   , "tuples"

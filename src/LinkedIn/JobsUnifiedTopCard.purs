@@ -254,17 +254,19 @@ queryJobsUnifiedTopCardElement n = do
   }
 
 toHeader ∷ forall a. JobsUnifiedTopCardElement a → a
-toHeader (JobsUnifiedTopCardElement {header}) = header
+toHeader = view $ _top_card <<< prop (Proxy :: Proxy "header")
 
 toPrimaryDescriptionLink ∷ forall a. JobsUnifiedTopCardElement a → a
-toPrimaryDescriptionLink (JobsUnifiedTopCardElement {
-  primaryDescription: TopCardPrimaryDescription {link}
-}) = link
+toPrimaryDescriptionLink = view $ _top_card
+  <<< prop (Proxy :: Proxy "primaryDescription")
+  <<< _primary_description
+  <<< prop (Proxy :: Proxy "link")
 
 toPrimaryDescriptionText ∷ forall a. JobsUnifiedTopCardElement a → a
-toPrimaryDescriptionText (JobsUnifiedTopCardElement {
-  primaryDescription: TopCardPrimaryDescription {text}
-}) = text
+toPrimaryDescriptionText = view $ _top_card
+  <<< prop (Proxy :: Proxy "primaryDescription")
+  <<< _primary_description
+  <<< prop (Proxy :: Proxy "text")
 
 _top_card ∷ forall a. Lens' (JobsUnifiedTopCardElement a) { actions ∷ Maybe (NonEmptyList (TopCardAction a)) , header ∷ a , insights ∷ Maybe (NonEmptyList (TopCardInsight a)) , primaryDescription ∷ TopCardPrimaryDescription a }
 _top_card = lens' \(JobsUnifiedTopCardElement c) -> Tuple c \c' -> JobsUnifiedTopCardElement c'

@@ -4,14 +4,18 @@ import Prelude
 
 import Data.Foldable (class Foldable, foldMap, foldlDefault, foldrDefault)
 import Data.Generic.Rep (class Generic)
+import Data.Lens (Lens', lens', toListOf, view)
+import Data.Lens.Record (prop)
 import Data.List (List)
+import Data.List as L
 import Data.List.Types (NonEmptyList)
 import Data.Maybe (Maybe)
 import Data.Show.Generic (genericShow)
 import Data.Traversable (class Traversable, sequence, traverseDefault)
-import LinkedIn.ArtDeco (ArtDecoPvsEntity, queryArtDecoPvsEntity)
-import LinkedIn.ArtDeco as AD
+import Data.Tuple (Tuple(..))
+import LinkedIn.ArtDeco (ArtDecoPvsEntity, _pvs_to_header_bold, _pvs_to_header_light, _pvs_to_header_normal, _pvs_to_subcomponents, queryArtDecoPvsEntity)
 import LinkedIn.QueryRunner (QueryRunner, subQueryOne)
+import Type.Proxy (Proxy(..))
 import Web.DOM (Node)
 
 
@@ -43,17 +47,22 @@ queryArtDecoCard n = do
   pvs_entity <- subQueryOne queryArtDecoPvsEntity ":scope div.pvs-entity--padded" n
   pure $ ArtDecoCardElement {pvs_entity}
 
-toCenterContent ∷ forall a. ArtDecoCardElement a → List a
-toCenterContent = toPvsEntity >>> AD.toCenterContent
+toHeaderBold ∷ ∀ a. ArtDecoCardElement a → a
+toHeaderBold = view $ _card_to_pvs_entity <<< _pvs_to_header_bold
 
-toHeaderBold ∷ forall a. ArtDecoCardElement a → a
-toHeaderBold = toPvsEntity >>> AD.toHeaderBold
+toHeaderNormal ∷ ∀ a. ArtDecoCardElement a → Maybe a
+toHeaderNormal = view $ _card_to_pvs_entity <<< _pvs_to_header_normal
 
-toHeaderLight ∷ forall a.  ArtDecoCardElement a → Maybe (NonEmptyList a)
-toHeaderLight = toPvsEntity >>> AD.toHeaderLight
+toHeaderLight ∷ ∀ a. ArtDecoCardElement a → Maybe (NonEmptyList a)
+toHeaderLight = view $ _card_to_pvs_entity <<< _pvs_to_header_light
 
-toHeaderNormal ∷ forall a. ArtDecoCardElement a → Maybe a
-toHeaderNormal = toPvsEntity >>> AD.toHeaderNormal
+toCenterContent ∷ ∀ a. ArtDecoCardElement a → List a
+toCenterContent c = L.catMaybes $ toContent c
+  where
+    toContent = toListOf $ _card_to_pvs_entity <<< _pvs_to_subcomponents
 
-toPvsEntity ∷ forall a. ArtDecoCardElement a → ArtDecoPvsEntity a
-toPvsEntity (ArtDecoCardElement { pvs_entity }) = pvs_entity
+_card :: forall a. Lens' (ArtDecoCardElement a) { pvs_entity ∷ ArtDecoPvsEntity a }
+_card = lens' \(ArtDecoCardElement c) -> Tuple c \c' -> ArtDecoCardElement c'
+
+_card_to_pvs_entity :: forall a. Lens' (ArtDecoCardElement a) (ArtDecoPvsEntity a)
+_card_to_pvs_entity = _card <<< prop (Proxy :: Proxy "pvs_entity")

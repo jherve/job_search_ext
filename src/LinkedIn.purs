@@ -78,6 +78,7 @@ queryAll' constructor selector doc = do
 data DetachedNode =
   DetachedElement {tag :: String, content :: String, id :: Maybe String, classes :: List String}
   | DetachedA {content :: String, href :: String}
+  | DetachedButton {content :: String, role :: Maybe String, classes :: List String}
   | DetachedComment String
   | DetachedText String
 
@@ -126,6 +127,16 @@ toDetached node = unsafePartial $ toDetached' (nodeType node) node where
     pure $ DetachedA {
       content: normalize text,
       href: unsafePartial $ fromJust href
+    }
+
+  elementToDetached el "BUTTON" text = do
+    role <- getAttribute "role" el
+    classes <- getClassList el
+
+    pure $ DetachedButton {
+      content: normalize text,
+      role,
+      classes
     }
 
   elementToDetached el tag text = do

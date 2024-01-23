@@ -4,6 +4,7 @@ import Prelude
 
 import Data.Date (Month, Year)
 import Data.Generic.Rep (class Generic)
+import Data.Maybe (Maybe)
 import Data.Show.Generic (genericShow)
 
 data MonthYear = MonthYear Month Year
@@ -40,6 +41,7 @@ data UIElement =
   | UIPlainText String
   | UIDotSeparated UIElement UIElement
   | UILink String UIElement
+  | UIButton (Maybe String) UIElement
 
 derive instance Generic UIElement _
 instance Show UIElement where

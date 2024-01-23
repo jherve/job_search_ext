@@ -5,11 +5,15 @@ import Prelude
 import Control.Monad.Error.Class (throwError)
 import Data.Foldable (class Foldable, foldMap, foldlDefault, foldrDefault)
 import Data.Generic.Rep (class Generic)
+import Data.Lens (Lens, Lens', Prism', lens', prism', toListOf, traversed, view)
+import Data.Lens.Record (prop)
 import Data.List.Types (NonEmptyList)
 import Data.Maybe (Maybe(..))
 import Data.Show.Generic (genericShow)
 import Data.Traversable (class Traversable, sequence, traverse, traverseDefault)
+import Data.Tuple (Tuple(..))
 import LinkedIn.QueryRunner (QueryError(..), QueryRunner, chooseOne, chooseOne3, ignoreNotFound, queryAll, queryOne, queryText)
+import Type.Proxy (Proxy(..))
 import Web.DOM (Node)
 import Web.DOM.Node as N
 
@@ -261,3 +265,40 @@ toPrimaryDescriptionText ∷ forall a. JobsUnifiedTopCardElement a → a
 toPrimaryDescriptionText (JobsUnifiedTopCardElement {
   primaryDescription: TopCardPrimaryDescription {text}
 }) = text
+
+_top_card ∷ forall a. Lens' (JobsUnifiedTopCardElement a) { actions ∷ Maybe (NonEmptyList (TopCardAction a)) , header ∷ a , insights ∷ Maybe (NonEmptyList (TopCardInsight a)) , primaryDescription ∷ TopCardPrimaryDescription a }
+_top_card = lens' \(JobsUnifiedTopCardElement c) -> Tuple c \c' -> JobsUnifiedTopCardElement c'
+
+_insight ∷ forall a. Lens' (TopCardInsight a) { content ∷ TopCardInsightContent a , icon ∷ a }
+_insight = lens' \(TopCardInsight i) -> Tuple i \i' -> TopCardInsight i'
+
+_action_apply ∷ forall a. Lens' (TopCardAction a) a
+_action_apply = lens' \(TopCardActionApplyButton i) -> Tuple i \i' -> TopCardActionApplyButton i'
+
+_primary_description ∷ ∀ a. Lens' (TopCardPrimaryDescription a) { link ∷ a , text ∷ a , tvmText ∷ Maybe (NonEmptyList a) }
+_primary_description = lens' \(TopCardPrimaryDescription i) -> Tuple i \i' -> TopCardPrimaryDescription i'
+
+_insight_content_single ∷ forall a. Prism' (TopCardInsightContent a) a
+_insight_content_single = prism' TopCardInsightContentSingle case _ of
+  TopCardInsightContentSingle i -> Just i
+  _ -> Nothing
+
+_insight_content_button ∷ forall a. Prism' (TopCardInsightContent a) a
+_insight_content_button = prism' TopCardInsightContentButton case _ of
+  TopCardInsightContentButton i -> Just i
+  _ -> Nothing
+
+_insight_content_secondary ∷ forall a. Prism' (TopCardInsightContent a) { primary ∷ a , secondary ∷ NonEmptyList (TopCardSecondaryInsight a) }
+_insight_content_secondary = prism' TopCardInsightContentSecondary case _ of
+  TopCardInsightContentSecondary i -> Just i
+  _ -> Nothing
+
+_insight_content_secondary_nested ∷ forall a. Prism' (TopCardSecondaryInsight a) a
+_insight_content_secondary_nested = prism' TopCardSecondaryInsightNested case _ of
+  TopCardSecondaryInsightNested i -> Just i
+  _ -> Nothing
+
+_insight_content_secondary_plain ∷ forall a. Prism' (TopCardSecondaryInsight a) a
+_insight_content_secondary_plain = prism' TopCardSecondaryInsightPlain case _ of
+  TopCardSecondaryInsightPlain i -> Just i
+  _ -> Nothing

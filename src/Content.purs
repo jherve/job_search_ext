@@ -16,11 +16,11 @@ import LinkedIn.ArtDecoCard (queryArtDecoCard)
 import LinkedIn.ArtDecoTab (queryArtDecoTab)
 import LinkedIn.DetachedNode (toDetached)
 import LinkedIn.JobsUnifiedTopCard (queryJobsUnifiedTopCardElement)
+import LinkedIn.Page.Skills as PageS
 import LinkedIn.Profile.Project as PP
 import LinkedIn.Profile.Skill as PS
 import LinkedIn.Profile.WorkExperience as PWE
 import LinkedIn.QueryRunner (runQuery)
-import LinkedIn.Page.Skills (SkillsPage(..), querySkillsPage)
 import Yoga.Tree (Tree, showTree)
 
 main :: Effect Unit
@@ -72,16 +72,12 @@ main = do
           log "parsed OK"
           logShow detached
 
-  skillsNode <- runQuery $ querySkillsPage dom
+  skillsNode <- runQuery $ PageS.querySkillsPage dom
   case skillsNode of
     Left l' -> logShow l'
     Right q -> do
-      detached <- traverse toDetached q
-      log "skills OK"
-      logShow detached
-      let
-        SkillsPage tabs = detached
-      logShow $ map PS.fromUI tabs
+      skills <- PageS.extract q
+      logShow skills
 
 maybeShowTree ∷ Maybe (NonEmptyList LinkedInUIElement) → Effect String
 maybeShowTree Nothing = pure "nope"

@@ -5,7 +5,7 @@ import Prelude
 import Control.Monad.Error.Class (throwError)
 import Data.Foldable (class Foldable, foldMap, foldlDefault, foldrDefault)
 import Data.Generic.Rep (class Generic)
-import Data.Lens (Lens, Lens', Prism', lens', prism', toListOf, traversed, view)
+import Data.Lens (Lens', Prism', lens', prism', view)
 import Data.Lens.Record (prop)
 import Data.List.Types (NonEmptyList)
 import Data.Maybe (Maybe(..))

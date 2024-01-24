@@ -16,7 +16,6 @@ import LinkedIn.Utils as U
 import Web.DOM (Node)
 import Web.DOM.Node as N
 import Web.DOM.NodeList as NL
-import Web.DOM.NodeType (NodeType(..))
 import Web.DOM.Text as T
 
 data QueryError =

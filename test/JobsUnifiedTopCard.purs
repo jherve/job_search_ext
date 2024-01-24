@@ -1,9 +1,7 @@
 module Test.JobsUnifiedTopCard where
 
-import LinkedIn.JobsUnifiedTopCard
 import Prelude
 
-import Data.Date (Month(..))
 import Data.Either (Either(..))
 import Data.List (List(..), (:))
 import Data.List.NonEmpty (NonEmptyList(..))
@@ -13,16 +11,12 @@ import Data.NonEmpty (NonEmpty(..))
 import Data.Traversable (traverse)
 import Effect (Effect)
 import LinkedIn.DetachedNode (DetachedNode(..), toDetached)
+import LinkedIn.JobsUnifiedTopCard (JobsUnifiedTopCardElement(..), TopCardAction(..), TopCardInsight(..), TopCardInsightContent(..), TopCardPrimaryDescription(..), TopCardSecondaryInsight(..), queryJobsUnifiedTopCardElement)
 import LinkedIn (LinkedInUIElement(..), getJobsUnifiedTopCard)
-import LinkedIn.Profile.WorkExperience (WorkExperience(..))
-import LinkedIn.Profile.WorkExperience as PWE
 import LinkedIn.QueryRunner (QueryError, runQuery)
-import LinkedIn.Types (ParseError(..))
-import LinkedIn.UIElements.Types (Duration(..), TimeSpan(..))
 import Node.JsDom (jsDomFromFile)
 import Partial.Unsafe (unsafePartial)
 import Test.Assert (assert, assertEqual)
-import Test.Utils (toMonthYear')
 
 testJobsUnifiedTopCard :: Effect Unit
 testJobsUnifiedTopCard = do
@@ -155,7 +149,7 @@ parseHeadCard ∷ Partial ⇒ Maybe (NonEmptyList LinkedInUIElement) → Effect 
 parseHeadCard (Just l) = do
   queried <- (\(LinkedInUIElement _ n) -> runQuery $ queryJobsUnifiedTopCardElement n) $ NEL.head l
   case queried of
-    Left l -> pure $ Left l
+    Left l' -> pure $ Left l'
     Right q -> do
       parsed <- traverse toDetached q
       pure $ Right parsed

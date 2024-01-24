@@ -1,6 +1,5 @@
 module ExampleWebExt.Content where
 
-import LinkedIn
 import Prelude
 
 import Browser.DOM (getBrowserDom)
@@ -16,12 +15,11 @@ import LinkedIn.ArtDecoCard (queryArtDecoCard)
 import LinkedIn.ArtDecoTab (queryArtDecoTab)
 import LinkedIn.DetachedNode (toDetached)
 import LinkedIn.JobsUnifiedTopCard (queryJobsUnifiedTopCardElement)
+import LinkedIn (LinkedInUIElement(..), asPrunedTrees, asTree, getArtDecoCards, getArtDecoTabs, getJobsUnifiedTopCard)
 import LinkedIn.Profile.Project as PP
 import LinkedIn.Profile.Skill as PS
-import LinkedIn.Profile.Utils (toUIElement)
 import LinkedIn.Profile.WorkExperience as PWE
 import LinkedIn.QueryRunner (runQuery)
-import Web.DOM (Node)
 import Yoga.Tree (Tree, showTree)
 
 main :: Effect Unit
@@ -44,7 +42,7 @@ main = do
     Just l -> do
       queried <- (\(LinkedInUIElement _ n) -> runQuery $ queryArtDecoCard n) $ NEL.head l
       case queried of
-        Left l -> logShow l
+        Left l' -> logShow l'
         Right p -> do
           detached <- traverse toDetached p
           logShow detached
@@ -56,7 +54,7 @@ main = do
     Just l -> do
       queried <- (\(LinkedInUIElement _ n) -> runQuery $ queryArtDecoTab n) $ NEL.head l
       case queried of
-        Left l -> logShow l
+        Left l' -> logShow l'
         Right p -> do
           detached <- traverse toDetached p
           logShow detached
@@ -67,7 +65,7 @@ main = do
     Just l -> do
       queried <- (\(LinkedInUIElement _ n) -> runQuery $ queryJobsUnifiedTopCardElement n) $ NEL.head l
       case queried of
-        Left l -> logShow l
+        Left l' -> logShow l'
         Right p -> do
           detached <- traverse toDetached p
           log "parsed OK"

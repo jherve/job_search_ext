@@ -1,7 +1,5 @@
 module Test.ArtDecoCard where
 
-import LinkedIn.ArtDeco
-import LinkedIn.ArtDecoCard
 import Prelude
 
 import Data.Date (Month(..))
@@ -13,6 +11,8 @@ import Data.Maybe (Maybe(..), isJust)
 import Data.NonEmpty (NonEmpty(..))
 import Data.Traversable (traverse)
 import Effect (Effect)
+import LinkedIn.ArtDeco (ArtDecoCenter(..), ArtDecoCenterContent(..), ArtDecoCenterHeader(..), ArtDecoPvsEntity(..), ArtDecoPvsEntitySubComponent(..))
+import LinkedIn.ArtDecoCard (ArtDecoCardElement(..), queryArtDecoCard)
 import LinkedIn.DetachedNode (DetachedNode(..), toDetached)
 import LinkedIn (LinkedInUIElement(..), getArtDecoCards)
 import LinkedIn.Profile.WorkExperience (WorkExperience(..))
@@ -96,7 +96,7 @@ parseHeadCard ∷ Partial => Maybe (NonEmptyList LinkedInUIElement) → Effect (
 parseHeadCard (Just l) = do
   queried <- (\(LinkedInUIElement _ n) -> runQuery $ queryArtDecoCard n) $ NEL.head l
   case queried of
-    Left l -> pure $ Left l
+    Left l' -> pure $ Left l'
     Right q -> do
       parsed <- traverse toDetached q
       pure $ Right parsed

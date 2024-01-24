@@ -59,11 +59,11 @@ toDetached node = unsafePartial $ toDetached' (nodeType node) node where
 elementToDetached :: Element -> String -> Effect DetachedNode
 elementToDetached el text = case E.tagName el of
   "A" -> do
-    href <- getAttribute "href" el
+    href <- unsafeGetAttribute "href" el
 
     pure $ DetachedA {
       content: normalize text,
-      href: unsafePartial $ fromJust href
+      href
     }
 
   "BUTTON" -> do
@@ -77,8 +77,8 @@ elementToDetached el text = case E.tagName el of
     }
 
   "LI-ICON" -> do
-    type_ <- getAttribute "type" el
-    pure $ DetachedLiIcon $ unsafePartial $ fromJust type_
+    type_ <- unsafeGetAttribute "type" el
+    pure $ DetachedLiIcon type_
 
   -- On SVG elements "className" returns a weird "SVGString" type that cannot be trimmed
   tag | tag == "svg" || tag == "use" || tag == "path" -> do
@@ -106,6 +106,11 @@ elementToDetached el text = case E.tagName el of
     getClassList el' = do
       classStr <- E.className el'
       pure $ A.toUnfoldable $ S.split (Pattern " ") (normalize classStr)
+
+unsafeGetAttribute ∷ String → Element → Effect String
+unsafeGetAttribute name e = do
+  attr <- getAttribute name e
+  pure $ unsafePartial $ fromJust attr
 
 normalize :: String -> String
 normalize = normaliseSpace >>> S.trim

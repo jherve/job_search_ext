@@ -2,28 +2,15 @@ module LinkedIn where
 
 import Prelude
 
-import Data.List.NonEmpty as NEL
 import Data.List.Types (NonEmptyList)
 import Data.Maybe (Maybe(..))
 import Data.Traversable (traverse)
 import Effect (Effect)
 import LinkedIn.DetachedNode (DetachedNode, asTree', cutBranches, filterEmpty)
+import LinkedIn.Queryable (queryAllNodes)
 import Web.DOM (Document, Node)
-import Web.DOM.Document as D
 import Web.DOM.Node (nodeName)
-import Web.DOM.NodeList as NL
-import Web.DOM.ParentNode (QuerySelector(..), querySelectorAll)
 import Yoga.Tree (Tree)
-
--- A light abstraction layer above the DOM manipulation API
-
-fromDocument ∷ Document → Node
-fromDocument doc = D.toNode doc
-
-queryAllNodes :: String -> Document -> Effect (Maybe (NonEmptyList Node))
-queryAllNodes selector doc = do
-  found <- querySelectorAll (QuerySelector selector) $ D.toParentNode doc
-  liftA1 NEL.fromFoldable $ NL.toArray found
 
 -- First pass of naming ; from here we know what we are looking for
 

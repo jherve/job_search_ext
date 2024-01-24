@@ -12,7 +12,7 @@ import Data.Maybe (Maybe(..))
 import Data.Show.Generic (genericShow)
 import Data.Traversable (traverse)
 import Effect (Effect)
-import LinkedIn.Utils as U
+import LinkedIn.Queryable (queryAllNodes, queryOneNode)
 import Web.DOM (Node)
 import Web.DOM.Node as N
 import Web.DOM.NodeList as NL
@@ -52,7 +52,7 @@ ignoreErrors = mapExceptT (map ignoreErrors')
 
 queryOne ∷ String → QueryRunner Node
 queryOne selector node = ExceptT $ do
-  maybeNode <- U.queryOneNode selector node
+  maybeNode <- queryOneNode selector node
   pure $ note (QNodeNotFoundError selector) maybeNode
 
 queryText ∷ Int -> QueryRunner Node
@@ -69,7 +69,7 @@ queryText idx n = ExceptT $ do
 
 queryAll ∷ String → QueryRunner (NonEmptyList Node)
 queryAll selector node = ExceptT $ do
-  maybeNodes <- U.queryAllNodes selector node
+  maybeNodes <- queryAllNodes selector node
   pure $ note (QNodeListNotFoundError selector) maybeNodes
 
 subQueryMany ∷ ∀ a. QueryRunner a → String → QueryRunner (NonEmptyList a)

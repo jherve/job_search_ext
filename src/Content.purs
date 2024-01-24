@@ -10,6 +10,7 @@ import Effect.Console (log)
 import LinkedIn.Page.Projects as PageP
 import LinkedIn.Page.WorkExperiences as PageWE
 import LinkedIn.Page.Skills as PageS
+import LinkedIn.Page.JobOffer as PageJ
 import LinkedIn.QueryRunner (runQuery)
 
 main :: Effect Unit
@@ -38,3 +39,10 @@ main = do
     Right q -> do
       skills <- PageS.extract q
       logShow skills
+
+  jobsNode <- runQuery $ PageJ.query dom
+  case jobsNode of
+    Left l' -> logShow l'
+    Right q -> do
+      job <- PageJ.extract q
+      logShow job

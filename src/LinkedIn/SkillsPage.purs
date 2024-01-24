@@ -8,8 +8,8 @@ import Data.List.Types (NonEmptyList)
 import Data.Show.Generic (genericShow)
 import Data.Traversable (class Traversable, sequence, traverseDefault)
 import LinkedIn.ArtDecoTab (ArtDecoTabElement, queryArtDecoTab)
-import LinkedIn.QueryRunner (QueryRunner, subQueryMany)
-import Web.DOM (Node)
+import LinkedIn.QueryRunner (QueryRunner', subQueryMany)
+import Web.DOM (Document, Node)
 
 data SkillsPage a = SkillsPage (NonEmptyList (ArtDecoTabElement a))
 
@@ -32,7 +32,7 @@ instance Traversable SkillsPage where
 
   traverse = \x -> traverseDefault x
 
-querySkillsPage :: QueryRunner (SkillsPage Node)
+querySkillsPage :: QueryRunner' Document (SkillsPage Node)
 querySkillsPage n = do
-  tabs <- subQueryMany queryArtDecoTab "section.artdeco-card > div ~ div > div > div > ul > li" n
+  tabs <- subQueryMany queryArtDecoTab "div.artdeco-tabs > div > div > div > div > ul > li" n
   pure $ SkillsPage tabs

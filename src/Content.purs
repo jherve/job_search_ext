@@ -20,8 +20,7 @@ import LinkedIn.Profile.Project as PP
 import LinkedIn.Profile.Skill as PS
 import LinkedIn.Profile.WorkExperience as PWE
 import LinkedIn.QueryRunner (runQuery)
-import LinkedIn.SkillsPage (querySkillsPage)
-import Web.DOM.Document as D
+import LinkedIn.SkillsPage (SkillsPage(..), querySkillsPage)
 import Yoga.Tree (Tree, showTree)
 
 main :: Effect Unit
@@ -73,13 +72,16 @@ main = do
           log "parsed OK"
           logShow detached
 
-  skillsNode <- runQuery $ querySkillsPage $ D.toNode dom
+  skillsNode <- runQuery $ querySkillsPage dom
   case skillsNode of
     Left l' -> logShow l'
     Right q -> do
       detached <- traverse toDetached q
       log "skills OK"
       logShow detached
+      let
+        SkillsPage tabs = detached
+      logShow $ map PS.fromUI tabs
 
 maybeShowTree ∷ Maybe (NonEmptyList LinkedInUIElement) → Effect String
 maybeShowTree Nothing = pure "nope"

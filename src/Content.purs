@@ -11,15 +11,17 @@ import Data.Traversable (traverse)
 import Effect (Effect)
 import Effect.Class.Console (logShow)
 import Effect.Console (log)
+import LinkedIn (LinkedInUIElement(..), asPrunedTrees, asTree, getArtDecoCards, getArtDecoTabs, getJobsUnifiedTopCard)
 import LinkedIn.ArtDecoCard (queryArtDecoCard)
 import LinkedIn.ArtDecoTab (queryArtDecoTab)
 import LinkedIn.DetachedNode (toDetached)
 import LinkedIn.JobsUnifiedTopCard (queryJobsUnifiedTopCardElement)
-import LinkedIn (LinkedInUIElement(..), asPrunedTrees, asTree, getArtDecoCards, getArtDecoTabs, getJobsUnifiedTopCard)
 import LinkedIn.Profile.Project as PP
 import LinkedIn.Profile.Skill as PS
 import LinkedIn.Profile.WorkExperience as PWE
 import LinkedIn.QueryRunner (runQuery)
+import LinkedIn.SkillsPage (querySkillsPage)
+import Web.DOM.Document as D
 import Yoga.Tree (Tree, showTree)
 
 main :: Effect Unit
@@ -70,6 +72,14 @@ main = do
           detached <- traverse toDetached p
           log "parsed OK"
           logShow detached
+
+  skillsNode <- runQuery $ querySkillsPage $ D.toNode dom
+  case skillsNode of
+    Left l' -> logShow l'
+    Right q -> do
+      detached <- traverse toDetached q
+      log "skills OK"
+      logShow detached
 
 maybeShowTree ∷ Maybe (NonEmptyList LinkedInUIElement) → Effect String
 maybeShowTree Nothing = pure "nope"

@@ -2,18 +2,18 @@ module Test.JobsUnifiedTopCard where
 
 import Prelude
 
-import Data.Either (Either(..))
+import Data.Either (hush, isRight)
 import Data.List (List(..), (:))
 import Data.List.NonEmpty (NonEmptyList(..))
-import Data.List.NonEmpty as NEL
-import Data.Maybe (Maybe(..), isJust)
+import Data.Maybe (Maybe(..), fromJust)
 import Data.NonEmpty (NonEmpty(..))
 import Data.Traversable (traverse)
 import Effect (Effect)
-import LinkedIn (LinkedInUIElement(..), getJobsUnifiedTopCard)
 import LinkedIn.DetachedNode (DetachedNode(..), toDetached)
-import LinkedIn.JobsUnifiedTopCard (JobsUnifiedTopCardElement(..), TopCardAction(..), TopCardInsight(..), TopCardInsightContent(..), TopCardPrimaryDescription(..), TopCardSecondaryInsight(..), queryJobsUnifiedTopCardElement)
-import LinkedIn.QueryRunner (QueryError, runQuery)
+import LinkedIn.JobsUnifiedTopCard (JobsUnifiedTopCardElement(..), TopCardAction(..), TopCardInsight(..), TopCardInsightContent(..), TopCardPrimaryDescription(..), TopCardSecondaryInsight(..))
+import LinkedIn.Page.JobOffer (JobOfferPage(..))
+import LinkedIn.Page.JobOffer as PageJO
+import LinkedIn.QueryRunner (runQuery)
 import Node.JsDom (jsDomFromFile)
 import Partial.Unsafe (unsafePartial)
 import Test.Assert (assert, assertEqual)
@@ -21,12 +21,19 @@ import Test.Assert (assert, assertEqual)
 testJobsUnifiedTopCard :: Effect Unit
 testJobsUnifiedTopCard = do
   dom <- jsDomFromFile "test/examples/job_offer.html"
-  topCard <- getJobsUnifiedTopCard dom
-  assert $ isJust topCard
-  headCard <- unsafePartial $ parseHeadCard topCard
+
+  wep <- runQuery $ PageJO.query dom
+
+  assert $ isRight wep
+
+  let
+    JobOfferPage jobCard = unsafePartial $ fromJust $ hush wep
+
+  topCard <- traverse toDetached jobCard
+
   assertEqual {
-    actual: headCard,
-    expected:  Right (JobsUnifiedTopCardElement {
+    actual: topCard,
+    expected:  JobsUnifiedTopCardElement {
       actions: (Just (NonEmptyList
         (NonEmpty (TopCardActionApplyButton (DetachedButton {
           classes: ("jobs-apply-button" : "artdeco-button" : "artdeco-button--3" : "artdeco-button--primary" : "ember-view" : Nil),
@@ -118,16 +125,5 @@ testJobsUnifiedTopCard = do
           ))
         ))
       })
-    })
+    }
   }
-
-
-parseHeadCard ∷ Partial ⇒ Maybe (NonEmptyList LinkedInUIElement) → Effect (Either QueryError (JobsUnifiedTopCardElement DetachedNode))
-parseHeadCard (Just l) = do
-  queried <- (\(LinkedInUIElement _ n) -> runQuery $ queryJobsUnifiedTopCardElement n) $ NEL.head l
-  case queried of
-    Left l' -> pure $ Left l'
-    Right q -> do
-      parsed <- traverse toDetached q
-      pure $ Right parsed
-

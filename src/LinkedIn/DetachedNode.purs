@@ -53,11 +53,10 @@ toDetached node = unsafePartial $ toDetached' (nodeType node) node where
     txt <- textContent n
     let
       el = unsafePartial $ fromJust $ E.fromNode n
-      tag = E.tagName el
-    elementToDetached el tag txt
+    elementToDetached el txt
 
-elementToDetached :: Element -> String -> String -> Effect DetachedNode
-elementToDetached el tag text = case tag of
+elementToDetached :: Element -> String -> Effect DetachedNode
+elementToDetached el text = case E.tagName el of
   "A" -> do
     href <- getAttribute "href" el
 
@@ -77,22 +76,22 @@ elementToDetached el tag text = case tag of
     }
 
   -- On SVG elements "className" returns a weird "SVGString" type that cannot be trimmed
-  tag' | tag' == "svg" || tag' == "use" || tag' == "path" -> do
+  tag | tag == "svg" || tag == "use" || tag == "path" -> do
     id <- E.id el
     data_ <- getAttribute "data-test-icon" el
 
     pure $ DetachedSvgElement {
-      tag: tag',
+      tag,
       id: if S.null id then Nothing else Just id,
       dataTestIcon: data_
     }
 
-  tag' -> do
+  tag -> do
     id <- E.id el
     classes <- getClassList el
 
     pure $ DetachedElement {
-      tag: tag',
+      tag,
       content: normalize text,
       id: if S.null id then Nothing else Just id,
       classes

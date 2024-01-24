@@ -16,6 +16,8 @@ import LinkedIn.ArtDecoCard (queryArtDecoCard)
 import LinkedIn.ArtDecoTab (queryArtDecoTab)
 import LinkedIn.DetachedNode (toDetached)
 import LinkedIn.JobsUnifiedTopCard (queryJobsUnifiedTopCardElement)
+import LinkedIn.Page.Projects as PageP
+import LinkedIn.Page.WorkExperiences as PageWE
 import LinkedIn.Page.Skills as PageS
 import LinkedIn.Profile.Project as PP
 import LinkedIn.Profile.Skill as PS
@@ -71,6 +73,20 @@ main = do
           detached <- traverse toDetached p
           log "parsed OK"
           logShow detached
+
+  wepNode <- runQuery $ PageWE.query dom
+  case wepNode of
+    Left l' -> logShow l'
+    Right q -> do
+      wep <- PageWE.extract q
+      logShow wep
+
+  projectsNode <- runQuery $ PageP.query dom
+  case projectsNode of
+    Left l' -> logShow l'
+    Right q -> do
+      projects <- PageP.extract q
+      logShow projects
 
   skillsNode <- runQuery $ PageS.query dom
   case skillsNode of

@@ -10,9 +10,9 @@ import Data.Maybe (Maybe(..), isJust)
 import Data.NonEmpty (NonEmpty(..))
 import Data.Traversable (traverse)
 import Effect (Effect)
+import LinkedIn (LinkedInUIElement(..), getJobsUnifiedTopCard)
 import LinkedIn.DetachedNode (DetachedNode(..), toDetached)
 import LinkedIn.JobsUnifiedTopCard (JobsUnifiedTopCardElement(..), TopCardAction(..), TopCardInsight(..), TopCardInsightContent(..), TopCardPrimaryDescription(..), TopCardSecondaryInsight(..), queryJobsUnifiedTopCardElement)
-import LinkedIn (LinkedInUIElement(..), getJobsUnifiedTopCard)
 import LinkedIn.QueryRunner (QueryError, runQuery)
 import Node.JsDom (jsDomFromFile)
 import Partial.Unsafe (unsafePartial)
@@ -65,34 +65,21 @@ testJobsUnifiedTopCard = do
                 id: (Just "undefined"),
                 tag: "SPAN"
               })) : Nil))) }),
-            icon: (DetachedElement {
-              classes: ("" : Nil),
-              content: "",
-              id: Nothing,
-              tag: "LI-ICON"
-            })
+            icon: DetachedLiIcon "job"
         }) ((TopCardInsight {
           content: (TopCardInsightContentSingle (DetachedElement {
             classes: ("" : Nil),
             content: "201-500 employés · Technologies et services de l’information",
             id: (Just "undefined"),
             tag: "SPAN" })),
-          icon: (DetachedElement {
-            classes: ("" : Nil),
-            content: "",
-            id: Nothing,
-            tag: "LI-ICON" })
+          icon: DetachedLiIcon "company"
         }) : (TopCardInsight {
             content: (TopCardInsightContentSingle (DetachedElement {
               classes: ("" : Nil),
               content: "2 anciens élèves travaillent ici",
               id: (Just "undefined"),
               tag: "SPAN" })),
-            icon: (DetachedElement {
-              classes: ("" : Nil),
-              content: "",
-              id: Nothing,
-              tag: "LI-ICON" })
+            icon: DetachedLiIcon "people"
             }) : (TopCardInsight {
               content: (TopCardInsightContentSingle (DetachedElement {
                 classes: ("" : Nil),

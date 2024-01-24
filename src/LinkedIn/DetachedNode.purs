@@ -28,6 +28,7 @@ import Yoga.Tree (Tree, leaf, mkTree)
 data DetachedNode =
   DetachedElement {tag :: String, content :: String, id :: Maybe String, classes :: List String}
   | DetachedSvgElement {tag :: String, id :: Maybe String, dataTestIcon :: Maybe String}
+  | DetachedLiIcon String
   | DetachedA {content :: String, href :: String}
   | DetachedButton {content :: String, role :: Maybe String, classes :: List String}
   | DetachedComment String
@@ -74,6 +75,10 @@ elementToDetached el text = case E.tagName el of
       role,
       classes
     }
+
+  "LI-ICON" -> do
+    type_ <- getAttribute "type" el
+    pure $ DetachedLiIcon $ unsafePartial $ fromJust type_
 
   -- On SVG elements "className" returns a weird "SVGString" type that cannot be trimmed
   tag | tag == "svg" || tag == "use" || tag == "path" -> do

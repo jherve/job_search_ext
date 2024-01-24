@@ -40,10 +40,13 @@ toUIElement ∷ DetachedNode → Either ParseError UIElement
 toUIElement (DetachedElement {content}) = runParser content uiElementP
 toUIElement (DetachedComment str) = runParser str uiElementP
 toUIElement (DetachedText str) = runParser str uiElementP
+
 toUIElement (DetachedSvgElement {id, dataTestIcon, tag: "svg"}) = case id <|> dataTestIcon of
   Just i -> Right (UIIcon i)
   Nothing -> Left (ParseError "SVG element could not be identified" initialPos)
 toUIElement (DetachedSvgElement _) = Left (ParseError "SVG element could not be identified" initialPos)
+
+toUIElement (DetachedLiIcon i) = Right (UIIcon i)
 
 toUIElement (DetachedButton {content, role}) =  map toButton $ runParser content uiElementP
   where toButton ui = UIButton role ui

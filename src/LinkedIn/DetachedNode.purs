@@ -16,7 +16,7 @@ import Data.Traversable (sequence)
 import Effect (Effect)
 import Partial.Unsafe (unsafePartial)
 import Web.DOM (Node)
-import Web.DOM.Element (getAttribute)
+import Web.DOM.Element (Element, getAttribute)
 import Web.DOM.Element as E
 import Web.DOM.Node (nodeType, textContent)
 import Web.DOM.Node as N
@@ -55,7 +55,9 @@ toDetached node = unsafePartial $ toDetached' (nodeType node) node where
       tag = E.tagName el
     elementToDetached el tag txt
 
-  elementToDetached el "A" text = do
+elementToDetached :: Element -> String -> String -> Effect DetachedNode
+elementToDetached el tag text = case tag of
+  "A" -> do
     href <- getAttribute "href" el
 
     pure $ DetachedA {
@@ -63,7 +65,7 @@ toDetached node = unsafePartial $ toDetached' (nodeType node) node where
       href: unsafePartial $ fromJust href
     }
 
-  elementToDetached el "BUTTON" text = do
+  "BUTTON" -> do
     role <- getAttribute "role" el
     classes <- getClassList el
 
@@ -73,21 +75,32 @@ toDetached node = unsafePartial $ toDetached' (nodeType node) node where
       classes
     }
 
-  elementToDetached el tag text = do
+  -- On SVG elements "className" returns a weird "SVGString" type that cannot be trimmed
+  tag' | tag' == "svg" || tag' == "use" || tag' == "path" -> do
     id <- E.id el
-    -- On SVG elements "className" returns a weird "SVGString" type that cannot be trimmed
-    classes <- if tag /= "svg" && tag /= "use" && tag /= "path" then getClassList el else pure $ Nil
 
     pure $ DetachedElement {
-      tag: E.tagName el,
+      tag: tag',
+      content: normalize text,
+      id: if S.null id then Nothing else Just id,
+      classes: Nil
+    }
+
+  tag' -> do
+    id <- E.id el
+    classes <- getClassList el
+
+    pure $ DetachedElement {
+      tag: tag',
       content: normalize text,
       id: if S.null id then Nothing else Just id,
       classes
     }
 
-  getClassList el = do
-    classStr <- E.className el
-    pure $ A.toUnfoldable $ S.split (Pattern " ") (normalize classStr)
+  where
+    getClassList el' = do
+      classStr <- E.className el'
+      pure $ A.toUnfoldable $ S.split (Pattern " ") (normalize classStr)
 
 normalize :: String -> String
 normalize = normaliseSpace >>> S.trim

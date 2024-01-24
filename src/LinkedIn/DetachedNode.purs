@@ -27,6 +27,7 @@ import Yoga.Tree (Tree, leaf, mkTree)
 
 data DetachedNode =
   DetachedElement {tag :: String, content :: String, id :: Maybe String, classes :: List String}
+  | DetachedSvgElement {tag :: String, id :: Maybe String, dataTestIcon :: Maybe String}
   | DetachedA {content :: String, href :: String}
   | DetachedButton {content :: String, role :: Maybe String, classes :: List String}
   | DetachedComment String
@@ -78,12 +79,12 @@ elementToDetached el tag text = case tag of
   -- On SVG elements "className" returns a weird "SVGString" type that cannot be trimmed
   tag' | tag' == "svg" || tag' == "use" || tag' == "path" -> do
     id <- E.id el
+    data_ <- getAttribute "data-test-icon" el
 
-    pure $ DetachedElement {
+    pure $ DetachedSvgElement {
       tag: tag',
-      content: normalize text,
       id: if S.null id then Nothing else Just id,
-      classes: Nil
+      dataTestIcon: data_
     }
 
   tag' -> do

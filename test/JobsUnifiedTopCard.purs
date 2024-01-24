@@ -99,24 +99,14 @@ testJobsUnifiedTopCard = do
                 content: "Découvrez comment vous vous positionnez par rapport à 87 candidats. Essai Premium pour 0 EUR",
                 id: (Just "undefined"),
                 tag: "SPAN" })),
-              icon: (DetachedElement {
-                classes: Nil,
-                content: "",
-                id: Nothing,
-                tag: "svg"
-              })
+              icon: (DetachedSvgElement { dataTestIcon: (Just "lightbulb-medium"), id: Nothing, tag: "svg" })
             }) : (TopCardInsight {
               content: (TopCardInsightContentButton (DetachedButton {
                 classes: ("job-details-jobs-unified-top-card__job-insight-text-button" : Nil),
                 content: "9 compétences sur 11 correspondent à votre profil, vous pourriez bien convenir pour ce poste",
                 role: Nothing
               })),
-              icon: (DetachedElement {
-                classes: Nil,
-                content: "",
-                id: Nothing,
-                tag: "svg"
-              })
+              icon: (DetachedSvgElement { dataTestIcon: (Just "checklist-medium"), id: Nothing, tag: "svg" })
             }) : Nil)))),
       primaryDescription: (TopCardPrimaryDescription {
         link: (DetachedA { content: "LINCOLN", href: "https://www.linkedin.com/company/lincoln-/life" }),

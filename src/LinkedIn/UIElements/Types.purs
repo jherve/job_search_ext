@@ -42,6 +42,7 @@ data UIElement =
   | UIDotSeparated UIElement UIElement
   | UILink String UIElement
   | UIButton (Maybe String) UIElement
+  | UIIcon String
 
 derive instance Generic UIElement _
 instance Show UIElement where

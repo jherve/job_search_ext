@@ -7,11 +7,12 @@ import Data.Either (Either(..))
 import Effect (Effect)
 import Effect.Class.Console (logShow)
 import Effect.Console (log)
-import LinkedIn.Page.Projects as PageP
-import LinkedIn.Page.WorkExperiences as PageWE
-import LinkedIn.Page.Skills as PageS
 import LinkedIn.Page.JobOffer as PageJ
-import LinkedIn.QueryRunner (runQuery)
+import LinkedIn.Page.Projects as PageP
+import LinkedIn.Page.Skills as PageS
+import LinkedIn.Page.WorkExperiences as PageWE
+import LinkedIn.QueryRunner (QueryRunner', runQuery)
+import Web.DOM (Document, Node)
 
 main :: Effect Unit
 main = do
@@ -19,30 +20,22 @@ main = do
 
   dom <- getBrowserDom
 
-  wepNode <- runQuery $ PageWE.query dom
-  case wepNode of
-    Left l' -> logShow l'
-    Right q -> do
-      wep <- PageWE.extract q
-      logShow wep
+  runQueryAndExtract PageWE.query PageWE.extract dom
+  runQueryAndExtract PageP.query PageP.extract dom
+  runQueryAndExtract PageS.query PageS.extract dom
+  runQueryAndExtract PageJ.query PageJ.extract dom
 
-  projectsNode <- runQuery $ PageP.query dom
-  case projectsNode of
+runQueryAndExtract ∷
+  ∀ f1 a.
+  Show a
+  ⇒ QueryRunner' Document (f1 Node)
+  → (f1 Node → Effect (Either String a))
+  → Document
+  → Effect Unit
+runQueryAndExtract query extract dom = do
+  n <- runQuery $ query dom
+  case n of
     Left l' -> logShow l'
     Right q -> do
-      projects <- PageP.extract q
-      logShow projects
-
-  skillsNode <- runQuery $ PageS.query dom
-  case skillsNode of
-    Left l' -> logShow l'
-    Right q -> do
-      skills <- PageS.extract q
-      logShow skills
-
-  jobsNode <- runQuery $ PageJ.query dom
-  case jobsNode of
-    Left l' -> logShow l'
-    Right q -> do
-      job <- PageJ.extract q
-      logShow job
+      extracted <- extract q
+      logShow extracted

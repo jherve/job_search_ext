@@ -1,4 +1,4 @@
-module LinkedIn.Utils (queryOne, queryAll) where
+module LinkedIn.Utils (queryOneNode, queryAllNodes) where
 
 import Prelude
 
@@ -20,14 +20,14 @@ toParentNode' n =
         he <- E.fromNode node
         pure $ E.toParentNode he
 
-queryOne :: String -> Node -> Effect (Maybe Node)
-queryOne selector n = do
+queryOneNode :: String -> Node -> Effect (Maybe Node)
+queryOneNode selector n = do
   found <- querySelector (QuerySelector selector) $ toParentNode' n
   pure case found of
     Nothing -> Nothing
     Just el -> Just $ E.toNode el
 
-queryAll :: String -> Node -> Effect (Maybe (NonEmptyList Node))
-queryAll selector n = do
+queryAllNodes :: String -> Node -> Effect (Maybe (NonEmptyList Node))
+queryAllNodes selector n = do
   found <- querySelectorAll (QuerySelector selector) $ toParentNode' n
   liftA1 NEL.fromFoldable $ NL.toArray found

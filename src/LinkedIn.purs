@@ -10,10 +10,9 @@ import Effect (Effect)
 import LinkedIn.DetachedNode (DetachedNode, asTree', cutBranches, filterEmpty)
 import Web.DOM (Document, Node)
 import Web.DOM.Document as D
-import Web.DOM.Element as E
 import Web.DOM.Node (nodeName)
 import Web.DOM.NodeList as NL
-import Web.DOM.ParentNode (QuerySelector(..), querySelector, querySelectorAll)
+import Web.DOM.ParentNode (QuerySelector(..), querySelectorAll)
 import Yoga.Tree (Tree)
 
 -- A light abstraction layer above the DOM manipulation API
@@ -21,15 +20,8 @@ import Yoga.Tree (Tree)
 fromDocument ∷ Document → Node
 fromDocument doc = D.toNode doc
 
-queryOne :: String -> Document -> Effect (Maybe Node)
-queryOne selector doc = do
-  found <- querySelector (QuerySelector selector) $ D.toParentNode doc
-  pure case found of
-    Nothing -> Nothing
-    Just el -> Just $ E.toNode el
-
-queryAll :: String -> Document -> Effect (Maybe (NonEmptyList Node))
-queryAll selector doc = do
+queryAllNodes :: String -> Document -> Effect (Maybe (NonEmptyList Node))
+queryAllNodes selector doc = do
   found <- querySelectorAll (QuerySelector selector) $ D.toParentNode doc
   liftA1 NEL.fromFoldable $ NL.toArray found
 
@@ -58,7 +50,7 @@ getJobsUnifiedTopCard = queryAll' LinkedInUIJobsUnifiedTopCard "div.jobs-unified
 
 queryAll' ∷ LinkedInUIElementType → String → Document → Effect (Maybe (NonEmptyList LinkedInUIElement))
 queryAll' constructor selector doc = do
-  nodes <- queryAll selector doc
+  nodes <- queryAllNodes selector doc
   pure case nodes of
     Nothing -> Nothing
     Just cards -> Just $ map (LinkedInUIElement constructor) cards

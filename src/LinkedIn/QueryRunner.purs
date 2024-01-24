@@ -47,12 +47,12 @@ ignoreErrors ∷ ∀ a f. Functor f ⇒ ExceptT QueryError f a → ExceptT Query
 ignoreErrors = mapExceptT (map ignoreErrors')
   where
     ignoreErrors' = case _ of
-      (Left q) -> Right Nothing
+      (Left _) -> Right Nothing
       (Right n') -> Right (Just n')
 
 queryOne ∷ String → QueryRunner Node
 queryOne selector node = ExceptT $ do
-  maybeNode <- U.queryOne selector node
+  maybeNode <- U.queryOneNode selector node
   pure $ note (QNodeNotFoundError selector) maybeNode
 
 queryText ∷ Int -> QueryRunner Node
@@ -69,7 +69,7 @@ queryText idx n = ExceptT $ do
 
 queryAll ∷ String → QueryRunner (NonEmptyList Node)
 queryAll selector node = ExceptT $ do
-  maybeNodes <- U.queryAll selector node
+  maybeNodes <- U.queryAllNodes selector node
   pure $ note (QNodeListNotFoundError selector) maybeNodes
 
 subQueryMany ∷ ∀ a. QueryRunner a → String → QueryRunner (NonEmptyList a)

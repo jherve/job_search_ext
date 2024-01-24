@@ -12,10 +12,8 @@ import Data.Maybe (Maybe(..))
 import Data.Show.Generic (genericShow)
 import Data.Traversable (traverse)
 import Effect (Effect)
-import LinkedIn.Queryable (queryAllNodes, queryOneNode)
+import LinkedIn.Queryable (class Queryable, getChildrenArray, queryAllNodes, queryOneNode)
 import Web.DOM (Node)
-import Web.DOM.Node as N
-import Web.DOM.NodeList as NL
 import Web.DOM.Text as T
 
 data QueryError =
@@ -30,7 +28,10 @@ derive instance Eq QueryError
 instance Show QueryError where
   show = genericShow
 
-type QueryRunner a = Node → ExceptT QueryError Effect a
+-- QueryRunner' is a generalization of QueryRunner for all Queryable instances (e.g. Document)
+type QueryRunner' q a = q → ExceptT QueryError Effect a
+
+type QueryRunner a = QueryRunner' Node a
 
 runQuery ∷ ∀ a. ExceptT QueryError Effect a → Effect (Either QueryError a)
 runQuery = runExceptT
@@ -51,15 +52,14 @@ ignoreErrors = mapExceptT (map ignoreErrors')
       (Left _) -> Right Nothing
       (Right n') -> Right (Just n')
 
-queryOne ∷ String → QueryRunner Node
+queryOne ∷ forall q. Queryable q => String → QueryRunner' q Node
 queryOne selector node = ExceptT $ do
   maybeNode <- queryOneNode selector node
   pure $ note (QNodeNotFoundError selector) maybeNode
 
-queryText ∷ Int -> QueryRunner Node
+queryText ∷ forall q. Queryable q => Int -> QueryRunner' q Node
 queryText idx n = ExceptT $ do
-  children <- N.childNodes n
-  childrenArr <- NL.toArray children
+  childrenArr <- getChildrenArray n
   let
     maybeText n' = do
       _ <- T.fromNode n'
@@ -68,15 +68,15 @@ queryText idx n = ExceptT $ do
 
   pure $ note QTextNotFoundError $ A.index allTexts idx
 
-queryAll ∷ String → QueryRunner (NonEmptyList Node)
+queryAll ∷ forall q. Queryable q => String → QueryRunner' q (NonEmptyList Node)
 queryAll selector node = ExceptT $ do
   maybeNodes <- queryAllNodes selector node
   pure $ note (QNodeListNotFoundError selector) maybeNodes
 
-subQueryMany ∷ ∀ a. QueryRunner a → String → QueryRunner (NonEmptyList a)
+subQueryMany ∷ ∀ a q. Queryable q ⇒ QueryRunner a → String → QueryRunner' q (NonEmptyList a)
 subQueryMany query selector n = traverse query =<< queryAll selector n
 
-subQueryOne ∷ ∀ a. QueryRunner a → String → QueryRunner a
+subQueryOne ∷ ∀ a q. Queryable q ⇒ QueryRunner a → String → QueryRunner' q a
 subQueryOne query selector n = query =<< queryOne selector n
 
 chooseOne ∷ ∀ a t m. Monad m ⇒ (t → ExceptT QueryError m a) → (t → ExceptT QueryError m a) → (t → ExceptT QueryError m a)

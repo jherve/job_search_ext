@@ -10,6 +10,7 @@ import Partial.Unsafe (unsafePartial)
 import Web.DOM (Document, Node, ParentNode)
 import Web.DOM.Document as D
 import Web.DOM.Element as E
+import Web.DOM.Node as N
 import Web.DOM.NodeList as NL
 import Web.DOM.ParentNode (QuerySelector(..), querySelector, querySelectorAll)
 
@@ -17,6 +18,7 @@ import Web.DOM.ParentNode (QuerySelector(..), querySelector, querySelectorAll)
 
 class Queryable a where
   toParentNode :: a -> ParentNode
+  toChildrenArray :: a -> Effect (Array Node)
 
 instance Queryable Node where
   toParentNode :: Node -> ParentNode
@@ -27,8 +29,13 @@ instance Queryable Node where
           he <- E.fromNode node
           pure $ E.toParentNode he
 
+  toChildrenArray n = do
+    children <- N.childNodes n
+    NL.toArray children
+
 instance Queryable Document where
   toParentNode = D.toParentNode
+  toChildrenArray d = toChildrenArray $ D.toNode d
 
 queryOneNode :: forall a. Queryable a => String -> a -> Effect (Maybe Node)
 queryOneNode selector n = do
@@ -41,3 +48,6 @@ queryAllNodes :: forall a. Queryable a => String -> a -> Effect (Maybe (NonEmpty
 queryAllNodes selector n = do
   found <- querySelectorAll (QuerySelector selector) $ toParentNode n
   liftA1 NEL.fromFoldable $ NL.toArray found
+
+getChildrenArray :: forall a. Queryable a => a -> Effect (Array Node)
+getChildrenArray = toChildrenArray

@@ -40,6 +40,7 @@ ignoreNotFound = mapExceptT (map ignoreNotFound')
   where
     ignoreNotFound' = case _ of
       (Left (QNodeNotFoundError _ )) -> Right Nothing
+      (Left (QNodeListNotFoundError _ )) -> Right Nothing
       (Left q) -> Left q
       (Right n') -> Right (Just n')
 

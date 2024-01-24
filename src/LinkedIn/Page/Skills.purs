@@ -37,8 +37,8 @@ instance Traversable SkillsPage where
 
   traverse = \x -> traverseDefault x
 
-querySkillsPage :: QueryRunner' Document (SkillsPage Node)
-querySkillsPage n = do
+query :: QueryRunner' Document (SkillsPage Node)
+query n = do
   tabs <- subQueryMany queryArtDecoTab "div.artdeco-tabs > div > div > div > div > ul > li" n
   pure $ SkillsPage tabs
 

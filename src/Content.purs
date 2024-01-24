@@ -72,7 +72,7 @@ main = do
           log "parsed OK"
           logShow detached
 
-  skillsNode <- runQuery $ PageS.querySkillsPage dom
+  skillsNode <- runQuery $ PageS.query dom
   case skillsNode of
     Left l' -> logShow l'
     Right q -> do

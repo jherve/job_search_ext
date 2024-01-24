@@ -34,16 +34,14 @@ testJobsUnifiedTopCard = do
     actual: headCard,
     expected:  Right (JobsUnifiedTopCardElement {
       actions: (Just (NonEmptyList
-        (NonEmpty (TopCardActionApplyButton (DetachedElement {
+        (NonEmpty (TopCardActionApplyButton (DetachedButton {
           classes: ("jobs-apply-button" : "artdeco-button" : "artdeco-button--3" : "artdeco-button--primary" : "ember-view" : Nil),
           content: "Candidature simplifiée",
-          id: (Just "ember115"),
-          tag: "BUTTON"
-        })) ((TopCardActionApplyButton (DetachedElement {
+          role: Nothing
+        })) ((TopCardActionApplyButton (DetachedButton {
           classes: ("jobs-save-button" : "artdeco-button" : "artdeco-button--3" : "artdeco-button--secondary" : Nil),
           content: "Enregistrer Enregistrer Data Engineer H/F - Secteur Energie chez LINCOLN",
-          id: Nothing,
-          tag: "BUTTON"
+          role: Nothing
         })) : Nil)))),
       header: (DetachedElement {
         classes: ("t-24" : "t-bold" : "job-details-jobs-unified-top-card__job-title" : Nil),
@@ -108,30 +106,26 @@ testJobsUnifiedTopCard = do
                 id: (Just "undefined"),
                 tag: "SPAN" })),
               icon: (DetachedElement {
-                classes: ("" : Nil),
+                classes: Nil,
                 content: "",
                 id: Nothing,
                 tag: "svg"
               })
             }) : (TopCardInsight {
-              content: (TopCardInsightContentButton (DetachedElement {
+              content: (TopCardInsightContentButton (DetachedButton {
                 classes: ("job-details-jobs-unified-top-card__job-insight-text-button" : Nil),
                 content: "9 compétences sur 11 correspondent à votre profil, vous pourriez bien convenir pour ce poste",
-                id: (Just "undefined"),
-                tag: "BUTTON" })),
+                role: Nothing
+              })),
               icon: (DetachedElement {
-                classes: ("" : Nil),
+                classes: Nil,
                 content: "",
                 id: Nothing,
                 tag: "svg"
               })
             }) : Nil)))),
       primaryDescription: (TopCardPrimaryDescription {
-        link: (DetachedElement {
-          classes: ("app-aware-link" : Nil),
-          content: "LINCOLN",
-          id: Nothing,
-          tag: "A" }),
+        link: (DetachedA { content: "LINCOLN", href: "https://www.linkedin.com/company/lincoln-/life" }),
         text: (DetachedText "· Boulogne-Billancourt, Île-de-France, France"),
         tvmText: (Just (NonEmptyList
           (NonEmpty (DetachedElement {

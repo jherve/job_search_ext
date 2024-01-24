@@ -50,31 +50,22 @@ toDetached node = unsafePartial $ toDetached' (nodeType node) node where
     txt <- textContent n
     pure $ DetachedText $ normalize txt
 
-  toDetached' ElementNode n = do
-    txt <- textContent n
-    let
-      el = unsafePartial $ fromJust $ E.fromNode n
-    elementToDetached el txt
+  toDetached' ElementNode n = elementToDetached $ unsafePartial $ fromJust $ E.fromNode n
 
-elementToDetached :: Element -> String -> Effect DetachedNode
-elementToDetached el text = case E.tagName el of
+elementToDetached :: Element -> Effect DetachedNode
+elementToDetached el = case E.tagName el of
   "A" -> do
+    content <- toText el
     href <- unsafeGetAttribute "href" el
 
-    pure $ DetachedA {
-      content: normalize text,
-      href
-    }
+    pure $ DetachedA {content, href}
 
   "BUTTON" -> do
+    content <- toText el
     role <- getAttribute "role" el
     classes <- getClassList el
 
-    pure $ DetachedButton {
-      content: normalize text,
-      role,
-      classes
-    }
+    pure $ DetachedButton {content, role, classes}
 
   "LI-ICON" -> do
     type_ <- unsafeGetAttribute "type" el
@@ -82,30 +73,30 @@ elementToDetached el text = case E.tagName el of
 
   -- On SVG elements "className" returns a weird "SVGString" type that cannot be trimmed
   tag | tag == "svg" || tag == "use" || tag == "path" -> do
-    id <- E.id el
+    id <- getId el
     data_ <- getAttribute "data-test-icon" el
 
-    pure $ DetachedSvgElement {
-      tag,
-      id: if S.null id then Nothing else Just id,
-      dataTestIcon: data_
-    }
+    pure $ DetachedSvgElement {tag, id, dataTestIcon: data_}
 
   tag -> do
-    id <- E.id el
+    content <- toText el
+    id <- getId el
     classes <- getClassList el
 
-    pure $ DetachedElement {
-      tag,
-      content: normalize text,
-      id: if S.null id then Nothing else Just id,
-      classes
-    }
+    pure $ DetachedElement {tag, content, id, classes}
 
   where
     getClassList el' = do
       classStr <- E.className el'
       pure $ A.toUnfoldable $ S.split (Pattern " ") (normalize classStr)
+
+    getId el' = do
+      id <- E.id el'
+      pure $ if S.null id then Nothing else Just id
+
+    toText el' = do
+      txt <- textContent $ E.toNode el'
+      pure $ normalize txt
 
 unsafeGetAttribute ∷ String → Element → Effect String
 unsafeGetAttribute name e = do

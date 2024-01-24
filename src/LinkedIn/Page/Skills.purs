@@ -1,4 +1,4 @@
-module LinkedIn.SkillsPage where
+module LinkedIn.Page.Skills where
 
 import Prelude
 

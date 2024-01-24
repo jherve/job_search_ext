@@ -20,7 +20,7 @@ import LinkedIn.Profile.Project as PP
 import LinkedIn.Profile.Skill as PS
 import LinkedIn.Profile.WorkExperience as PWE
 import LinkedIn.QueryRunner (runQuery)
-import LinkedIn.SkillsPage (SkillsPage(..), querySkillsPage)
+import LinkedIn.Page.Skills (SkillsPage(..), querySkillsPage)
 import Yoga.Tree (Tree, showTree)
 
 main :: Effect Unit

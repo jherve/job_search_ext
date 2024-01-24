@@ -14,6 +14,7 @@ import Effect.Class.Console (logShow)
 import Effect.Console (log)
 import LinkedIn.ArtDecoCard (queryArtDecoCard)
 import LinkedIn.ArtDecoTab (queryArtDecoTab)
+import LinkedIn.DetachedNode (toDetached)
 import LinkedIn.JobsUnifiedTopCard (queryJobsUnifiedTopCardElement)
 import LinkedIn.Profile.Project as PP
 import LinkedIn.Profile.Skill as PS

@@ -7,7 +7,7 @@ import Data.Foldable (class Foldable, findMap)
 import Data.List (List)
 import Data.List as L
 import Data.Maybe (Maybe(..))
-import LinkedIn (DetachedNode(..))
+import LinkedIn.DetachedNode (DetachedNode(..))
 import LinkedIn.UIElements.Parser (uiElementP)
 import LinkedIn.UIElements.Types (UIElement(..))
 import Parsing (runParser, ParseError)

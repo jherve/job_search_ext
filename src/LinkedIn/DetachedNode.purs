@@ -13,6 +13,7 @@ import Data.String (Pattern(..))
 import Data.String as S
 import Data.String.CodeUnits (fromCharArray, toCharArray)
 import Data.Traversable (sequence)
+import Debug (trace)
 import Effect (Effect)
 import Partial.Unsafe (unsafePartial)
 import Web.DOM (Node)
@@ -88,7 +89,11 @@ elementToDetached el = case E.tagName el of
   where
     getClassList el' = do
       classStr <- E.className el'
-      pure $ A.toUnfoldable $ S.split (Pattern " ") (normalize classStr)
+      let
+        list = case normalize classStr of
+          "" -> Nil
+          str -> A.toUnfoldable $ S.split (Pattern " ") str
+      pure list
 
     getId el' = do
       id <- E.id el'

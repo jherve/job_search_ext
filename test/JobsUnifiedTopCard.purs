@@ -54,14 +54,14 @@ testJobsUnifiedTopCard = do
         (NonEmpty (TopCardInsight {
           content: (TopCardInsightContentSecondary {
             primary: (DetachedElement {
-              classes: ("" : Nil),
+              classes: Nil,
               content: "Sur site",
               id: Nothing,
               tag: "SPAN"
             }),
             secondary: (NonEmptyList (NonEmpty (TopCardSecondaryInsightNested
               (DetachedElement {
-                classes: ("" : Nil),
+                classes: Nil,
                 content: "Temps plein",
                 id: Nothing,
                 tag: "SPAN"
@@ -75,21 +75,21 @@ testJobsUnifiedTopCard = do
             icon: DetachedLiIcon "job"
         }) ((TopCardInsight {
           content: (TopCardInsightContentSingle (DetachedElement {
-            classes: ("" : Nil),
+            classes: Nil,
             content: "201-500 employés · Technologies et services de l’information",
             id: (Just "undefined"),
             tag: "SPAN" })),
           icon: DetachedLiIcon "company"
         }) : (TopCardInsight {
             content: (TopCardInsightContentSingle (DetachedElement {
-              classes: ("" : Nil),
+              classes: Nil,
               content: "2 anciens élèves travaillent ici",
               id: (Just "undefined"),
               tag: "SPAN" })),
             icon: DetachedLiIcon "people"
             }) : (TopCardInsight {
               content: (TopCardInsightContentSingle (DetachedElement {
-                classes: ("" : Nil),
+                classes: Nil,
                 content: "Découvrez comment vous vous positionnez par rapport à 87 candidats. Essai Premium pour 0 EUR",
                 id: (Just "undefined"),
                 tag: "SPAN" })),

@@ -18,8 +18,8 @@ import Node.JsDom (jsDomFromFile)
 import Partial.Unsafe (unsafePartial)
 import Test.Assert (assert, assertEqual)
 
-testJobsUnifiedTopCard :: Effect Unit
-testJobsUnifiedTopCard = do
+main :: Effect Unit
+main = do
   dom <- jsDomFromFile "test/examples/job_offer.html"
 
   wep <- runQuery $ PageJO.query dom

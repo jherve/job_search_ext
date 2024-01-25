@@ -96,6 +96,6 @@ testArtDecoCards = do
       })
   }
 
-testArtDecoCard :: Effect Unit
-testArtDecoCard = do
+main :: Effect Unit
+main = do
   testArtDecoCards

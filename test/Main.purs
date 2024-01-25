@@ -3,12 +3,12 @@ module Test.Main where
 import Prelude
 
 import Effect (Effect)
-import Test.ArtDecoCard (testArtDecoCard)
-import Test.JobsUnifiedTopCard (testJobsUnifiedTopCard)
-import Test.UIStringParser (testUIStringParser)
+import Test.ArtDecoCard as ArtDecoCard
+import Test.JobsUnifiedTopCard as JobsUnifiedTopCard
+import Test.UIStringParser as UIStringParser
 
 main :: Effect Unit
 main = do
-  testArtDecoCard
-  testJobsUnifiedTopCard
-  testUIStringParser
+  ArtDecoCard.main
+  JobsUnifiedTopCard.main
+  UIStringParser.main

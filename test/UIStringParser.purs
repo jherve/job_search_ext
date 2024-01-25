@@ -1,5 +1,5 @@
 module Test.UIStringParser
-  ( testUIStringParser
+  ( main
   )
   where
 
@@ -89,8 +89,8 @@ testUIParserDotSeparated = do
     expected: Right(UIStringDotSeparated (UIStringPlain "") (UIStringPlain "Boulogne-Billancourt, Île-de-France, France"))
   }
 
-testUIStringParser :: Effect Unit
-testUIStringParser = do
+main :: Effect Unit
+main = do
   testMonthYearParser
   testTimeSpanParser
   testDurationParser

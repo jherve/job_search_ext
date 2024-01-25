@@ -10,7 +10,7 @@ import Data.Show.Generic (genericShow)
 import LinkedIn.DetachedNode (DetachedNode)
 import LinkedIn.JobsUnifiedTopCard (JobsUnifiedTopCardElement, toHeader, toPrimaryDescriptionLink, toPrimaryDescriptionText)
 import LinkedIn.Profile.Utils (toUIElement)
-import LinkedIn.UIElements.Types (UIElement(..))
+import LinkedIn.UIElements.Types (UIElement(..), UIString(..))
 
 data JobOffer = JobOffer {
   title :: String,
@@ -39,12 +39,12 @@ fromUI card = ado
 
 extractTitle :: UIElement -> Maybe String
 extractTitle = case _ of
-  UIPlainText str -> Just str
+  UIElement (UIStringPlain str) -> Just str
   _ -> Nothing
 
 extractCompany :: UIElement -> Maybe String
 extractCompany = case _ of
-  UILink _ (UIPlainText str) -> Just str
+  UILink _ (UIStringPlain str) -> Just str
   _ -> Nothing
 
 extractCompanyLink :: UIElement -> Maybe String
@@ -54,5 +54,5 @@ extractCompanyLink = case _ of
 
 extractLocation :: UIElement -> Maybe String
 extractLocation = case _ of
-  UIDotSeparated _ (UIPlainText str) -> Just str
+  UIElement (UIStringDotSeparated _ (UIStringPlain str)) -> Just str
   _ -> Nothing

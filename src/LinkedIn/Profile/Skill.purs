@@ -7,10 +7,10 @@ import Data.Foldable (findMap)
 import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe(..))
 import Data.Show.Generic (genericShow)
-import LinkedIn.DetachedNode (DetachedNode)
 import LinkedIn.ArtDecoTab (ArtDecoTabElement, toHeaderBold)
+import LinkedIn.DetachedNode (DetachedNode)
 import LinkedIn.Profile.Utils (toUIElement)
-import LinkedIn.UIElements.Types (UIElement(..))
+import LinkedIn.UIElements.Types (UIElement(..), UIString(..))
 
 data Skill = Skill {
   name :: String
@@ -31,5 +31,5 @@ fromUI (tab) = ado
 
 extractName :: UIElement -> Maybe String
 extractName = case _ of
-  UIPlainText str -> Just str
+  UIElement (UIStringPlain str) -> Just str
   _ -> Nothing

@@ -7,10 +7,10 @@ import Data.Foldable (findMap)
 import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe(..))
 import Data.Show.Generic (genericShow)
-import LinkedIn.DetachedNode (DetachedNode)
 import LinkedIn.ArtDecoCard (ArtDecoCardElement, toCenterContent, toHeaderBold, toHeaderLight, toHeaderNormal)
+import LinkedIn.DetachedNode (DetachedNode)
 import LinkedIn.Profile.Utils (maybeExtractFromMaybe, maybeFindInMaybeNEL, maybeGetInList, toUIElement)
-import LinkedIn.UIElements.Types (Duration, TimeSpan, UIElement(..))
+import LinkedIn.UIElements.Types (Duration, TimeSpan, UIElement(..), UIString(..))
 
 data WorkExperience = WorkExperience {
   position :: String,
@@ -47,32 +47,32 @@ fromUI (card) = ado
 
 extractPosition :: UIElement -> Maybe String
 extractPosition = case _ of
-  UIPlainText str -> Just str
+  UIElement (UIStringPlain str) -> Just str
   _ -> Nothing
 
 extractCompany ∷ UIElement → Maybe String
 extractCompany = case _ of
-  UIPlainText str -> Just str
-  UIDotSeparated (UIPlainText str) _ -> Just str
+  UIElement (UIStringPlain str) -> Just str
+  UIElement (UIStringDotSeparated (UIStringPlain str) _) -> Just str
   _ -> Nothing
 
 extractContractType ∷ UIElement → Maybe String
 extractContractType = case _ of
-  UIDotSeparated _ (UIPlainText str) -> Just str
+  UIElement (UIStringDotSeparated _ (UIStringPlain str)) -> Just str
   _ -> Nothing
 
 extractTimeSpan ∷ UIElement → Maybe TimeSpan
 extractTimeSpan = case _ of
-  UITimeSpan s -> Just s
-  UIDotSeparated (UITimeSpan s) _ -> Just s
+  UIElement (UIStringTimeSpan s) -> Just s
+  UIElement (UIStringDotSeparated (UIStringTimeSpan s) _) -> Just s
   _ -> Nothing
 
 extractDuration ∷ UIElement → Maybe Duration
 extractDuration = case _ of
-  UIDotSeparated _ (UIDuration d) -> Just d
+  UIElement (UIStringDotSeparated _ (UIStringDuration d)) -> Just d
   _ -> Nothing
 
 extractDescription ∷ UIElement → Maybe String
 extractDescription = case _ of
-  UIPlainText d -> Just d
+  UIElement (UIStringPlain d) -> Just d
   _ -> Nothing

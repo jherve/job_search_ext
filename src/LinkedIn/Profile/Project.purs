@@ -7,10 +7,10 @@ import Data.Foldable (findMap)
 import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe(..))
 import Data.Show.Generic (genericShow)
-import LinkedIn.DetachedNode (DetachedNode)
 import LinkedIn.ArtDecoCard (ArtDecoCardElement, toCenterContent, toHeaderBold, toHeaderNormal)
+import LinkedIn.DetachedNode (DetachedNode)
 import LinkedIn.Profile.Utils (maybeExtractFromMaybe, maybeGetInList, toUIElement)
-import LinkedIn.UIElements.Types (TimeSpan, UIElement(..))
+import LinkedIn.UIElements.Types (TimeSpan, UIElement(..), UIString(..))
 
 data Project = Project {
   name :: String,
@@ -39,16 +39,16 @@ fromUI card = ado
 
 extractName :: UIElement -> Maybe String
 extractName = case _ of
-  UIPlainText str -> Just str
+  UIElement (UIStringPlain str) -> Just str
   _ -> Nothing
 
 extractTimeSpan ∷ UIElement → Maybe TimeSpan
 extractTimeSpan = case _ of
-  UITimeSpan s -> Just s
-  UIDotSeparated (UITimeSpan s) _ -> Just s
+  UIElement (UIStringTimeSpan s) -> Just s
+  UIElement (UIStringDotSeparated (UIStringTimeSpan s) _) -> Just s
   _ -> Nothing
 
 extractDescription ∷ UIElement → Maybe String
 extractDescription = case _ of
-  UIPlainText d -> Just d
+  UIElement (UIStringPlain d) -> Just d
   _ -> Nothing

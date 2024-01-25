@@ -129,19 +129,28 @@ stringWithoutMedianDotP :: Parser String String
 stringWithoutMedianDotP = takeWhile (\c -> c /= codePointFromChar '·' && c /= codePointFromChar '•')
 
 uiStringP :: Parser String UIString
-uiStringP = (try dotSeparatedP') <|> singleUiStringP where
-  dotSeparatedP' = do
-    subStr <- stringWithoutMedianDotP
-    _ <- medianDotP
-    _ <- space
-    sub2Str <- rest
-    case runParser subStr singleUiStringP of
-      Right sub -> case runParser sub2Str singleUiStringP of
-        Right sub2 -> pure $ UIStringDotSeparated sub sub2
-        Left _ -> fail "not a sub"
-      Left _ -> fail "not a sub"
+uiStringP = (try uiStringdotSeparatedP) <|> uiStringSingleP
 
-  singleUiStringP = (try durationP') <|> (try timeSpanP') <|> plainP'
-  durationP' = UIStringDuration <$> durationP
-  timeSpanP' = UIStringTimeSpan <$> timeSpanP
-  plainP' = UIStringPlain <$> rest
+uiStringdotSeparatedP ∷ Parser String UIString
+uiStringdotSeparatedP = do
+  subStr <- stringWithoutMedianDotP
+  _ <- medianDotP
+  _ <- space
+  sub2Str <- rest
+  case runParser subStr uiStringSingleP of
+    Right sub -> case runParser sub2Str uiStringSingleP of
+      Right sub2 -> pure $ UIStringDotSeparated sub sub2
+      Left _ -> fail "not a sub"
+    Left _ -> fail "not a sub"
+
+uiStringSingleP ∷ Parser String UIString
+uiStringSingleP = (try uiStringDurationP) <|> (try uiStringTimeSpanP) <|> uiStringPlainP
+
+uiStringDurationP ∷ Parser String UIString
+uiStringDurationP = UIStringDuration <$> durationP
+
+uiStringTimeSpanP ∷ Parser String UIString
+uiStringTimeSpanP = UIStringTimeSpan <$> timeSpanP
+
+uiStringPlainP ∷ Parser String UIString
+uiStringPlainP = UIStringPlain <$> rest

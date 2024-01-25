@@ -35,16 +35,23 @@ derive instance Generic Duration _
 instance Show Duration where
   show = genericShow
 
-data UIElement = 
-  UIDuration Duration
-  | UITimeSpan TimeSpan
-  | UIPlainText String
-  | UIDotSeparated UIElement UIElement
-  | UILink String UIElement
-  | UIButton (Maybe String) UIElement
+data UIString =
+  UIStringDuration Duration
+  | UIStringTimeSpan TimeSpan
+  | UIStringPlain String
+  | UIStringDotSeparated UIString UIString
+
+derive instance Generic UIString _
+instance Show UIString where
+  show (UIStringDotSeparated ui1 ui2) = "(UIStringDotSeparated " <> show ui1 <> show ui2 <> ")"
+  show u = genericShow u
+
+data UIElement =
+  UIElement UIString
+  | UILink String UIString
+  | UIButton (Maybe String) UIString
   | UIIcon String
 
 derive instance Generic UIElement _
 instance Show UIElement where
-  show (UIDotSeparated ui1 ui2) = "(UIDotSeparated " <> show ui1 <> show ui2 <> ")"
-  show u = genericShow u
+  show = genericShow

@@ -14,7 +14,7 @@ import Data.Map as M
 import Data.Maybe (Maybe(..))
 import Data.String.CodePoints (codePointFromChar)
 import Data.Tuple (Tuple(..))
-import LinkedIn.UIElements.Types (Duration(..), MonthYear(..), MonthYearOrToday(..), TimeSpan(..), UIElement(..))
+import LinkedIn.UIElements.Types (Duration(..), MonthYear(..), MonthYearOrToday(..), TimeSpan(..), UIElement(..), UIString(..))
 import Parsing (Parser, fail, runParser)
 import Parsing.Combinators (choice, try)
 import Parsing.String (string, char, rest)
@@ -128,20 +128,20 @@ stringWithoutCommaP = takeWhile (\c -> c /= codePointFromChar ',')
 stringWithoutMedianDotP :: Parser String String
 stringWithoutMedianDotP = takeWhile (\c -> c /= codePointFromChar '·' && c /= codePointFromChar '•')
 
-uiElementP :: Parser String UIElement
-uiElementP = (try dotSeparatedP') <|> simpleUiElementP' where
+uiStringP :: Parser String UIString
+uiStringP = (try dotSeparatedP') <|> singleUiStringP where
   dotSeparatedP' = do
     subStr <- stringWithoutMedianDotP
     _ <- medianDotP
     _ <- space
     sub2Str <- rest
-    case runParser subStr simpleUiElementP' of
-      Right sub -> case runParser sub2Str simpleUiElementP' of
-        Right sub2 -> pure $ UIDotSeparated sub sub2
+    case runParser subStr singleUiStringP of
+      Right sub -> case runParser sub2Str singleUiStringP of
+        Right sub2 -> pure $ UIStringDotSeparated sub sub2
         Left _ -> fail "not a sub"
       Left _ -> fail "not a sub"
 
-  simpleUiElementP' = (try durationP') <|> (try timeSpanP') <|> stringP'
-  durationP' = UIDuration <$> durationP
-  timeSpanP' = UITimeSpan <$> timeSpanP
-  stringP' = UIPlainText <$> rest
+  singleUiStringP = (try durationP') <|> (try timeSpanP') <|> plainP'
+  durationP' = UIStringDuration <$> durationP
+  timeSpanP' = UIStringTimeSpan <$> timeSpanP
+  plainP' = UIStringPlain <$> rest

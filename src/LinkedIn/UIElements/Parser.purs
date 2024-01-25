@@ -9,7 +9,6 @@ import Data.Either (Either(..))
 import Data.Enum (toEnum)
 import Data.Int (fromNumber)
 import Data.List (List(..), (:))
-import Data.List.NonEmpty as NEL
 import Data.Map (Map)
 import Data.Map as M
 import Data.Maybe (Maybe(..))
@@ -17,7 +16,7 @@ import Data.String.CodePoints (codePointFromChar)
 import Data.Tuple (Tuple(..))
 import LinkedIn.UIElements.Types (Duration(..), MonthYear(..), MonthYearOrToday(..), TimeSpan(..), UIElement(..))
 import Parsing (Parser, fail, runParser)
-import Parsing.Combinators (choice, sepBy1, try)
+import Parsing.Combinators (choice, try)
 import Parsing.String (string, char, rest)
 import Parsing.String.Basic (intDecimal, number, space, takeWhile)
 

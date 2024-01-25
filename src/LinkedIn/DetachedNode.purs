@@ -13,7 +13,6 @@ import Data.String (Pattern(..))
 import Data.String as S
 import Data.String.CodeUnits (fromCharArray, toCharArray)
 import Data.Traversable (sequence)
-import Debug (trace)
 import Effect (Effect)
 import Partial.Unsafe (unsafePartial)
 import Web.DOM (Node)

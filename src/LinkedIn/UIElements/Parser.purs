@@ -14,7 +14,7 @@ import Data.Map as M
 import Data.Maybe (Maybe(..))
 import Data.String.CodePoints (codePointFromChar)
 import Data.Tuple (Tuple(..))
-import LinkedIn.UIElements.Types (Duration(..), MonthYear(..), MonthYearOrToday(..), TimeSpan(..), UIElement(..), UIString(..))
+import LinkedIn.UIElements.Types (Duration(..), MonthYear(..), MonthYearOrToday(..), TimeSpan(..), UIString(..))
 import Parsing (Parser, fail, runParser)
 import Parsing.Combinators (choice, try)
 import Parsing.String (string, char, rest)

@@ -19,11 +19,12 @@ export const jsDomParse = function (string) {
           const [selector] = args;
 
           if (selector.startsWith(":scope")) {
+            const old_id = this.id;
             this.id = "scope";
             const ret = this.parentElement.querySelectorAll(
               selector.replace(":scope", "#scope")
             );
-            this.id = undefined;
+            this.id = old_id;
 
             return ret;
           } else {
@@ -41,11 +42,12 @@ export const jsDomParse = function (string) {
           const [selector] = args;
 
           if (selector.startsWith(":scope")) {
+            const old_id = this.id;
             this.id = "scope";
             const ret = this.parentElement.querySelector(
               selector.replace(":scope", "#scope")
             );
-            this.id = undefined;
+            this.id = old_id;
             return ret;
           } else {
             return querySelectorFunc.apply(this, args);

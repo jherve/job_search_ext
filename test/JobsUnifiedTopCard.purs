@@ -69,7 +69,7 @@ testJobsUnifiedTopCard = do
               (DetachedElement {
                 classes: ("job-details-jobs-unified-top-card__job-insight-view-model-secondary" : Nil),
                 content: "Confirmé",
-                id: (Just "undefined"),
+                id: Nothing,
                 tag: "SPAN"
               })) : Nil))) }),
             icon: DetachedLiIcon "job"
@@ -77,21 +77,21 @@ testJobsUnifiedTopCard = do
           content: (TopCardInsightContentSingle (DetachedElement {
             classes: Nil,
             content: "201-500 employés · Technologies et services de l’information",
-            id: (Just "undefined"),
+            id: Nothing,
             tag: "SPAN" })),
           icon: DetachedLiIcon "company"
         }) : (TopCardInsight {
             content: (TopCardInsightContentSingle (DetachedElement {
               classes: Nil,
               content: "2 anciens élèves travaillent ici",
-              id: (Just "undefined"),
+              id: Nothing,
               tag: "SPAN" })),
             icon: DetachedLiIcon "people"
             }) : (TopCardInsight {
               content: (TopCardInsightContentSingle (DetachedElement {
                 classes: Nil,
                 content: "Découvrez comment vous vous positionnez par rapport à 87 candidats. Essai Premium pour 0 EUR",
-                id: (Just "undefined"),
+                id: Nothing,
                 tag: "SPAN" })),
               icon: (DetachedSvgElement { dataTestIcon: (Just "lightbulb-medium"), id: Nothing, tag: "svg" })
             }) : (TopCardInsight {

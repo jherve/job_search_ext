@@ -41,6 +41,7 @@ data UIString =
   | UIStringPlain String
   | UIStringDotSeparated UIString UIString
 
+derive instance Eq UIString
 derive instance Generic UIString _
 instance Show UIString where
   show (UIStringDotSeparated ui1 ui2) = "(UIStringDotSeparated " <> show ui1 <> show ui2 <> ")"

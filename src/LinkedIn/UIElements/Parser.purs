@@ -5,19 +5,23 @@ import Prelude
 import Control.Alt ((<|>))
 import Data.Array as A
 import Data.Date (Month(..), Year)
-import Data.Either (Either(..))
+import Data.Either (hush)
 import Data.Enum (toEnum)
 import Data.Int (fromNumber)
 import Data.List (List(..), (:))
+import Data.List as L
+import Data.List.NonEmpty as NEL
+import Data.List.Types (NonEmptyList)
 import Data.Map (Map)
 import Data.Map as M
 import Data.Maybe (Maybe(..))
+import Data.String as S
 import Data.String.CodePoints (codePointFromChar)
 import Data.Tuple (Tuple(..))
 import LinkedIn.UIElements.Types (Duration(..), MonthYear(..), MonthYearOrToday(..), TimeSpan(..), UIString(..))
-import Parsing (Parser, fail, runParser)
+import Parsing (Parser, ParserT, fail, liftMaybe, runParser)
 import Parsing.Combinators (choice, try)
-import Parsing.String (string, char, rest)
+import Parsing.String (char, rest, string)
 import Parsing.String.Basic (intDecimal, number, space, takeWhile)
 
 monthStrToMonth :: Map String Month
@@ -131,17 +135,39 @@ stringWithoutMedianDotP = takeWhile (\c -> c /= codePointFromChar '·' && c /= c
 uiStringP :: Parser String UIString
 uiStringP = (try uiStringdotSeparatedP) <|> uiStringSingleP
 
+uiStringWithoutMedianDotP ∷ Parser String UIString
+uiStringWithoutMedianDotP = do
+  s <- rest
+  liftMaybe (\_ -> "nope") $ hush $ runParser s uiStringSingleP
+
 uiStringdotSeparatedP ∷ Parser String UIString
 uiStringdotSeparatedP = do
-  subStr <- stringWithoutMedianDotP
-  _ <- medianDotP
-  _ <- space
-  sub2Str <- rest
-  case runParser subStr uiStringSingleP of
-    Right sub -> case runParser sub2Str uiStringSingleP of
-      Right sub2 -> pure $ UIStringDotSeparated sub sub2
-      Left _ -> fail "not a sub"
-    Left _ -> fail "not a sub"
+  Tuple s1 s2 <- medianDotSeparated
+
+  let
+    intoUiElement :: String -> Parser String UIString
+    intoUiElement s = liftMaybe (\_ -> "could not convert to ui element") $ hush $ runParser s uiStringSingleP
+
+  s1' <- intoUiElement s1
+  s2' <- intoUiElement s2
+
+  pure $ UIStringDotSeparated s1' s2'
+
+sepBy2 :: forall m s a sep. ParserT s m a -> ParserT s m sep -> ParserT s m (NonEmptyList a)
+sepBy2 p sep = do
+  a0 <- p
+  a1 <- sep *> p
+  as <- L.manyRec $ sep *> p
+  pure $ NEL.cons a0 $ NEL.cons' a1 as
+
+commaSeparated ∷ Parser String (NonEmptyList String)
+commaSeparated = stringWithoutCommaP `sepBy2` commaP
+
+medianDotSeparated ∷ Parser String (Tuple String String)
+medianDotSeparated = do
+  a0 <- stringWithoutMedianDotP
+  a1 <- medianDotP *> rest
+  pure $ Tuple (S.trim a0) (S.trim a1)
 
 uiStringSingleP ∷ Parser String UIString
 uiStringSingleP = (try uiStringDurationP) <|> (try uiStringTimeSpanP) <|> uiStringPlainP

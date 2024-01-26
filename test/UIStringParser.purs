@@ -3,13 +3,14 @@ module Test.UIStringParser
   )
   where
 
+import Prelude
+
 import Data.Date (Month(..))
 import Data.Either (Either(..))
 import Effect (Effect)
 import LinkedIn.UIElements.Parser (durationP, monthYearP, timeSpanP, uiStringDurationP, uiStringdotSeparatedP)
 import LinkedIn.UIElements.Types (Duration(..), TimeSpan(..), UIString(..))
-import Parsing (runParser)
-import Prelude (Unit, discard)
+import Parsing (ParseError(..), Position(..), runParser)
 import Test.Assert (assertEqual)
 import Test.Utils (toMonthYear')
 
@@ -76,13 +77,23 @@ testUIParserDuration = do
 testUIParserDotSeparated ∷ Effect Unit
 testUIParserDotSeparated = do
   assertEqual {
-    actual: run "2 ans 3 mois · some text",
-    expected: Right(UIStringDotSeparated (UIStringDuration (YearsMonth 2 3)) (UIStringPlain "some text"))
+    actual: run "some text 1 · some text 2",
+    expected: Right(UIStringDotSeparated (UIStringPlain "some text 1") (UIStringPlain "some text 2"))
   }
 
   assertEqual {
-    actual: run "· Boulogne-Billancourt, Île-de-France, France",
-    expected: Right(UIStringDotSeparated (UIStringPlain "") (UIStringPlain "Boulogne-Billancourt, Île-de-France, France"))
+    actual: run "· some text after a dot",
+    expected: Right(UIStringDotSeparated (UIStringPlain "") (UIStringPlain "some text after a dot"))
+  }
+
+  assertEqual {
+    actual: run "some text before a dot ·",
+    expected: Right(UIStringDotSeparated (UIStringPlain "some text before a dot") (UIStringPlain ""))
+  }
+
+  assertEqual {
+    actual: run "string with no dot",
+    expected: (Left (ParseError "Expected '•'" (Position { column: 19, index: 18, line: 1 })))
   }
 
   where run s = runParser s uiStringdotSeparatedP

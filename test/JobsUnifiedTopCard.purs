@@ -2,7 +2,7 @@ module Test.JobsUnifiedTopCard where
 
 import Prelude
 
-import Data.Either (hush, isRight)
+import Data.Either (Either(..), hush, isRight)
 import Data.List (List(..), (:))
 import Data.List.NonEmpty (NonEmptyList(..))
 import Data.Maybe (Maybe(..), fromJust)
@@ -10,9 +10,12 @@ import Data.NonEmpty (NonEmpty(..))
 import Data.Traversable (traverse)
 import Effect (Effect)
 import LinkedIn.DetachedNode (DetachedNode(..), toDetached)
+import LinkedIn.Jobs.JobOffer (JobOffer(..))
+import LinkedIn.Jobs.JobOffer as JJO
 import LinkedIn.JobsUnifiedTopCard (JobsUnifiedTopCardElement(..), TopCardAction(..), TopCardInsight(..), TopCardInsightContent(..), TopCardPrimaryDescription(..), TopCardSecondaryInsight(..))
 import LinkedIn.Page.JobOffer (JobOfferPage(..))
 import LinkedIn.Page.JobOffer as PageJO
+import LinkedIn.Profile.Utils (fromDetachedToUI)
 import LinkedIn.QueryRunner (runQuery)
 import Node.JsDom (jsDomFromFile)
 import Partial.Unsafe (unsafePartial)
@@ -126,4 +129,20 @@ main = do
         ))
       })
     }
+  }
+
+
+  assertEqual {
+    actual: (JJO.fromUI <=< fromDetachedToUI) topCard,
+    expected:
+      Right (JobOffer {
+        companyDomain: (Just "Technologies et services de l’information"),
+        companyLink: "https://www.linkedin.com/company/lincoln-/life",
+        companyName: "LINCOLN",
+        companySize: (Just "201-500 employés"),
+        hasSimplifiedApplicationProcess: true,
+        location: (Just "Boulogne-Billancourt, Île-de-France, France"),
+        remote: (Just "Sur site"),
+        title: "Data Engineer H/F - Secteur Energie"
+      })
   }

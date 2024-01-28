@@ -21,6 +21,7 @@ data JobOffer = JobOffer {
   hasSimplifiedApplicationProcess :: Boolean
 }
 
+derive instance Eq JobOffer
 derive instance Generic JobOffer _
 instance Show JobOffer where
   show = genericShow

@@ -3,7 +3,7 @@ module ExampleWebExt.Content where
 import Prelude
 
 import Browser.DOM (getBrowserDom)
-import Data.Either (Either(..))
+import Data.Either (Either(..), hush)
 import Data.Maybe (Maybe(..))
 import Data.Traversable (class Traversable, traverse)
 import Effect (Effect)
@@ -25,10 +25,10 @@ main = do
 
   dom <- getBrowserDom
 
-  runQueryAndExtract PageWE.query PageWE.extract dom
-  runQueryAndExtract PageP.query PageP.extract dom
-  runQueryAndExtract PageS.query PageS.extract dom
-  runQueryAndExtract PageJ.query PageJ.extract dom
+  runQueryAndExtract PageWE.query PageWE.extract dom >>= logShow
+  runQueryAndExtract PageP.query PageP.extract dom >>= logShow
+  runQueryAndExtract PageS.query PageS.extract dom >>= logShow
+  runQueryAndExtract PageJ.query PageJ.extract dom >>= logShow
 
   runQueryAndDetach PageJ.query dom >>= logShow
 
@@ -46,14 +46,14 @@ runQueryAndExtract ∷
   ⇒ QueryRunner' Document (t Node)
   → (t UIElement → Either String a)
   → Document
-  → Effect Unit
+  → Effect (Maybe a)
 runQueryAndExtract query extract dom = do
   n <- runQuery $ query dom
   case n of
-    Left l' -> logShow l'
+    Left _ -> pure Nothing
     Right q -> do
       extracted <- (extractData extract) q
-      logShow extracted
+      pure $ hush extracted
 
 runQueryAndDetach ∷
   ∀ f1.

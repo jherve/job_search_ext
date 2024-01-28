@@ -5,9 +5,9 @@ import Prelude
 import Data.Either (Either, note)
 import Data.Generic.Rep (class Generic)
 import Data.Lens (findOf)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(..), isJust)
 import Data.Show.Generic (genericShow)
-import LinkedIn.JobsUnifiedTopCard (JobsUnifiedTopCardElement, TopCardInsight(..), TopCardInsightContent(..), _top_to_insights, toHeader, toPrimaryDescriptionLink, toPrimaryDescriptionText)
+import LinkedIn.JobsUnifiedTopCard (JobsUnifiedTopCardElement, TopCardInsight(..), TopCardInsightContent(..), _top_to_action_buttons, _top_to_insights, toHeader, toPrimaryDescriptionLink, toPrimaryDescriptionText)
 import LinkedIn.UIElements.Types (UIElement(..), UIString(..))
 
 data JobOffer = JobOffer {
@@ -17,7 +17,8 @@ data JobOffer = JobOffer {
   location :: Maybe String,
   remote :: Maybe String,
   companyDomain :: Maybe String,
-  companySize :: Maybe String
+  companySize :: Maybe String,
+  hasSimplifiedApplicationProcess :: Boolean
 }
 
 derive instance Generic JobOffer _
@@ -37,7 +38,8 @@ fromUI card = ado
       location: extractLocation primaryDescText,
       remote: extractJobRemote =<< jobInsight,
       companyDomain: extractCompanyDomain =<< companyInsight,
-      companySize: extractCompanySize =<< companyInsight
+      companySize: extractCompanySize =<< companyInsight,
+      hasSimplifiedApplicationProcess: isJust $ extractSimplifiedApplicationProcess =<< applyButton
     }
   where
     header = toHeader card
@@ -45,6 +47,11 @@ fromUI card = ado
     primaryDescText = toPrimaryDescriptionText card
     jobInsight = getInsight "job" card
     companyInsight = getInsight "company" card
+    applyButton = findOf _top_to_action_buttons isApply card
+      where
+        isApply = case _ of
+          UIButton {mainClass: Just main} -> main == "jobs-apply-button"
+          _ -> false
 
 getInsight ∷ String → JobsUnifiedTopCardElement UIElement → Maybe (TopCardInsight UIElement)
 getInsight i card = findOf _top_to_insights (isIcon i) card
@@ -86,4 +93,9 @@ extractLocation = case _ of
 extractJobRemote :: TopCardInsight UIElement -> Maybe String
 extractJobRemote = case _ of
   TopCardInsight {content: TopCardInsightContentSecondary {primary: (UIElement (UIStringPlain str))}} -> Just str
+  _ -> Nothing
+
+extractSimplifiedApplicationProcess ∷ UIElement → Maybe Boolean
+extractSimplifiedApplicationProcess = case _ of
+  UIButton {role: Nothing} -> Just true
   _ -> Nothing

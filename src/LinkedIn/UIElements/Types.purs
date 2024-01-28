@@ -50,7 +50,7 @@ instance Show UIString where
 data UIElement =
   UIElement UIString
   | UILink String UIString
-  | UIButton (Maybe String) UIString
+  | UIButton {role :: Maybe String, label :: UIString, mainClass :: Maybe String}
   | UIIcon String
 
 derive instance Generic UIElement _

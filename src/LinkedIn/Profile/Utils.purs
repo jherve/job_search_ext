@@ -4,6 +4,7 @@ import Prelude
 
 import Control.Alt ((<|>))
 import Data.Either (Either(..))
+import Data.List as L
 import Data.Maybe (Maybe(..))
 import Data.Traversable (class Traversable, traverse)
 import Effect (Effect)
@@ -34,8 +35,8 @@ toUIElement (DetachedSvgElement _) = Left (ParseError "SVG element could not be 
 
 toUIElement (DetachedLiIcon i) = Right (UIIcon i)
 
-toUIElement (DetachedButton {content, role}) =  map toButton $ runParser content uiStringP
-  where toButton ui = UIButton role ui
+toUIElement (DetachedButton {content, role, classes}) =  map toButton $ runParser content uiStringP
+  where toButton ui = UIButton {role, label: ui, mainClass: L.head classes}
 
 toUIElement (DetachedA {content, href}) = map toLink $ runParser content uiStringP
   where toLink ui = UILink href ui

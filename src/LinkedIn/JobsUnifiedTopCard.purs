@@ -276,6 +276,12 @@ _top_to_insights = _top_card
 _insight_to_content = prop (Proxy :: Proxy "content")
   <<< traversed
 
+_top_to_action_buttons = _top_card
+  <<< prop (Proxy :: Proxy "actions")
+  <<< traversed
+  <<< traversed
+  <<< _action_button
+
 _top_card ∷ forall a. Lens' (JobsUnifiedTopCardElement a) { actions ∷ Maybe (NonEmptyList (TopCardAction a)) , header ∷ a , insights ∷ Maybe (NonEmptyList (TopCardInsight a)) , primaryDescription ∷ TopCardPrimaryDescription a }
 _top_card = lens' \(JobsUnifiedTopCardElement c) -> Tuple c \c' -> JobsUnifiedTopCardElement c'
 

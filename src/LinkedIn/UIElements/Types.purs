@@ -35,9 +35,17 @@ derive instance Generic Duration _
 instance Show Duration where
   show = genericShow
 
+data JobFlexibility = JobFlexHybrid | JobFlexOnSite | JobFlexFullRemote
+
+derive instance Eq JobFlexibility
+derive instance Generic JobFlexibility _
+instance Show JobFlexibility where
+  show = genericShow
+
 data UIString =
   UIStringDuration Duration
   | UIStringTimeSpan TimeSpan
+  | UIStringJobFlex JobFlexibility
   | UIStringPlain String
   | UIStringDotSeparated UIString UIString
 

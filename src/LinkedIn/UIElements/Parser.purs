@@ -18,7 +18,7 @@ import Data.Maybe (Maybe(..))
 import Data.String as S
 import Data.String.CodePoints (codePointFromChar)
 import Data.Tuple (Tuple(..))
-import LinkedIn.UIElements.Types (Duration(..), MonthYear(..), MonthYearOrToday(..), TimeSpan(..), UIString(..))
+import LinkedIn.UIElements.Types (Duration(..), JobFlexibility(..), MonthYear(..), MonthYearOrToday(..), TimeSpan(..), UIString(..))
 import Parsing (Parser, ParserT, fail, liftMaybe, runParser)
 import Parsing.Combinators (choice, try)
 import Parsing.String (char, rest, string)
@@ -120,6 +120,18 @@ durationP = (try yearsMonthP) <|> (try monthsP) <|> yearsP where
 
     pure $ YearsMonth y m
 
+jobFlexP :: Parser String JobFlexibility
+jobFlexP = (try hybrid) <|> (try onSite) <|> (try fullRemote) where
+  hybrid = do
+    _ <- string("Hybride")
+    pure JobFlexHybrid
+  onSite = do
+    _ <- string("Sur site")
+    pure JobFlexOnSite
+  fullRemote = do
+    _ <- string("À distance")
+    pure JobFlexFullRemote
+
 medianDotP ∷ Parser String Char
 medianDotP = char('·') <|> char('•')
 
@@ -170,13 +182,16 @@ medianDotSeparated = do
   pure $ Tuple (S.trim a0) (S.trim a1)
 
 uiStringSingleP ∷ Parser String UIString
-uiStringSingleP = (try uiStringDurationP) <|> (try uiStringTimeSpanP) <|> uiStringPlainP
+uiStringSingleP = (try uiStringDurationP) <|> (try uiStringTimeSpanP) <|> (try uiStringJobFlexP) <|> uiStringPlainP
 
 uiStringDurationP ∷ Parser String UIString
 uiStringDurationP = UIStringDuration <$> durationP
 
 uiStringTimeSpanP ∷ Parser String UIString
 uiStringTimeSpanP = UIStringTimeSpan <$> timeSpanP
+
+uiStringJobFlexP ∷ Parser String UIString
+uiStringJobFlexP = UIStringJobFlex <$> jobFlexP
 
 uiStringPlainP ∷ Parser String UIString
 uiStringPlainP = UIStringPlain <$> rest

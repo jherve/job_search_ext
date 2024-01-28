@@ -17,6 +17,7 @@ import LinkedIn.Page.JobOffer (JobOfferPage(..))
 import LinkedIn.Page.JobOffer as PageJO
 import LinkedIn.Profile.Utils (fromDetachedToUI)
 import LinkedIn.QueryRunner (runQuery)
+import LinkedIn.UIElements.Types (JobFlexibility(..))
 import Node.JsDom (jsDomFromFile)
 import Partial.Unsafe (unsafePartial)
 import Test.Assert (assert, assertEqual)
@@ -142,7 +143,7 @@ main = do
         companySize: (Just "201-500 employés"),
         hasSimplifiedApplicationProcess: true,
         location: (Just "Boulogne-Billancourt, Île-de-France, France"),
-        remote: (Just "Sur site"),
+        flexibility: (Just JobFlexOnSite),
         title: "Data Engineer H/F - Secteur Energie"
       })
   }

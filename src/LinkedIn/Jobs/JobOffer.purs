@@ -8,14 +8,14 @@ import Data.Lens (findOf)
 import Data.Maybe (Maybe(..), isJust)
 import Data.Show.Generic (genericShow)
 import LinkedIn.JobsUnifiedTopCard (JobsUnifiedTopCardElement, TopCardInsight(..), TopCardInsightContent(..), _top_to_action_buttons, _top_to_insights, toHeader, toPrimaryDescriptionLink, toPrimaryDescriptionText)
-import LinkedIn.UIElements.Types (UIElement(..), UIString(..))
+import LinkedIn.UIElements.Types (JobFlexibility, UIElement(..), UIString(..))
 
 data JobOffer = JobOffer {
   title :: String,
   companyName :: String,
   companyLink :: String,
   location :: Maybe String,
-  remote :: Maybe String,
+  flexibility :: Maybe JobFlexibility,
   companyDomain :: Maybe String,
   companySize :: Maybe String,
   hasSimplifiedApplicationProcess :: Boolean
@@ -37,7 +37,7 @@ fromUI card = ado
       companyName,
       companyLink,
       location: extractLocation primaryDescText,
-      remote: extractJobRemote =<< jobInsight,
+      flexibility: extractJobRemote =<< jobInsight,
       companyDomain: extractCompanyDomain =<< companyInsight,
       companySize: extractCompanySize =<< companyInsight,
       hasSimplifiedApplicationProcess: isJust $ extractSimplifiedApplicationProcess =<< applyButton
@@ -91,9 +91,9 @@ extractLocation = case _ of
   UIElement (UIStringDotSeparated _ (UIStringPlain str)) -> Just str
   _ -> Nothing
 
-extractJobRemote :: TopCardInsight UIElement -> Maybe String
+extractJobRemote :: TopCardInsight UIElement -> Maybe JobFlexibility
 extractJobRemote = case _ of
-  TopCardInsight {content: TopCardInsightContentSecondary {primary: (UIElement (UIStringPlain str))}} -> Just str
+  TopCardInsight {content: TopCardInsightContentSecondary {primary: (UIElement (UIStringJobFlex flex))}} -> Just flex
   _ -> Nothing
 
 extractSimplifiedApplicationProcess ∷ UIElement → Maybe Boolean

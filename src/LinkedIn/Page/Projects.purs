@@ -13,6 +13,7 @@ import LinkedIn.ArtDecoCard (ArtDecoCardElement, queryArtDecoCard)
 import LinkedIn.DetachedNode (toDetached)
 import LinkedIn.Profile.Project (Project)
 import LinkedIn.Profile.Project as PP
+import LinkedIn.Profile.Utils (fromDetachedToUI)
 import LinkedIn.QueryRunner (QueryRunner', subQueryMany)
 import Web.DOM (Document, Node)
 
@@ -47,4 +48,4 @@ extract p = do
   detached <- traverse toDetached p
   let
     ProjectsPage cards = detached
-  pure $ traverse PP.fromUI cards
+  pure $ traverse (PP.fromUI <=< fromDetachedToUI) cards

@@ -12,6 +12,7 @@ import LinkedIn.DetachedNode (toDetached)
 import LinkedIn.Jobs.JobOffer (JobOffer)
 import LinkedIn.Jobs.JobOffer as JJO
 import LinkedIn.JobsUnifiedTopCard (JobsUnifiedTopCardElement, queryJobsUnifiedTopCardElement)
+import LinkedIn.Profile.Utils (fromDetachedToUI)
 import LinkedIn.QueryRunner (QueryRunner', subQueryOne)
 import Web.DOM (Document, Node)
 
@@ -46,4 +47,4 @@ extract p = do
   detached <- traverse toDetached p
   let
     JobOfferPage tabs = detached
-  pure $ JJO.fromUI tabs
+  pure $ (JJO.fromUI <=< fromDetachedToUI) tabs

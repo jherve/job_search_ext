@@ -16,6 +16,7 @@ import LinkedIn.ArtDecoCard (ArtDecoCardElement(..))
 import LinkedIn.DetachedNode (DetachedNode(..), toDetached)
 import LinkedIn.Page.WorkExperiences (WorkExperiencesPage(..))
 import LinkedIn.Page.WorkExperiences as PageWE
+import LinkedIn.Profile.Utils (fromDetachedToUI)
 import LinkedIn.Profile.WorkExperience (WorkExperience(..))
 import LinkedIn.Profile.WorkExperience as PWE
 import LinkedIn.QueryRunner (runQuery)
@@ -84,7 +85,7 @@ testArtDecoCards = do
   }
 
   assertEqual {
-    actual: PWE.fromUI headCard,
+    actual: (PWE.fromUI <=< fromDetachedToUI) headCard,
     expected:
       Right (WorkExperience {
         company: Just "DeepLearning.AI",

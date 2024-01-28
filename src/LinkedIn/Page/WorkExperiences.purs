@@ -11,6 +11,7 @@ import Data.Traversable (class Traversable, sequence, traverse, traverseDefault)
 import Effect (Effect)
 import LinkedIn.ArtDecoCard (ArtDecoCardElement, queryArtDecoCard)
 import LinkedIn.DetachedNode (toDetached)
+import LinkedIn.Profile.Utils (fromDetachedToUI)
 import LinkedIn.Profile.WorkExperience (WorkExperience)
 import LinkedIn.Profile.WorkExperience as PWE
 import LinkedIn.QueryRunner (QueryRunner', subQueryMany)
@@ -47,4 +48,4 @@ extract p = do
   detached <- traverse toDetached p
   let
     WorkExperiencesPage cards = detached
-  pure $ traverse PWE.fromUI cards
+  pure $ traverse (PWE.fromUI <=< fromDetachedToUI) cards

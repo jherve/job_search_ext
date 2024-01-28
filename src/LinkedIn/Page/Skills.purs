@@ -13,6 +13,7 @@ import LinkedIn.ArtDecoTab (ArtDecoTabElement, queryArtDecoTab)
 import LinkedIn.DetachedNode (toDetached)
 import LinkedIn.Profile.Skill (Skill)
 import LinkedIn.Profile.Skill as PS
+import LinkedIn.Profile.Utils (fromDetachedToUI)
 import LinkedIn.QueryRunner (QueryRunner', subQueryMany)
 import Web.DOM (Document, Node)
 
@@ -47,4 +48,4 @@ extract p = do
   detached <- traverse toDetached p
   let
     SkillsPage tabs = detached
-  pure $ traverse PS.fromUI tabs
+  pure $ traverse (PS.fromUI <=< fromDetachedToUI) tabs

@@ -5,7 +5,7 @@ import Prelude
 import Control.Monad.Error.Class (throwError)
 import Data.Foldable (class Foldable, foldMap, foldlDefault, foldrDefault)
 import Data.Generic.Rep (class Generic)
-import Data.Lens (Lens', Prism', lens', prism', view)
+import Data.Lens (Lens', Prism', lens', prism', traversed, view)
 import Data.Lens.Record (prop)
 import Data.List.Types (NonEmptyList)
 import Data.Maybe (Maybe(..))
@@ -267,6 +267,14 @@ toPrimaryDescriptionText = view $ _top_card
   <<< prop (Proxy :: Proxy "primaryDescription")
   <<< _primary_description
   <<< prop (Proxy :: Proxy "text")
+
+_top_to_insights = _top_card
+  <<< prop (Proxy :: Proxy "insights")
+  <<< traversed
+  <<< traversed
+
+_insight_to_content = prop (Proxy :: Proxy "content")
+  <<< traversed
 
 _top_card ∷ forall a. Lens' (JobsUnifiedTopCardElement a) { actions ∷ Maybe (NonEmptyList (TopCardAction a)) , header ∷ a , insights ∷ Maybe (NonEmptyList (TopCardInsight a)) , primaryDescription ∷ TopCardPrimaryDescription a }
 _top_card = lens' \(JobsUnifiedTopCardElement c) -> Tuple c \c' -> JobsUnifiedTopCardElement c'

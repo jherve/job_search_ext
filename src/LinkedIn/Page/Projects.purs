@@ -8,13 +8,11 @@ import Data.Generic.Rep (class Generic)
 import Data.List.Types (NonEmptyList)
 import Data.Show.Generic (genericShow)
 import Data.Traversable (class Traversable, sequence, traverse, traverseDefault)
-import Effect (Effect)
 import LinkedIn.ArtDecoCard (ArtDecoCardElement, queryArtDecoCard)
-import LinkedIn.DetachedNode (toDetached)
 import LinkedIn.Profile.Project (Project)
 import LinkedIn.Profile.Project as PP
-import LinkedIn.Profile.Utils (fromDetachedToUI)
 import LinkedIn.QueryRunner (QueryRunner', subQueryMany)
+import LinkedIn.UIElements.Types (UIElement)
 import Web.DOM (Document, Node)
 
 data ProjectsPage a = ProjectsPage (NonEmptyList (ArtDecoCardElement a))
@@ -43,9 +41,5 @@ query n = do
   cards <- subQueryMany queryArtDecoCard "section.artdeco-card > div ~ div > div > div > ul > li" n
   pure $ ProjectsPage cards
 
-extract ∷ ProjectsPage Node → Effect (Either String (NonEmptyList Project))
-extract p = do
-  detached <- traverse toDetached p
-  let
-    ProjectsPage cards = detached
-  pure $ traverse (PP.fromUI <=< fromDetachedToUI) cards
+extract ∷ ProjectsPage UIElement → Either String (NonEmptyList Project)
+extract (ProjectsPage cards) = traverse PP.fromUI cards

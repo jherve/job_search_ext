@@ -6,14 +6,12 @@ import Data.Either (Either)
 import Data.Foldable (class Foldable, foldMap, foldlDefault, foldrDefault)
 import Data.Generic.Rep (class Generic)
 import Data.Show.Generic (genericShow)
-import Data.Traversable (class Traversable, sequence, traverse, traverseDefault)
-import Effect (Effect)
-import LinkedIn.DetachedNode (toDetached)
+import Data.Traversable (class Traversable, sequence, traverseDefault)
 import LinkedIn.Jobs.JobOffer (JobOffer)
 import LinkedIn.Jobs.JobOffer as JJO
 import LinkedIn.JobsUnifiedTopCard (JobsUnifiedTopCardElement, queryJobsUnifiedTopCardElement)
-import LinkedIn.Profile.Utils (fromDetachedToUI)
 import LinkedIn.QueryRunner (QueryRunner', subQueryOne)
+import LinkedIn.UIElements.Types (UIElement)
 import Web.DOM (Document, Node)
 
 data JobOfferPage a = JobOfferPage (JobsUnifiedTopCardElement a)
@@ -42,9 +40,5 @@ query n = do
   card <- subQueryOne queryJobsUnifiedTopCardElement "div.jobs-unified-top-card" n
   pure $ JobOfferPage card
 
-extract ∷ JobOfferPage Node → Effect (Either String JobOffer)
-extract p = do
-  detached <- traverse toDetached p
-  let
-    JobOfferPage tabs = detached
-  pure $ (JJO.fromUI <=< fromDetachedToUI) tabs
+extract ∷ JobOfferPage UIElement → Either String JobOffer
+extract (JobOfferPage tabs) = JJO.fromUI tabs

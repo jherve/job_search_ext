@@ -8,13 +8,11 @@ import Data.Generic.Rep (class Generic)
 import Data.List.Types (NonEmptyList)
 import Data.Show.Generic (genericShow)
 import Data.Traversable (class Traversable, sequence, traverse, traverseDefault)
-import Effect (Effect)
 import LinkedIn.ArtDecoCard (ArtDecoCardElement, queryArtDecoCard)
-import LinkedIn.DetachedNode (toDetached)
-import LinkedIn.Profile.Utils (fromDetachedToUI)
 import LinkedIn.Profile.WorkExperience (WorkExperience)
 import LinkedIn.Profile.WorkExperience as PWE
 import LinkedIn.QueryRunner (QueryRunner', subQueryMany)
+import LinkedIn.UIElements.Types (UIElement)
 import Web.DOM (Document, Node)
 
 data WorkExperiencesPage a = WorkExperiencesPage (NonEmptyList (ArtDecoCardElement a))
@@ -43,9 +41,5 @@ query n = do
   cards <- subQueryMany queryArtDecoCard "section.artdeco-card > div ~ div > div > div > ul > li" n
   pure $ WorkExperiencesPage cards
 
-extract ∷ WorkExperiencesPage Node → Effect (Either String (NonEmptyList WorkExperience))
-extract p = do
-  detached <- traverse toDetached p
-  let
-    WorkExperiencesPage cards = detached
-  pure $ traverse (PWE.fromUI <=< fromDetachedToUI) cards
+extract ∷ WorkExperiencesPage UIElement → Either String (NonEmptyList WorkExperience)
+extract (WorkExperiencesPage cards) = traverse PWE.fromUI cards

@@ -14,7 +14,9 @@ import LinkedIn.Page.JobOffer as PageJ
 import LinkedIn.Page.Projects as PageP
 import LinkedIn.Page.Skills as PageS
 import LinkedIn.Page.WorkExperiences as PageWE
+import LinkedIn.Profile.Utils (fromDetachedToUI, fromNodeToDetached)
 import LinkedIn.QueryRunner (QueryRunner', runQuery)
+import LinkedIn.UIElements.Types (UIElement)
 import Web.DOM (Document, Node)
 
 main :: Effect Unit
@@ -30,11 +32,19 @@ main = do
 
   runQueryAndDetach PageJ.query dom >>= logShow
 
+extractData ∷ ∀ t a. Traversable t ⇒ (t UIElement → Either String a) → t Node → Effect (Either String a)
+extractData parsePageUI n = do
+  d <- fromNodeToDetached n
+  pure $ case fromDetachedToUI d of
+      Left l -> Left l
+      Right ui -> parsePageUI ui
+
 runQueryAndExtract ∷
-  ∀ f1 a.
-  Show a
-  ⇒ QueryRunner' Document (f1 Node)
-  → (f1 Node → Effect (Either String a))
+  ∀ t a.
+  Traversable t
+  => Show a
+  ⇒ QueryRunner' Document (t Node)
+  → (t UIElement → Either String a)
   → Document
   → Effect Unit
 runQueryAndExtract query extract dom = do
@@ -42,7 +52,7 @@ runQueryAndExtract query extract dom = do
   case n of
     Left l' -> logShow l'
     Right q -> do
-      extracted <- extract q
+      extracted <- (extractData extract) q
       logShow extracted
 
 runQueryAndDetach ∷

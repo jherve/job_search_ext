@@ -55,7 +55,7 @@ fromUI card = ado
           _ -> false
 
 getInsight ∷ String → JobsUnifiedTopCardElement UIElement → Maybe (TopCardInsight UIElement)
-getInsight i card = findOf _top_to_insights (isIcon i) card
+getInsight iType card = findOf _top_to_insights (isIcon iType) card
   where
     isIcon icon = case _ of
       TopCardInsight {icon: UIIcon i} -> i == icon

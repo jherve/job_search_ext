@@ -35,11 +35,11 @@ main = do
     actual: topCard,
     expected:  JobsUnifiedTopCardElement {
       actions: (Just (NonEmptyList
-        (NonEmpty (TopCardActionApplyButton (DetachedButton {
+        (NonEmpty (TopCardActionButton (DetachedButton {
           classes: ("jobs-apply-button" : "artdeco-button" : "artdeco-button--3" : "artdeco-button--primary" : "ember-view" : Nil),
           content: "Candidature simplifiée",
           role: Nothing
-        })) ((TopCardActionApplyButton (DetachedButton {
+        })) ((TopCardActionButton (DetachedButton {
           classes: ("jobs-save-button" : "artdeco-button" : "artdeco-button--3" : "artdeco-button--secondary" : Nil),
           content: "Enregistrer Enregistrer Data Engineer H/F - Secteur Energie chez LINCOLN",
           role: Nothing

@@ -46,7 +46,7 @@ data TopCardSecondaryInsight a =
 
 -- External application : <button id="ember74"  class="jobs-apply-button artdeco-button artdeco-button--3 artdeco-button--primary ember-view artdeco-button--icon-right" role="link">
 -- LinkedIn Applcation : <button id="ember115" class="jobs-apply-button artdeco-button artdeco-button--3 artdeco-button--primary ember-view" data-job-id="3786945580">
-data TopCardAction a = TopCardActionApplyButton a
+data TopCardAction a = TopCardActionButton a
 
 derive instance Generic (JobsUnifiedTopCardElement a) _
 derive instance Eq a => Eq (JobsUnifiedTopCardElement a)
@@ -169,20 +169,20 @@ instance Show a => Show (TopCardAction a) where
 derive instance Functor TopCardAction
 
 instance Foldable TopCardAction where
-  foldMap f (TopCardActionApplyButton a) = f a
+  foldMap f (TopCardActionButton a) = f a
 
   foldl = \x -> foldlDefault x
   foldr = \x -> foldrDefault x
 
 instance Traversable TopCardAction where
-  sequence (TopCardActionApplyButton app) = ado
+  sequence (TopCardActionButton app) = ado
     a <- app
-  in TopCardActionApplyButton a
+  in TopCardActionButton a
 
   traverse = \x -> traverseDefault x
 
 queryTopCardAction :: QueryRunner (TopCardAction Node)
-queryTopCardAction n = pure $ TopCardActionApplyButton n
+queryTopCardAction n = pure $ TopCardActionButton n
 
 queryTopCardSecondaryInsightNested :: QueryRunner (TopCardSecondaryInsight Node)
 queryTopCardSecondaryInsightNested n = do
@@ -282,8 +282,8 @@ _top_card = lens' \(JobsUnifiedTopCardElement c) -> Tuple c \c' -> JobsUnifiedTo
 _insight ∷ forall a. Lens' (TopCardInsight a) { content ∷ TopCardInsightContent a , icon ∷ a }
 _insight = lens' \(TopCardInsight i) -> Tuple i \i' -> TopCardInsight i'
 
-_action_apply ∷ forall a. Lens' (TopCardAction a) a
-_action_apply = lens' \(TopCardActionApplyButton i) -> Tuple i \i' -> TopCardActionApplyButton i'
+_action_button ∷ forall a. Lens' (TopCardAction a) a
+_action_button = lens' \(TopCardActionButton i) -> Tuple i \i' -> TopCardActionButton i'
 
 _primary_description ∷ ∀ a. Lens' (TopCardPrimaryDescription a) { link ∷ a , text ∷ a , tvmText ∷ Maybe (NonEmptyList a) }
 _primary_description = lens' \(TopCardPrimaryDescription i) -> Tuple i \i' -> TopCardPrimaryDescription i'

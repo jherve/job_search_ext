@@ -3,37 +3,12 @@ module LinkedIn.Profile.Utils where
 import Prelude
 
 import Control.Alt ((<|>))
-import Data.Either (Either(..), hush)
-import Data.Foldable (class Foldable, findMap)
-import Data.List (List)
-import Data.List as L
+import Data.Either (Either(..))
 import Data.Maybe (Maybe(..))
 import LinkedIn.DetachedNode (DetachedNode(..))
 import LinkedIn.UIElements.Parser (uiStringP)
 import LinkedIn.UIElements.Types (UIElement(..))
 import Parsing (ParseError(..), initialPos, runParser)
-
-maybeGetInList ::
-  ∀ a. (UIElement → Maybe a)
-  -> List (Either ParseError UIElement)
-  -> Int
-  -> Maybe a
-maybeGetInList extract idx list = L.index idx list >>= hush >>= extract
-
-maybeExtractFromMaybe ∷
-  ∀ a. (UIElement → Maybe a)
-  → Maybe (Either ParseError UIElement)
-  → Maybe a
-maybeExtractFromMaybe extract maybeNode = maybeNode >>= hush >>= extract
-
-maybeFindInMaybeNEL ∷
-  ∀ a f. Foldable f ⇒
-  (UIElement → Maybe a)
-  → Maybe (f (Either ParseError UIElement))
-  → Maybe a
-maybeFindInMaybeNEL extract = case _ of
-  Just nel -> findMap (hush >>> (extract =<< _)) nel
-  Nothing -> Nothing
 
 -- TODO : should certainly use another type than ParseError here
 toUIElement ∷ DetachedNode → Either ParseError UIElement

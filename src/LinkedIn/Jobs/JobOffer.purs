@@ -15,7 +15,9 @@ data JobOffer = JobOffer {
   companyName :: String,
   companyLink :: String,
   location :: Maybe String,
-  remote :: Maybe String
+  remote :: Maybe String,
+  companyDomain :: Maybe String,
+  companySize :: Maybe String
 }
 
 derive instance Generic JobOffer _
@@ -33,13 +35,20 @@ fromUI card = ado
       companyName,
       companyLink,
       location: extractLocation primaryDescText,
-      remote: extractJobRemote =<< jobInsight
+      remote: extractJobRemote =<< jobInsight,
+      companyDomain: extractCompanyDomain =<< companyInsight,
+      companySize: extractCompanySize =<< companyInsight
     }
   where
     header = toHeader card
     link = toPrimaryDescriptionLink card
     primaryDescText = toPrimaryDescriptionText card
-    jobInsight = findOf _top_to_insights (isIcon "job") card
+    jobInsight = getInsight "job" card
+    companyInsight = getInsight "company" card
+
+getInsight ∷ String → JobsUnifiedTopCardElement UIElement → Maybe (TopCardInsight UIElement)
+getInsight i card = findOf _top_to_insights (isIcon i) card
+  where
     isIcon icon = case _ of
       TopCardInsight {icon: UIIcon i} -> i == icon
       _ -> false
@@ -57,6 +66,16 @@ extractCompany = case _ of
 extractCompanyLink :: UIElement -> Maybe String
 extractCompanyLink = case _ of
   UILink link _ -> Just link
+  _ -> Nothing
+
+extractCompanyDomain ∷ TopCardInsight UIElement → Maybe String
+extractCompanyDomain = case _ of
+  TopCardInsight {content: TopCardInsightContentSingle (UIElement (UIStringDotSeparated _ (UIStringPlain str)))} -> Just str
+  _ -> Nothing
+
+extractCompanySize ∷ TopCardInsight UIElement → Maybe String
+extractCompanySize = case _ of
+  TopCardInsight {content: TopCardInsightContentSingle (UIElement (UIStringDotSeparated (UIStringPlain str) _))} -> Just str
   _ -> Nothing
 
 extractLocation :: UIElement -> Maybe String

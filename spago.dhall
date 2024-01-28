@@ -14,6 +14,7 @@ You can edit this file as you like.
   , "enums"
   , "foldable-traversable"
   , "free"
+  , "int64"
   , "integers"
   , "lists"
   , "maybe"

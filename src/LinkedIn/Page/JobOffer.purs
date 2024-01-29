@@ -9,9 +9,9 @@ import Data.Show.Generic (genericShow)
 import Data.Traversable (class Traversable, sequence, traverseDefault)
 import LinkedIn.Jobs.JobOffer (JobOffer)
 import LinkedIn.Jobs.JobOffer as JJO
-import LinkedIn.JobsUnifiedTopCard (JobsUnifiedTopCardElement, queryJobsUnifiedTopCardElement)
+import LinkedIn.UI.Components.JobsUnifiedTopCard (JobsUnifiedTopCardElement, queryJobsUnifiedTopCardElement)
 import LinkedIn.QueryRunner (QueryRunner', subQueryOne)
-import LinkedIn.UIElements.Types (UIElement)
+import LinkedIn.UI.Elements.Types (UIElement)
 import Web.DOM (Document, Node)
 
 data JobOfferPage a = JobOfferPage (JobsUnifiedTopCardElement a)

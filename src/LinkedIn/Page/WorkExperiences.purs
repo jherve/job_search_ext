@@ -8,11 +8,11 @@ import Data.Generic.Rep (class Generic)
 import Data.List.Types (NonEmptyList)
 import Data.Show.Generic (genericShow)
 import Data.Traversable (class Traversable, sequence, traverse, traverseDefault)
-import LinkedIn.ArtDecoCard (ArtDecoCardElement, queryArtDecoCard)
+import LinkedIn.UI.Components.ArtDecoCard (ArtDecoCardElement, queryArtDecoCard)
 import LinkedIn.Profile.WorkExperience (WorkExperience)
 import LinkedIn.Profile.WorkExperience as PWE
 import LinkedIn.QueryRunner (QueryRunner', subQueryMany)
-import LinkedIn.UIElements.Types (UIElement)
+import LinkedIn.UI.Elements.Types (UIElement)
 import Web.DOM (Document, Node)
 
 data WorkExperiencesPage a = WorkExperiencesPage (NonEmptyList (ArtDecoCardElement a))

@@ -1,4 +1,4 @@
-module LinkedIn.Profile.Utils where
+module LinkedIn.UI.Elements.Parser where
 
 import Prelude
 
@@ -7,15 +7,10 @@ import Data.Either (Either(..))
 import Data.List as L
 import Data.Maybe (Maybe(..))
 import Data.Traversable (class Traversable, traverse)
-import Effect (Effect)
-import LinkedIn.DetachedNode (DetachedNode(..), toDetached)
-import LinkedIn.UIElements.Parser (uiStringP)
-import LinkedIn.UIElements.Types (UIElement(..))
+import LinkedIn.DetachedNode (DetachedNode(..))
+import LinkedIn.UI.Strings.Parser (uiStringP)
+import LinkedIn.UI.Elements.Types (UIElement(..))
 import Parsing (ParseError(..), initialPos, runParser)
-import Web.DOM (Node)
-
-fromNodeToDetached ∷ ∀ t. Traversable t ⇒ t Node → Effect (t DetachedNode)
-fromNodeToDetached = traverse toDetached
 
 fromDetachedToUI ∷ ∀ t. Traversable t ⇒ t DetachedNode → Either String (t UIElement)
 fromDetachedToUI el = case traverse toUIElement el of

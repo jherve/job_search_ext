@@ -1,10 +1,9 @@
-module LinkedIn.UIElements.Types where
+module LinkedIn.UI.Basic.Types where
 
 import Prelude
 
 import Data.Date (Month, Year)
 import Data.Generic.Rep (class Generic)
-import Data.Maybe (Maybe)
 import Data.Show.Generic (genericShow)
 
 data MonthYear = MonthYear Month Year
@@ -40,27 +39,4 @@ data JobFlexibility = JobFlexHybrid | JobFlexOnSite | JobFlexFullRemote
 derive instance Eq JobFlexibility
 derive instance Generic JobFlexibility _
 instance Show JobFlexibility where
-  show = genericShow
-
-data UIString =
-  UIStringDuration Duration
-  | UIStringTimeSpan TimeSpan
-  | UIStringJobFlex JobFlexibility
-  | UIStringPlain String
-  | UIStringDotSeparated UIString UIString
-
-derive instance Eq UIString
-derive instance Generic UIString _
-instance Show UIString where
-  show (UIStringDotSeparated ui1 ui2) = "(UIStringDotSeparated " <> show ui1 <> show ui2 <> ")"
-  show u = genericShow u
-
-data UIElement =
-  UIElement UIString
-  | UILink String UIString
-  | UIButton {role :: Maybe String, label :: UIString, mainClass :: Maybe String}
-  | UIIcon String
-
-derive instance Generic UIElement _
-instance Show UIElement where
   show = genericShow

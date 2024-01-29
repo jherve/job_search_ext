@@ -1,11 +1,10 @@
-module LinkedIn.UIElements.Parser where
+module LinkedIn.UI.Basic.Parser where
 
 import Prelude
 
 import Control.Alt ((<|>))
 import Data.Array as A
 import Data.Date (Month(..), Year)
-import Data.Either (hush)
 import Data.Enum (toEnum)
 import Data.Int (fromNumber)
 import Data.List (List(..), (:))
@@ -18,8 +17,8 @@ import Data.Maybe (Maybe(..))
 import Data.String as S
 import Data.String.CodePoints (codePointFromChar)
 import Data.Tuple (Tuple(..))
-import LinkedIn.UIElements.Types (Duration(..), JobFlexibility(..), MonthYear(..), MonthYearOrToday(..), TimeSpan(..), UIString(..))
-import Parsing (Parser, ParserT, fail, liftMaybe, runParser)
+import LinkedIn.UI.Basic.Types (Duration(..), JobFlexibility(..), MonthYear(..), MonthYearOrToday(..), TimeSpan(..))
+import Parsing (Parser, ParserT, fail)
 import Parsing.Combinators (choice, try)
 import Parsing.String (char, rest, string)
 import Parsing.String.Basic (intDecimal, number, space, takeWhile)
@@ -144,27 +143,6 @@ stringWithoutCommaP = takeWhile (\c -> c /= codePointFromChar ',')
 stringWithoutMedianDotP :: Parser String String
 stringWithoutMedianDotP = takeWhile (\c -> c /= codePointFromChar '·' && c /= codePointFromChar '•')
 
-uiStringP :: Parser String UIString
-uiStringP = (try uiStringdotSeparatedP) <|> uiStringSingleP
-
-uiStringWithoutMedianDotP ∷ Parser String UIString
-uiStringWithoutMedianDotP = do
-  s <- rest
-  liftMaybe (\_ -> "nope") $ hush $ runParser s uiStringSingleP
-
-uiStringdotSeparatedP ∷ Parser String UIString
-uiStringdotSeparatedP = do
-  Tuple s1 s2 <- medianDotSeparated
-
-  let
-    intoUiElement :: String -> Parser String UIString
-    intoUiElement s = liftMaybe (\_ -> "could not convert to ui element") $ hush $ runParser s uiStringSingleP
-
-  s1' <- intoUiElement s1
-  s2' <- intoUiElement s2
-
-  pure $ UIStringDotSeparated s1' s2'
-
 sepBy2 :: forall m s a sep. ParserT s m a -> ParserT s m sep -> ParserT s m (NonEmptyList a)
 sepBy2 p sep = do
   a0 <- p
@@ -180,18 +158,3 @@ medianDotSeparated = do
   a0 <- stringWithoutMedianDotP
   a1 <- medianDotP *> rest
   pure $ Tuple (S.trim a0) (S.trim a1)
-
-uiStringSingleP ∷ Parser String UIString
-uiStringSingleP = (try uiStringDurationP) <|> (try uiStringTimeSpanP) <|> (try uiStringJobFlexP) <|> uiStringPlainP
-
-uiStringDurationP ∷ Parser String UIString
-uiStringDurationP = UIStringDuration <$> durationP
-
-uiStringTimeSpanP ∷ Parser String UIString
-uiStringTimeSpanP = UIStringTimeSpan <$> timeSpanP
-
-uiStringJobFlexP ∷ Parser String UIString
-uiStringJobFlexP = UIStringJobFlex <$> jobFlexP
-
-uiStringPlainP ∷ Parser String UIString
-uiStringPlainP = UIStringPlain <$> rest

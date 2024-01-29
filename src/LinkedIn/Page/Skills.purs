@@ -8,11 +8,11 @@ import Data.Generic.Rep (class Generic)
 import Data.List.Types (NonEmptyList)
 import Data.Show.Generic (genericShow)
 import Data.Traversable (class Traversable, sequence, traverse, traverseDefault)
-import LinkedIn.ArtDecoTab (ArtDecoTabElement, queryArtDecoTab)
+import LinkedIn.UI.Components.ArtDecoTab (ArtDecoTabElement, queryArtDecoTab)
 import LinkedIn.Profile.Skill (Skill)
 import LinkedIn.Profile.Skill as PS
 import LinkedIn.QueryRunner (QueryRunner', subQueryMany)
-import LinkedIn.UIElements.Types (UIElement)
+import LinkedIn.UI.Elements.Types (UIElement)
 import Web.DOM (Document, Node)
 
 data SkillsPage a = SkillsPage (NonEmptyList (ArtDecoTabElement a))

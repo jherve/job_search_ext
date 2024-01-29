@@ -1,4 +1,4 @@
-module LinkedIn.ArtDecoTab where
+module LinkedIn.UI.Components.ArtDecoTab where
 
 import Prelude
 
@@ -13,7 +13,7 @@ import Data.Maybe (Maybe)
 import Data.Show.Generic (genericShow)
 import Data.Traversable (class Traversable, sequence, traverseDefault)
 import Data.Tuple (Tuple(..))
-import LinkedIn.ArtDeco (ArtDecoPvsEntity, _pvs_to_header_bold, _pvs_to_header_light, _pvs_to_header_normal, _pvs_to_subcomponents, queryArtDecoPvsEntity)
+import LinkedIn.UI.Components.ArtDeco (ArtDecoPvsEntity, _pvs_to_header_bold, _pvs_to_header_light, _pvs_to_header_normal, _pvs_to_subcomponents, queryArtDecoPvsEntity)
 import LinkedIn.QueryRunner (QueryRunner, subQueryOne)
 import Type.Proxy (Proxy(..))
 import Web.DOM (Node)

@@ -7,8 +7,10 @@ import Data.Generic.Rep (class Generic)
 import Data.List as L
 import Data.Maybe (Maybe(..))
 import Data.Show.Generic (genericShow)
-import LinkedIn.ArtDecoCard (ArtDecoCardElement, toCenterContent, toHeaderBold, toHeaderNormal)
-import LinkedIn.UIElements.Types (TimeSpan, UIElement(..), UIString(..))
+import LinkedIn.UI.Components.ArtDecoCard (ArtDecoCardElement, toCenterContent, toHeaderBold, toHeaderNormal)
+import LinkedIn.UI.Basic.Types (TimeSpan)
+import LinkedIn.UI.Strings.Types (UIString(..))
+import LinkedIn.UI.Elements.Types (UIElement(..))
 
 data Project = Project {
   name :: String,

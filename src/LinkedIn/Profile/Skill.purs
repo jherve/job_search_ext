@@ -6,8 +6,9 @@ import Data.Either (Either, note)
 import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe(..))
 import Data.Show.Generic (genericShow)
-import LinkedIn.ArtDecoTab (ArtDecoTabElement, toHeaderBold)
-import LinkedIn.UIElements.Types (UIElement(..), UIString(..))
+import LinkedIn.UI.Components.ArtDecoTab (ArtDecoTabElement, toHeaderBold)
+import LinkedIn.UI.Strings.Types (UIString(..))
+import LinkedIn.UI.Elements.Types (UIElement(..))
 
 data Skill = Skill {
   name :: String

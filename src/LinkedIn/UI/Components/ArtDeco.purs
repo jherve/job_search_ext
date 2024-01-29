@@ -1,4 +1,4 @@
-module LinkedIn.ArtDeco where
+module LinkedIn.UI.Components.ArtDeco where
 
 import Prelude
 

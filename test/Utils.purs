@@ -5,8 +5,8 @@ import Prelude
 import Data.Date (Month)
 import Data.Int (toNumber)
 import Data.Maybe (fromJust)
-import LinkedIn.UIElements.Parser (toYear)
-import LinkedIn.UIElements.Types (MonthYear(..))
+import LinkedIn.UI.Basic.Parser (toYear)
+import LinkedIn.UI.Basic.Types (MonthYear(..))
 import Partial.Unsafe (unsafePartial)
 
 toMonthYear' :: Month -> Int -> MonthYear

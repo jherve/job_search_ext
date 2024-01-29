@@ -1,4 +1,4 @@
-module LinkedIn.JobsUnifiedTopCard where
+module LinkedIn.UI.Components.JobsUnifiedTopCard where
 
 import Prelude
 

@@ -7,8 +7,10 @@ import Data.Generic.Rep (class Generic)
 import Data.Lens (findOf)
 import Data.Maybe (Maybe(..), isJust)
 import Data.Show.Generic (genericShow)
-import LinkedIn.JobsUnifiedTopCard (JobsUnifiedTopCardElement, TopCardInsight(..), TopCardInsightContent(..), _top_to_action_buttons, _top_to_insights, toHeader, toPrimaryDescriptionLink, toPrimaryDescriptionText)
-import LinkedIn.UIElements.Types (JobFlexibility, UIElement(..), UIString(..))
+import LinkedIn.UI.Components.JobsUnifiedTopCard (JobsUnifiedTopCardElement, TopCardInsight(..), TopCardInsightContent(..), _top_to_action_buttons, _top_to_insights, toHeader, toPrimaryDescriptionLink, toPrimaryDescriptionText)
+import LinkedIn.UI.Basic.Types (JobFlexibility)
+import LinkedIn.UI.Strings.Types (UIString(..))
+import LinkedIn.UI.Elements.Types (UIElement(..))
 
 data JobOffer = JobOffer {
   title :: String,

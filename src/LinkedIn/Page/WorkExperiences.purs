@@ -2,18 +2,16 @@ module LinkedIn.Page.WorkExperiences where
 
 import Prelude
 
-import Data.Either (Either)
 import Data.Foldable (class Foldable, foldMap, foldlDefault, foldrDefault)
 import Data.Generic.Rep (class Generic)
 import Data.List.Types (NonEmptyList)
 import Data.Show.Generic (genericShow)
 import Data.Traversable (class Traversable, sequence, traverse, traverseDefault)
-import LinkedIn.UI.Components.ArtDecoCard (ArtDecoCardElement, queryArtDecoCard)
+import LinkedIn.Extractible (class Extractible)
 import LinkedIn.Profile.WorkExperience (WorkExperience)
 import LinkedIn.Profile.WorkExperience as PWE
-import LinkedIn.QueryRunner (QueryRunner', subQueryMany)
-import LinkedIn.UI.Elements.Types (UIElement)
-import Web.DOM (Document, Node)
+import LinkedIn.QueryRunner (subQueryMany)
+import LinkedIn.UI.Components.ArtDecoCard (ArtDecoCardElement, queryArtDecoCard)
 
 data WorkExperiencesPage a = WorkExperiencesPage (NonEmptyList (ArtDecoCardElement a))
 
@@ -36,10 +34,9 @@ instance Traversable WorkExperiencesPage where
 
   traverse = \x -> traverseDefault x
 
-query :: QueryRunner' Document (WorkExperiencesPage Node)
-query n = do
-  cards <- subQueryMany queryArtDecoCard "section.artdeco-card > div ~ div > div > div > ul > li" n
-  pure $ WorkExperiencesPage cards
+instance Extractible WorkExperiencesPage (NonEmptyList WorkExperience) where
+  query n = do
+    cards <- subQueryMany queryArtDecoCard "section.artdeco-card > div ~ div > div > div > ul > li" n
+    pure $ WorkExperiencesPage cards
 
-extract ∷ WorkExperiencesPage UIElement → Either String (NonEmptyList WorkExperience)
-extract (WorkExperiencesPage cards) = traverse PWE.fromUI cards
+  extract (WorkExperiencesPage cards) = traverse PWE.fromUI cards

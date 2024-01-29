@@ -6,28 +6,32 @@ import Data.Either (Either(..))
 import Data.Traversable (class Traversable, traverse)
 import Effect (Effect)
 import LinkedIn.DetachedNode (DetachedNode, toDetached)
+import LinkedIn.Extractible (class Extractible)
+import LinkedIn.Extractible as LE
 import LinkedIn.QueryRunner (QueryError, QueryRunner', runQuery)
 import LinkedIn.UI.Elements.Parser (fromDetachedToUI)
 import LinkedIn.UI.Elements.Types (UIElement)
+import Type.Proxy (Proxy)
 import Web.DOM (Document, Node)
 
-run :: forall t a.
+run :: forall a t.
   Traversable t
-  ⇒ QueryRunner' Document (t Node)
-  -> (t UIElement → Either String a)
+  => Extractible t a
+  => Proxy t
   -> Document
   -> Effect (Either String a)
-run query parse dom = do
-  detached <- runToDetached query dom
-  pure $ extract parse $ toUI detached
+run prox dom = do
+  detached <- runToDetached prox dom
+  pure $ extract LE.extract $ toUI detached
 
-runToDetached :: forall t.
+runToDetached :: forall t a.
   Traversable t
-  ⇒ QueryRunner' Document (t Node)
+  => Extractible t a
+  => Proxy t
   -> Document
   -> Effect (Either QueryError (t DetachedNode))
-runToDetached query dom = do
-  qRes <- doQuery query dom
+runToDetached _ dom = do
+  qRes <- doQuery LE.query dom
   detach qRes
 
 doQuery ∷ ∀ b. QueryRunner' Document b → Document → Effect (Either QueryError b)

@@ -2,18 +2,16 @@ module LinkedIn.Page.Skills where
 
 import Prelude
 
-import Data.Either (Either)
 import Data.Foldable (class Foldable, foldMap, foldlDefault, foldrDefault)
 import Data.Generic.Rep (class Generic)
 import Data.List.Types (NonEmptyList)
 import Data.Show.Generic (genericShow)
 import Data.Traversable (class Traversable, sequence, traverse, traverseDefault)
-import LinkedIn.UI.Components.ArtDecoTab (ArtDecoTabElement, queryArtDecoTab)
+import LinkedIn.Extractible (class Extractible)
 import LinkedIn.Profile.Skill (Skill)
 import LinkedIn.Profile.Skill as PS
-import LinkedIn.QueryRunner (QueryRunner', subQueryMany)
-import LinkedIn.UI.Elements.Types (UIElement)
-import Web.DOM (Document, Node)
+import LinkedIn.QueryRunner (subQueryMany)
+import LinkedIn.UI.Components.ArtDecoTab (ArtDecoTabElement, queryArtDecoTab)
 
 data SkillsPage a = SkillsPage (NonEmptyList (ArtDecoTabElement a))
 
@@ -36,10 +34,9 @@ instance Traversable SkillsPage where
 
   traverse = \x -> traverseDefault x
 
-query :: QueryRunner' Document (SkillsPage Node)
-query n = do
-  tabs <- subQueryMany queryArtDecoTab "div.artdeco-tabs > div > div > div > div > ul > li" n
-  pure $ SkillsPage tabs
+instance Extractible SkillsPage (NonEmptyList Skill) where
+  query n = do
+    tabs <- subQueryMany queryArtDecoTab "div.artdeco-tabs > div > div > div > div > ul > li" n
+    pure $ SkillsPage tabs
 
-extract ∷ SkillsPage UIElement → Either String (NonEmptyList Skill)
-extract (SkillsPage tabs) = traverse PS.fromUI tabs
+  extract (SkillsPage tabs) = traverse PS.fromUI tabs

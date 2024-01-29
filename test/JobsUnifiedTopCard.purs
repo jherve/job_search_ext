@@ -10,13 +10,14 @@ import Data.NonEmpty (NonEmpty(..))
 import Data.Traversable (traverse)
 import Effect (Effect)
 import LinkedIn.DetachedNode (DetachedNode(..), toDetached)
+import LinkedIn.Extractible (query)
 import LinkedIn.Jobs.JobOffer (JobOffer(..))
 import LinkedIn.Jobs.JobOffer as JJO
-import LinkedIn.UI.Components.JobsUnifiedTopCard (JobsUnifiedTopCardElement(..), TopCardAction(..), TopCardInsight(..), TopCardInsightContent(..), TopCardPrimaryDescription(..), TopCardSecondaryInsight(..))
 import LinkedIn.Page.JobOffer (JobOfferPage(..))
 import LinkedIn.Page.JobOffer as PageJO
 import LinkedIn.QueryRunner (runQuery)
 import LinkedIn.UI.Basic.Types (JobFlexibility(..))
+import LinkedIn.UI.Components.JobsUnifiedTopCard (JobsUnifiedTopCardElement(..), TopCardAction(..), TopCardInsight(..), TopCardInsightContent(..), TopCardPrimaryDescription(..), TopCardSecondaryInsight(..))
 import LinkedIn.UI.Elements.Parser (fromDetachedToUI)
 import Node.JsDom (jsDomFromFile)
 import Partial.Unsafe (unsafePartial)
@@ -26,7 +27,7 @@ main :: Effect Unit
 main = do
   dom <- jsDomFromFile "test/examples/job_offer.html"
 
-  wep <- runQuery $ PageJO.query dom
+  wep <- runQuery $ query dom
 
   assert $ isRight wep
 

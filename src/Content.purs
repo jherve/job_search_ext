@@ -7,10 +7,11 @@ import Effect (Effect)
 import Effect.Class.Console (logShow)
 import Effect.Console (log)
 import LinkedIn (run, runToDetached)
-import LinkedIn.Page.JobOffer as PageJ
-import LinkedIn.Page.Projects as PageP
-import LinkedIn.Page.Skills as PageS
-import LinkedIn.Page.WorkExperiences as PageWE
+import LinkedIn.Page.JobOffer (JobOfferPage)
+import LinkedIn.Page.Projects (ProjectsPage)
+import LinkedIn.Page.Skills (SkillsPage)
+import LinkedIn.Page.WorkExperiences (WorkExperiencesPage)
+import Type.Proxy (Proxy(..))
 
 main :: Effect Unit
 main = do
@@ -18,9 +19,9 @@ main = do
 
   dom <- getBrowserDom
 
-  run PageWE.query PageWE.extract dom >>= logShow
-  run PageP.query PageP.extract dom >>= logShow
-  run PageS.query PageS.extract dom >>= logShow
-  run PageJ.query PageJ.extract dom >>= logShow
+  run (Proxy :: Proxy WorkExperiencesPage) dom >>= logShow
+  run (Proxy :: Proxy SkillsPage) dom >>= logShow
+  run (Proxy :: Proxy ProjectsPage) dom >>= logShow
+  run (Proxy :: Proxy JobOfferPage) dom >>= logShow
 
-  runToDetached PageJ.query dom >>= logShow
+  runToDetached (Proxy :: Proxy JobOfferPage) dom >>= logShow

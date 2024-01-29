@@ -11,15 +11,15 @@ import Data.Maybe (Maybe(..), fromJust)
 import Data.NonEmpty (NonEmpty(..))
 import Data.Traversable (traverse)
 import Effect (Effect)
-import LinkedIn.UI.Components.ArtDeco (ArtDecoCenter(..), ArtDecoCenterContent(..), ArtDecoCenterHeader(..), ArtDecoPvsEntity(..), ArtDecoPvsEntitySubComponent(..))
-import LinkedIn.UI.Components.ArtDecoCard (ArtDecoCardElement(..))
 import LinkedIn.DetachedNode (DetachedNode(..), toDetached)
+import LinkedIn.Extractible (query)
 import LinkedIn.Page.WorkExperiences (WorkExperiencesPage(..))
-import LinkedIn.Page.WorkExperiences as PageWE
 import LinkedIn.Profile.WorkExperience (WorkExperience(..))
 import LinkedIn.Profile.WorkExperience as PWE
 import LinkedIn.QueryRunner (runQuery)
 import LinkedIn.UI.Basic.Types (Duration(..), TimeSpan(..))
+import LinkedIn.UI.Components.ArtDeco (ArtDecoCenter(..), ArtDecoCenterContent(..), ArtDecoCenterHeader(..), ArtDecoPvsEntity(..), ArtDecoPvsEntitySubComponent(..))
+import LinkedIn.UI.Components.ArtDecoCard (ArtDecoCardElement(..))
 import LinkedIn.UI.Elements.Parser (fromDetachedToUI)
 import Node.JsDom (jsDomFromFile)
 import Partial.Unsafe (unsafePartial)
@@ -29,7 +29,7 @@ import Test.Utils (toMonthYear')
 testArtDecoCards :: Effect Unit
 testArtDecoCards = do
   dom <- jsDomFromFile "test/examples/andrew_ng_experiences.html"
-  wep <- runQuery $ PageWE.query dom
+  wep <- runQuery $ query dom
 
   assert $ isRight wep
 

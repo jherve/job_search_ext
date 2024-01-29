@@ -1,25 +1,18 @@
-module LinkedIn.PageUrl (PageUrl(..), JobOfferId(..), pageUrlP) where
+module LinkedIn.PageUrl (PageUrl(..), pageUrlP) where
 
 import Prelude
 
 import Control.Alt ((<|>))
 import Data.Generic.Rep (class Generic)
-import Data.Int64 (Int64)
 import Data.Int64 as I64
 import Data.Maybe (Maybe(..))
 import Data.Show.Generic (genericShow)
 import Data.String (codePointFromChar)
+import LinkedIn.UI.Basic.Types (JobOfferId(..))
 import Parsing (Parser, fail)
 import Parsing.Combinators (try)
 import Parsing.String (char, string)
 import Parsing.String.Basic (takeWhile)
-
-newtype JobOfferId = JobOfferId Int64
-
-derive instance Eq JobOfferId
-derive instance Generic JobOfferId _
-instance Show JobOfferId where
-  show = genericShow
 
 data PageUrl =
   UrlProfileMain String

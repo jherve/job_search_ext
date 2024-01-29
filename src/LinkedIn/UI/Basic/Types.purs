@@ -4,7 +4,15 @@ import Prelude
 
 import Data.Date (Month, Year)
 import Data.Generic.Rep (class Generic)
+import Data.Int64 (Int64)
 import Data.Show.Generic (genericShow)
+
+newtype JobOfferId = JobOfferId Int64
+
+derive instance Eq JobOfferId
+derive instance Generic JobOfferId _
+instance Show JobOfferId where
+  show = genericShow
 
 data MonthYear = MonthYear Month Year
 

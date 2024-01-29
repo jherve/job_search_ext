@@ -1,18 +1,32 @@
-module LinkedIn (run, runToDetached) where
+module LinkedIn (run, runToDetached, getContext) where
 
 import Prelude
 
 import Data.Either (Either(..))
+import Data.Maybe (Maybe(..))
 import Data.Traversable (class Traversable, traverse)
 import Effect (Effect)
 import LinkedIn.DetachedNode (DetachedNode, toDetached)
 import LinkedIn.Extractible (class Extractible)
 import LinkedIn.Extractible as LE
+import LinkedIn.PageUrl (PageUrl, pageUrlP)
 import LinkedIn.QueryRunner (QueryError, QueryRunner', runQuery)
 import LinkedIn.UI.Elements.Parser (fromDetachedToUI)
 import LinkedIn.UI.Elements.Types (UIElement)
+import Parsing (runParser)
 import Type.Proxy (Proxy)
 import Web.DOM (Document, Node)
+import Web.DOM.Document (url)
+import Web.URL as U
+
+getContext ∷ Document → Effect (Either String PageUrl)
+getContext dom = do
+  u <- url dom
+  pure $ case U.fromAbsolute u of
+    Nothing -> Left "No URL found"
+    Just u' -> case runParser (U.pathname u') pageUrlP of
+      Left _ -> Left "Unexpected URL"
+      Right page -> Right page
 
 run :: forall a t.
   Traversable t

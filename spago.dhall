@@ -30,6 +30,7 @@ You can edit this file as you like.
   , "transformers"
   , "tuples"
   , "web-dom"
+  , "web-url"
   , "yoga-tree"
   ]
 , packages = ./packages.dhall

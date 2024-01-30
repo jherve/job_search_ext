@@ -8,7 +8,7 @@ import Data.List.Types (NonEmptyList)
 import Data.Show.Generic (genericShow)
 import Data.Traversable (class Traversable, sequence, traverse, traverseDefault)
 import LinkedIn.Extractible (class Extractible)
-import LinkedIn.Profile.WorkExperience (WorkExperience)
+import LinkedIn.Output.Types (Output(..))
 import LinkedIn.Profile.WorkExperience as PWE
 import LinkedIn.QueryRunner (subQueryMany)
 import LinkedIn.UI.Components.ArtDecoCard (ArtDecoCardElement, queryArtDecoCard)
@@ -34,9 +34,9 @@ instance Traversable WorkExperiencesPage where
 
   traverse = \x -> traverseDefault x
 
-instance Extractible WorkExperiencesPage (NonEmptyList WorkExperience) where
+instance Extractible WorkExperiencesPage where
   query n = do
     cards <- subQueryMany queryArtDecoCard "section.artdeco-card > div ~ div > div > div > ul > li" n
     pure $ WorkExperiencesPage cards
 
-  extract (WorkExperiencesPage cards) = traverse PWE.fromUI cards
+  extract (WorkExperiencesPage cards) = OutWorkExperiences <$> traverse PWE.fromUI cards

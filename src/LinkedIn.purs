@@ -9,6 +9,7 @@ import Effect (Effect)
 import LinkedIn.DetachedNode (DetachedNode, toDetached)
 import LinkedIn.Extractible (class Extractible)
 import LinkedIn.Extractible as LE
+import LinkedIn.Output.Types (Output)
 import LinkedIn.PageUrl (PageUrl, pageUrlP)
 import LinkedIn.QueryRunner (QueryError, QueryRunner', runQuery)
 import LinkedIn.UI.Elements.Parser (fromDetachedToUI)
@@ -28,19 +29,19 @@ getContext dom = do
       Left _ -> Left "Unexpected URL"
       Right page -> Right page
 
-run :: forall a t.
+run :: forall t.
   Traversable t
-  => Extractible t a
+  => Extractible t
   => Proxy t
   -> Document
-  -> Effect (Either String a)
+  -> Effect (Either String Output)
 run prox dom = do
   detached <- runToDetached prox dom
   pure $ extract LE.extract $ toUI detached
 
-runToDetached :: forall t a.
+runToDetached :: forall t.
   Traversable t
-  => Extractible t a
+  => Extractible t
   => Proxy t
   -> Document
   -> Effect (Either QueryError (t DetachedNode))

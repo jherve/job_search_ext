@@ -7,8 +7,8 @@ import Data.Generic.Rep (class Generic)
 import Data.Show.Generic (genericShow)
 import Data.Traversable (class Traversable, sequence, traverseDefault)
 import LinkedIn.Extractible (class Extractible)
-import LinkedIn.Jobs.JobOffer (JobOffer)
 import LinkedIn.Jobs.JobOffer as JJO
+import LinkedIn.Output.Types (Output(..))
 import LinkedIn.QueryRunner (subQueryOne)
 import LinkedIn.UI.Components.JobsUnifiedTopCard (JobsUnifiedTopCardElement, queryJobsUnifiedTopCardElement)
 
@@ -33,9 +33,9 @@ instance Traversable JobOfferPage where
 
   traverse = \x -> traverseDefault x
 
-instance Extractible JobOfferPage JobOffer where
+instance Extractible JobOfferPage where
   query n = do
     card <- subQueryOne queryJobsUnifiedTopCardElement "div.jobs-unified-top-card" n
     pure $ JobOfferPage card
 
-  extract (JobOfferPage tabs) = JJO.fromUI tabs
+  extract (JobOfferPage tabs) = OutJobOffer <$> JJO.fromUI tabs

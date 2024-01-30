@@ -9,6 +9,7 @@ import Data.List.Types (NonEmptyList)
 import Data.Show.Generic (genericShow)
 import Data.Traversable (class Traversable, sequence, traverse, traverseDefault)
 import LinkedIn.Extractible (class Extractible)
+import LinkedIn.Output.Types (Output(..))
 import LinkedIn.Profile.Project (Project)
 import LinkedIn.Profile.Project as PP
 import LinkedIn.QueryRunner (QueryRunner', subQueryMany)
@@ -45,9 +46,9 @@ query n = do
 extract ∷ ProjectsPage UIElement → Either String (NonEmptyList Project)
 extract (ProjectsPage cards) = traverse PP.fromUI cards
 
-instance Extractible ProjectsPage (NonEmptyList Project) where
+instance Extractible ProjectsPage where
   query n = do
     cards <- subQueryMany queryArtDecoCard "section.artdeco-card > div ~ div > div > div > ul > li" n
     pure $ ProjectsPage cards
 
-  extract (ProjectsPage cards) = traverse PP.fromUI cards
+  extract (ProjectsPage cards) = OutProjects <$> traverse PP.fromUI cards

@@ -14,10 +14,10 @@ import LinkedIn.PageUrl (PageUrl(..))
 import Type.Proxy (Proxy(..))
 import Web.DOM (Document)
 
-toOutput ∷ PageUrl → Document → Effect (Either String Output)
-toOutput ctx dom = case ctx of
-  UrlProjects _ -> run (Proxy :: Proxy ProjectsPage) dom
-  UrlSkills _ -> run (Proxy :: Proxy SkillsPage) dom
-  UrlWorkExperience _ -> run (Proxy :: Proxy WorkExperiencesPage) dom
-  UrlJobOffer _ -> run (Proxy :: Proxy JobOfferPage) dom
-  _ -> pure $ Left "Not handled yet"
+toOutput ∷ PageUrl → (Document → Effect (Either String Output))
+toOutput = case _ of
+  UrlProjects _ -> run (Proxy :: Proxy ProjectsPage)
+  UrlSkills _ -> run (Proxy :: Proxy SkillsPage)
+  UrlWorkExperience _ -> run (Proxy :: Proxy WorkExperiencesPage)
+  UrlJobOffer _ -> run (Proxy :: Proxy JobOfferPage)
+  _ -> const $ pure $ Left "Not handled yet"

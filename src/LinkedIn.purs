@@ -1,11 +1,12 @@
-module LinkedIn (module LinkedIn.Output, getContext) where
+module LinkedIn (getContext, extractFromDocument, extractFromDocumentInContext) where
 
 import Prelude
 
 import Data.Either (Either(..))
 import Data.Maybe (Maybe(..))
 import Effect (Effect)
-import LinkedIn.Output (run, runToDetached, toOutput)
+import LinkedIn.Output (toOutput)
+import LinkedIn.Output.Types (Output)
 import LinkedIn.PageUrl (PageUrl, pageUrlP)
 import Parsing (runParser)
 import Web.DOM (Document)
@@ -20,3 +21,14 @@ getContext dom = do
     Just u' -> case runParser (U.pathname u') pageUrlP of
       Left _ -> Left "Unexpected URL"
       Right page -> Right page
+
+extractFromDocument :: Document -> Effect (Either String Output)
+extractFromDocument dom = do
+  ctx <- getContext dom
+
+  case ctx of
+    Left l -> pure $ Left l
+    Right ctx' -> toOutput ctx' dom
+
+extractFromDocumentInContext :: PageUrl -> Document -> Effect (Either String Output)
+extractFromDocumentInContext = toOutput

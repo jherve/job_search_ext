@@ -2,13 +2,15 @@ module LinkedIn.Profile.Skill where
 
 import Prelude
 
+import Data.Argonaut.Encode (class EncodeJson)
+import Data.Argonaut.Encode.Generic (genericEncodeJson)
 import Data.Either (Either, note)
 import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe(..))
 import Data.Show.Generic (genericShow)
 import LinkedIn.UI.Components.ArtDecoTab (ArtDecoTabElement, toHeaderBold)
-import LinkedIn.UI.Strings.Types (UIString(..))
 import LinkedIn.UI.Elements.Types (UIElement(..))
+import LinkedIn.UI.Strings.Types (UIString(..))
 
 data Skill = Skill {
   name :: String
@@ -17,6 +19,8 @@ data Skill = Skill {
 derive instance Generic Skill _
 instance Show Skill where
   show = genericShow
+instance EncodeJson Skill where
+  encodeJson a = genericEncodeJson a
 
 fromUI ∷ ArtDecoTabElement UIElement → Either String Skill
 fromUI tab = ado

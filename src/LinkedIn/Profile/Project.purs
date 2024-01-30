@@ -2,15 +2,17 @@ module LinkedIn.Profile.Project where
 
 import Prelude
 
+import Data.Argonaut.Encode (class EncodeJson)
+import Data.Argonaut.Encode.Generic (genericEncodeJson)
 import Data.Either (Either, note)
 import Data.Generic.Rep (class Generic)
 import Data.List as L
 import Data.Maybe (Maybe(..))
 import Data.Show.Generic (genericShow)
-import LinkedIn.UI.Components.ArtDecoCard (ArtDecoCardElement, toCenterContent, toHeaderBold, toHeaderNormal)
 import LinkedIn.UI.Basic.Types (TimeSpan)
-import LinkedIn.UI.Strings.Types (UIString(..))
+import LinkedIn.UI.Components.ArtDecoCard (ArtDecoCardElement, toCenterContent, toHeaderBold, toHeaderNormal)
 import LinkedIn.UI.Elements.Types (UIElement(..))
+import LinkedIn.UI.Strings.Types (UIString(..))
 
 data Project = Project {
   name :: String,
@@ -21,6 +23,8 @@ data Project = Project {
 derive instance Generic Project _
 instance Show Project where
   show = genericShow
+instance EncodeJson Project where
+  encodeJson a = genericEncodeJson a
 
 fromUI ∷ ArtDecoCardElement UIElement → Either String Project
 fromUI card = ado

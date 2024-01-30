@@ -4,7 +4,9 @@ You can edit this file as you like.
 -}
 { name = "web-extension"
 , dependencies =
-  [ "arrays"
+  [ "argonaut-codecs"
+  , "argonaut-generic"
+  , "arrays"
   , "assert"
   , "console"
   , "control"

@@ -2,15 +2,17 @@ module LinkedIn.Jobs.JobOffer where
 
 import Prelude
 
+import Data.Argonaut.Encode (class EncodeJson)
+import Data.Argonaut.Encode.Generic (genericEncodeJson)
 import Data.Either (Either, note)
 import Data.Generic.Rep (class Generic)
 import Data.Lens (findOf)
 import Data.Maybe (Maybe(..), isJust)
 import Data.Show.Generic (genericShow)
-import LinkedIn.UI.Components.JobsUnifiedTopCard (JobsUnifiedTopCardElement, TopCardInsight(..), TopCardInsightContent(..), _top_to_action_buttons, _top_to_insights, toHeader, toPrimaryDescriptionLink, toPrimaryDescriptionText)
 import LinkedIn.UI.Basic.Types (JobFlexibility)
-import LinkedIn.UI.Strings.Types (UIString(..))
+import LinkedIn.UI.Components.JobsUnifiedTopCard (JobsUnifiedTopCardElement, TopCardInsight(..), TopCardInsightContent(..), _top_to_action_buttons, _top_to_insights, toHeader, toPrimaryDescriptionLink, toPrimaryDescriptionText)
 import LinkedIn.UI.Elements.Types (UIElement(..))
+import LinkedIn.UI.Strings.Types (UIString(..))
 
 data JobOffer = JobOffer {
   title :: String,
@@ -27,6 +29,8 @@ derive instance Eq JobOffer
 derive instance Generic JobOffer _
 instance Show JobOffer where
   show = genericShow
+instance EncodeJson JobOffer where
+  encodeJson a = genericEncodeJson a
 
 fromUI ∷ JobsUnifiedTopCardElement UIElement → Either String JobOffer
 fromUI card = ado

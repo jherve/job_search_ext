@@ -16,7 +16,7 @@ import Web.DOM (Document)
 
 toPage ∷ Partial ⇒ PageUrl → Document → Effect (Either String Output)
 toPage ctx dom = case ctx of
-  UrlProjects _ -> map (map Projects) $ run (Proxy :: Proxy ProjectsPage) dom
-  UrlSkills _ ->  map (map Skills) $ run (Proxy :: Proxy SkillsPage) dom
-  UrlWorkExperience _ ->  map (map WorkExperiences) $ run (Proxy :: Proxy WorkExperiencesPage) dom
-  UrlJobOffer _ -> map (map JobOffer) $ run (Proxy :: Proxy JobOfferPage) dom
+  UrlProjects _ -> map (map OutProjects) $ run (Proxy :: Proxy ProjectsPage) dom
+  UrlSkills _ ->  map (map OutSkills) $ run (Proxy :: Proxy SkillsPage) dom
+  UrlWorkExperience _ ->  map (map OutWorkExperiences) $ run (Proxy :: Proxy WorkExperiencesPage) dom
+  UrlJobOffer _ -> map (map OutJobOffer) $ run (Proxy :: Proxy JobOfferPage) dom

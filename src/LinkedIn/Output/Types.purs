@@ -11,10 +11,10 @@ import LinkedIn.Profile.Skill (Skill)
 import LinkedIn.Profile.WorkExperience (WorkExperience)
 
 data Output =
-  Projects (NonEmptyList Project)
-  | Skills (NonEmptyList Skill)
-  | WorkExperiences (NonEmptyList WorkExperience)
-  | JobOffer JO.JobOffer
+  OutProjects (NonEmptyList Project)
+  | OutSkills (NonEmptyList Skill)
+  | OutWorkExperiences (NonEmptyList WorkExperience)
+  | OutJobOffer JO.JobOffer
 
 derive instance Generic Output _
 instance Show Output where

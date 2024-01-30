@@ -13,7 +13,6 @@ import LinkedIn.Page.JobOffer (JobOfferPage)
 import LinkedIn.Page.Projects (ProjectsPage)
 import LinkedIn.Page.Skills (SkillsPage)
 import LinkedIn.Page.WorkExperiences (WorkExperiencesPage)
-import Partial.Unsafe (unsafePartial)
 import Type.Proxy (Proxy(..))
 
 main :: Effect Unit
@@ -33,4 +32,4 @@ main = do
 
   case ctx of
     Left l -> logShow l
-    Right r -> unsafePartial $ toOutput r dom >>= logShow
+    Right r -> toOutput r dom >>= logShow

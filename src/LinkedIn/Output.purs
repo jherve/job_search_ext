@@ -12,8 +12,8 @@ import LinkedIn.PageUrl (PageUrl(..))
 import Type.Proxy (Proxy(..))
 import Web.DOM (Document)
 
-toPage ∷ Partial ⇒ PageUrl → Document → Effect (Either String Output)
-toPage ctx dom = case ctx of
+toOutput ∷ Partial ⇒ PageUrl → Document → Effect (Either String Output)
+toOutput ctx dom = case ctx of
   UrlProjects _ -> run (Proxy :: Proxy ProjectsPage) dom
   UrlSkills _ -> run (Proxy :: Proxy SkillsPage) dom
   UrlWorkExperience _ -> run (Proxy :: Proxy WorkExperiencesPage) dom

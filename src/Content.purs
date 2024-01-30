@@ -8,7 +8,7 @@ import Effect (Effect)
 import Effect.Class.Console (logShow)
 import Effect.Console (log)
 import LinkedIn (getContext, run)
-import LinkedIn.Output (toPage)
+import LinkedIn.Output (toOutput)
 import LinkedIn.Page.JobOffer (JobOfferPage)
 import LinkedIn.Page.Projects (ProjectsPage)
 import LinkedIn.Page.Skills (SkillsPage)
@@ -33,4 +33,4 @@ main = do
 
   case ctx of
     Left l -> logShow l
-    Right r -> unsafePartial $ toPage r dom >>= logShow
+    Right r -> unsafePartial $ toOutput r dom >>= logShow

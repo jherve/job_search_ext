@@ -1,7 +1,9 @@
-module LinkedIn (getContext, extractFromDocument, extractFromDocumentInContext) where
+module LinkedIn (encodeToJson, getContext, extractFromDocument, extractFromDocumentInContext) where
 
 import Prelude
 
+import Data.Argonaut.Core (Json)
+import Data.Argonaut.Encode (encodeJson)
 import Data.Either (Either(..))
 import Data.Maybe (Maybe(..))
 import Effect (Effect)
@@ -32,3 +34,6 @@ extractFromDocument dom = do
 
 extractFromDocumentInContext :: PageUrl -> Document -> Effect (Either String Output)
 extractFromDocumentInContext = toOutput
+
+encodeToJson :: Either String Output -> Json
+encodeToJson = encodeJson

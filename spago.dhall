@@ -5,6 +5,7 @@ You can edit this file as you like.
 { name = "web-extension"
 , dependencies =
   [ "argonaut-codecs"
+  , "argonaut-core"
   , "argonaut-generic"
   , "arrays"
   , "assert"

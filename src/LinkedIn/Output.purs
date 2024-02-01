@@ -2,7 +2,7 @@ module LinkedIn.Output (run, runToDetached, toOutput) where
 
 import Prelude
 
-import Control.Monad.Except (ExceptT, except, lift, runExceptT)
+import Control.Monad.Except (ExceptT, except, lift, runExceptT, withExceptT)
 import Data.Either (Either(..), either)
 import Data.Traversable (class Traversable, traverse)
 import Effect (Effect)
@@ -27,9 +27,18 @@ run :: forall t.
   => Proxy t
   -> Document
   -> Effect (Either String Output)
-run prox dom = do
-  detached <- runToDetached prox dom
-  pure $ extract LE.extract $ toUI detached
+run prox dom = runExceptT $ run' prox dom
+
+run' :: forall t.
+  Traversable t
+  => Extractible t
+  => Proxy t
+  -> Document
+  -> ExceptT String Effect Output
+run' prox dom = do
+  detached <- withExceptT (\_ -> "Error on detach") $ runToDetached'' prox dom
+  asUI <- except $ fromDetachedToUI detached
+  except $ LE.extract asUI
 
 runToDetached :: forall t.
   Traversable t

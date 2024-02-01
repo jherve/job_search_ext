@@ -3,6 +3,8 @@ module LinkedIn.PageUrl (PageUrl(..), pageUrlP) where
 import Prelude
 
 import Control.Alt ((<|>))
+import Data.Argonaut.Encode (class EncodeJson)
+import Data.Argonaut.Encode.Generic (genericEncodeJson)
 import Data.Generic.Rep (class Generic)
 import Data.Int64 as I64
 import Data.Maybe (Maybe(..))
@@ -27,6 +29,8 @@ derive instance Eq PageUrl
 derive instance Generic PageUrl _
 instance Show PageUrl where
   show = genericShow
+instance EncodeJson PageUrl where
+  encodeJson a = genericEncodeJson a
 
 pathComponentP :: String -> Parser String Unit
 pathComponentP s = do

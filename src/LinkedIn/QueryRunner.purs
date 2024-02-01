@@ -4,6 +4,8 @@ import Prelude
 
 import Control.Alt ((<|>))
 import Control.Monad.Except (ExceptT(..), mapExceptT, runExceptT, throwError)
+import Data.Argonaut.Encode (class EncodeJson)
+import Data.Argonaut.Encode.Generic (genericEncodeJson)
 import Data.Array as A
 import Data.Either (Either(..), note)
 import Data.Generic.Rep (class Generic)
@@ -22,6 +24,8 @@ data QueryError =
   | QNodeUnexpectedType String String
   | QTextNotFoundError
   | QChooseError
+instance EncodeJson QueryError where
+  encodeJson a = genericEncodeJson a
 
 derive instance Generic QueryError _
 derive instance Eq QueryError

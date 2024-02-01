@@ -58,9 +58,12 @@ runToDetached' _ dom = do
   lift $ traverse toDetached qRes
 
 toOutput ∷ PageUrl → (Document → Effect (Either String Output))
-toOutput = case _ of
-  UrlProjects _ -> run (Proxy :: Proxy ProjectsPage)
-  UrlSkills _ -> run (Proxy :: Proxy SkillsPage)
-  UrlWorkExperience _ -> run (Proxy :: Proxy WorkExperiencesPage)
-  UrlJobOffer _ -> run (Proxy :: Proxy JobOfferPage)
-  _ -> const $ pure $ Left "Not handled yet"
+toOutput url dom = runExceptT $ toOutput' url dom
+
+toOutput' ∷ PageUrl → (Document → ExceptT String Effect Output)
+toOutput' = case _ of
+  UrlProjects _ -> run' (Proxy :: Proxy ProjectsPage)
+  UrlSkills _ -> run' (Proxy :: Proxy SkillsPage)
+  UrlWorkExperience _ -> run' (Proxy :: Proxy WorkExperiencesPage)
+  UrlJobOffer _ -> run' (Proxy :: Proxy JobOfferPage)
+  _ -> const $ except $ Left "Not handled yet"

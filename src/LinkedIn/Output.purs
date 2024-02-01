@@ -3,7 +3,7 @@ module LinkedIn.Output (run, runToDetached, toOutput) where
 import Prelude
 
 import Control.Monad.Except (ExceptT, except, lift, runExceptT, withExceptT)
-import Data.Either (Either(..), either)
+import Data.Either (Either(..))
 import Data.Traversable (class Traversable, traverse)
 import Effect (Effect)
 import LinkedIn.DetachedNode (DetachedNode, toDetached)
@@ -15,11 +15,10 @@ import LinkedIn.Page.Projects (ProjectsPage)
 import LinkedIn.Page.Skills (SkillsPage)
 import LinkedIn.Page.WorkExperiences (WorkExperiencesPage)
 import LinkedIn.PageUrl (PageUrl(..))
-import LinkedIn.QueryRunner (QueryError, QueryRunner', runQuery)
+import LinkedIn.QueryRunner (QueryError)
 import LinkedIn.UI.Elements.Parser (fromDetachedToUI)
-import LinkedIn.UI.Elements.Types (UIElement)
 import Type.Proxy (Proxy(..))
-import Web.DOM (Document, Node)
+import Web.DOM (Document)
 
 run :: forall t.
   Traversable t
@@ -36,7 +35,7 @@ run' :: forall t.
   -> Document
   -> ExceptT String Effect Output
 run' prox dom = do
-  detached <- withExceptT (\_ -> "Error on detach") $ runToDetached'' prox dom
+  detached <- withExceptT (\_ -> "Error on detach") $ runToDetached' prox dom
   asUI <- except $ fromDetachedToUI detached
   except $ LE.extract asUI
 
@@ -46,37 +45,17 @@ runToDetached :: forall t.
   => Proxy t
   -> Document
   -> Effect (Either QueryError (t DetachedNode))
-runToDetached proxy dom = runExceptT $ runToDetached'' proxy dom
+runToDetached proxy dom = runExceptT $ runToDetached' proxy dom
 
-runToDetached'' :: forall t.
+runToDetached' :: forall t.
   Traversable t
   => Extractible t
   => Proxy t
   -> Document
   -> ExceptT QueryError Effect (t DetachedNode)
-runToDetached'' _ dom = do
+runToDetached' _ dom = do
   qRes <- LE.query @t dom
-  detach'' qRes
-
-doQuery ∷ ∀ b. QueryRunner' Document b → Document → Effect (Either QueryError b)
-doQuery query dom = runQuery $ query dom
-
-detach ∷ ∀ a t. Traversable t ⇒ Either a (t Node) → Effect (Either a (t DetachedNode))
-detach n = runExceptT $ detach' n
-
-detach' ∷ ∀ a t. Traversable t ⇒ Either a (t Node) → ExceptT a Effect (t DetachedNode)
-detach' n = do
-  n' <- except n
-  detach'' n'
-
-detach'' ∷ ∀ a t. Traversable t ⇒ (t Node) → ExceptT a Effect (t DetachedNode)
-detach'' n = lift $ traverse toDetached n
-
-toUI ∷ ∀ a t. Traversable t ⇒ Either a (t DetachedNode) → Either String (t UIElement)
-toUI = either (const $ Left "could not convert to UI") fromDetachedToUI
-
-extract ∷ ∀ t a. (t UIElement → Either String a) → Either String (t UIElement) → Either String a
-extract parsePage = either (\err -> Left err) parsePage
+  lift $ traverse toDetached qRes
 
 toOutput ∷ PageUrl → (Document → Effect (Either String Output))
 toOutput = case _ of

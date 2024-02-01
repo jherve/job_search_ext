@@ -20,11 +20,10 @@ import LinkedIn.QueryRunner (runQuery)
 import LinkedIn.UI.Basic.Types (Duration(..), TimeSpan(..))
 import LinkedIn.UI.Components.ArtDeco (ArtDecoCenter(..), ArtDecoCenterContent(..), ArtDecoCenterHeader(..), ArtDecoPvsEntity(..), ArtDecoPvsEntitySubComponent(..))
 import LinkedIn.UI.Components.ArtDecoCard (ArtDecoCardElement(..))
-import LinkedIn.UI.Elements.Parser (fromDetachedToUI)
 import Node.JsDom (jsDomFromFile)
 import Partial.Unsafe (unsafePartial)
 import Test.Assert (assert, assertEqual)
-import Test.Utils (toMonthYear')
+import Test.Utils (toMonthYear', fromDetachedToUI)
 
 testArtDecoCards :: Effect Unit
 testArtDecoCards = do

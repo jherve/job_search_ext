@@ -16,7 +16,7 @@ import LinkedIn.Page.Skills (SkillsPage)
 import LinkedIn.Page.WorkExperiences (WorkExperiencesPage)
 import LinkedIn.PageUrl (PageUrl(..))
 import LinkedIn.QueryRunner (QueryError)
-import LinkedIn.UI.Elements.Parser (fromDetachedToUI)
+import LinkedIn.UI.Elements.Parser (toUIElement)
 import Type.Proxy (Proxy(..))
 import Web.DOM (Document)
 
@@ -28,7 +28,7 @@ run :: forall t.
   -> ExceptT String Effect Output
 run prox dom = do
   detached <- withExceptT (\_ -> "Error on detach") $ runToDetached prox dom
-  asUI <- except $ fromDetachedToUI detached
+  asUI <- withExceptT (\_ -> "error on conversion to UI element") $ except $ traverse toUIElement detached
   except $ LE.extract asUI
 
 runToDetached :: forall t.

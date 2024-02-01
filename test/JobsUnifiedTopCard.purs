@@ -17,10 +17,10 @@ import LinkedIn.Page.JobOffer (JobOfferPage(..))
 import LinkedIn.QueryRunner (runQuery)
 import LinkedIn.UI.Basic.Types (JobFlexibility(..))
 import LinkedIn.UI.Components.JobsUnifiedTopCard (JobsUnifiedTopCardElement(..), TopCardAction(..), TopCardInsight(..), TopCardInsightContent(..), TopCardPrimaryDescription(..), TopCardSecondaryInsight(..))
-import LinkedIn.UI.Elements.Parser (fromDetachedToUI)
 import Node.JsDom (jsDomFromFile)
 import Partial.Unsafe (unsafePartial)
 import Test.Assert (assert, assertEqual)
+import Test.Utils (fromDetachedToUI)
 
 main :: Effect Unit
 main = do

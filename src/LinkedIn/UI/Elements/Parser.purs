@@ -6,16 +6,10 @@ import Control.Alt ((<|>))
 import Data.Either (Either(..))
 import Data.List as L
 import Data.Maybe (Maybe(..))
-import Data.Traversable (class Traversable, traverse)
 import LinkedIn.DetachedNode (DetachedNode(..))
 import LinkedIn.UI.Strings.Parser (uiStringP)
 import LinkedIn.UI.Elements.Types (UIElement(..))
 import Parsing (ParseError(..), initialPos, runParser)
-
-fromDetachedToUI ∷ ∀ t. Traversable t ⇒ t DetachedNode → Either String (t UIElement)
-fromDetachedToUI el = case traverse toUIElement el of
-  Left _ -> Left "error on conversion to UI element"
-  Right ui -> Right ui
 
 -- TODO : should certainly use another type than ParseError here
 toUIElement ∷ DetachedNode → Either ParseError UIElement

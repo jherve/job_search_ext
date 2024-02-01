@@ -24,7 +24,7 @@ derive instance Generic MonthYear _
 instance Show MonthYear where
   show = genericShow
 instance EncodeJson MonthYear where
-  encodeJson a = encodeString "monthyear" -- TODO
+  encodeJson _ = encodeString "monthyear" -- TODO
 
 data TimeSpan =
   TimeSpanBounded MonthYear MonthYear
@@ -49,7 +49,7 @@ derive instance Generic Duration _
 instance Show Duration where
   show = genericShow
 instance EncodeJson Duration where
-  encodeJson a = encodeString "duration" -- TODO
+  encodeJson _ = encodeString "duration" -- TODO
 
 data JobFlexibility = JobFlexHybrid | JobFlexOnSite | JobFlexFullRemote
 

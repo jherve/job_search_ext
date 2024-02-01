@@ -14,7 +14,6 @@ import LinkedIn.Extractible (query)
 import LinkedIn.Jobs.JobOffer (JobOffer(..))
 import LinkedIn.Jobs.JobOffer as JJO
 import LinkedIn.Page.JobOffer (JobOfferPage(..))
-import LinkedIn.Page.JobOffer as PageJO
 import LinkedIn.QueryRunner (runQuery)
 import LinkedIn.UI.Basic.Types (JobFlexibility(..))
 import LinkedIn.UI.Components.JobsUnifiedTopCard (JobsUnifiedTopCardElement(..), TopCardAction(..), TopCardInsight(..), TopCardInsightContent(..), TopCardPrimaryDescription(..), TopCardSecondaryInsight(..))

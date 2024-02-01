@@ -2,7 +2,8 @@ module LinkedIn.Output (run, runToDetached, toOutput) where
 
 import Prelude
 
-import Data.Either (Either(..))
+import Control.Monad.Except (except, lift, runExceptT)
+import Data.Either (Either(..), either)
 import Data.Traversable (class Traversable, traverse)
 import Effect (Effect)
 import LinkedIn.DetachedNode (DetachedNode, toDetached)
@@ -44,21 +45,15 @@ doQuery ∷ ∀ b. QueryRunner' Document b → Document → Effect (Either Query
 doQuery query dom = runQuery $ query dom
 
 detach ∷ ∀ a t. Traversable t ⇒ Either a (t Node) → Effect (Either a (t DetachedNode))
-detach = case _ of
-  Left l -> pure $ Left l
-  Right q -> do
-    d <- traverse toDetached q
-    pure $ Right d
+detach n = runExceptT $ do
+  n' <- except n
+  lift $ traverse toDetached n'
 
 toUI ∷ ∀ a t. Traversable t ⇒ Either a (t DetachedNode) → Either String (t UIElement)
-toUI = case _ of
-  Left _ -> Left "could not convert to UI"
-  Right d -> fromDetachedToUI d
+toUI = either (const $ Left "could not convert to UI") fromDetachedToUI
 
 extract ∷ ∀ t a. (t UIElement → Either String a) → Either String (t UIElement) → Either String a
-extract parsePage = case _ of
-  Left l -> Left l
-  Right ui -> parsePage ui
+extract parsePage = either (\err -> Left err) parsePage
 
 toOutput ∷ PageUrl → (Document → Effect (Either String Output))
 toOutput = case _ of

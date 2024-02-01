@@ -2,7 +2,7 @@ module LinkedIn (encodeToJson, getContext, extractFromDocument, extractFromDocum
 
 import Prelude
 
-import Control.Monad.Except (runExceptT)
+import Control.Monad.Except (ExceptT, lift, runExceptT, throwError)
 import Data.Argonaut.Core (Json)
 import Data.Argonaut.Encode (encodeJson)
 import Data.Either (Either(..))
@@ -17,21 +17,24 @@ import Web.DOM.Document (url)
 import Web.URL as U
 
 getContext ∷ Document → Effect (Either String PageUrl)
-getContext dom = do
-  u <- url dom
-  pure $ case U.fromAbsolute u of
-    Nothing -> Left "No URL found"
-    Just u' -> case runParser (U.pathname u') pageUrlP of
-      Left _ -> Left "Unexpected URL"
-      Right page -> Right page
+getContext = runExceptT <<< getContext'
+
+getContext' ∷ Document → ExceptT String Effect PageUrl
+getContext' dom = do
+  u <- lift $ url dom
+  case U.fromAbsolute u of
+    Nothing -> throwError "No URL found"
+    Just u' ->  case runParser (U.pathname u') pageUrlP of
+      Left _ -> throwError "Unexpected URL"
+      Right page -> pure page
 
 extractFromDocument :: Document -> Effect (Either String Output)
-extractFromDocument dom = do
-  ctx <- getContext dom
+extractFromDocument = runExceptT <<< extractFromDocument'
 
-  case ctx of
-    Left l -> pure $ Left l
-    Right ctx' -> runExceptT $ toOutput ctx' dom
+extractFromDocument' ∷ Document → ExceptT String Effect Output
+extractFromDocument' dom = do
+  ctx <- getContext' dom
+  toOutput ctx dom
 
 extractFromDocumentInContext :: PageUrl -> Document -> Effect (Either String Output)
 extractFromDocumentInContext url dom = runExceptT $ toOutput url dom

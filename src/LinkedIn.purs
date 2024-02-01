@@ -2,6 +2,7 @@ module LinkedIn (encodeToJson, getContext, extractFromDocument, extractFromDocum
 
 import Prelude
 
+import Control.Monad.Except (runExceptT)
 import Data.Argonaut.Core (Json)
 import Data.Argonaut.Encode (encodeJson)
 import Data.Either (Either(..))
@@ -30,10 +31,10 @@ extractFromDocument dom = do
 
   case ctx of
     Left l -> pure $ Left l
-    Right ctx' -> toOutput ctx' dom
+    Right ctx' -> runExceptT $ toOutput ctx' dom
 
 extractFromDocumentInContext :: PageUrl -> Document -> Effect (Either String Output)
-extractFromDocumentInContext = toOutput
+extractFromDocumentInContext url dom = runExceptT $ toOutput url dom
 
 encodeToJson :: Either String Output -> Json
 encodeToJson = encodeJson

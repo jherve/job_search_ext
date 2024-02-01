@@ -2,7 +2,7 @@ module LinkedIn.Output (run, runToDetached, toOutput) where
 
 import Prelude
 
-import Control.Monad.Except (ExceptT, except, lift, runExceptT, withExceptT)
+import Control.Monad.Except (ExceptT, except, lift, withExceptT)
 import Data.Either (Either(..))
 import Data.Traversable (class Traversable, traverse)
 import Effect (Effect)
@@ -25,17 +25,9 @@ run :: forall t.
   => Extractible t
   => Proxy t
   -> Document
-  -> Effect (Either String Output)
-run prox dom = runExceptT $ run' prox dom
-
-run' :: forall t.
-  Traversable t
-  => Extractible t
-  => Proxy t
-  -> Document
   -> ExceptT String Effect Output
-run' prox dom = do
-  detached <- withExceptT (\_ -> "Error on detach") $ runToDetached' prox dom
+run prox dom = do
+  detached <- withExceptT (\_ -> "Error on detach") $ runToDetached prox dom
   asUI <- except $ fromDetachedToUI detached
   except $ LE.extract asUI
 
@@ -44,26 +36,15 @@ runToDetached :: forall t.
   => Extractible t
   => Proxy t
   -> Document
-  -> Effect (Either QueryError (t DetachedNode))
-runToDetached proxy dom = runExceptT $ runToDetached' proxy dom
-
-runToDetached' :: forall t.
-  Traversable t
-  => Extractible t
-  => Proxy t
-  -> Document
   -> ExceptT QueryError Effect (t DetachedNode)
-runToDetached' _ dom = do
+runToDetached _ dom = do
   qRes <- LE.query @t dom
   lift $ traverse toDetached qRes
 
-toOutput ∷ PageUrl → (Document → Effect (Either String Output))
-toOutput url dom = runExceptT $ toOutput' url dom
-
-toOutput' ∷ PageUrl → (Document → ExceptT String Effect Output)
-toOutput' = case _ of
-  UrlProjects _ -> run' (Proxy :: Proxy ProjectsPage)
-  UrlSkills _ -> run' (Proxy :: Proxy SkillsPage)
-  UrlWorkExperience _ -> run' (Proxy :: Proxy WorkExperiencesPage)
-  UrlJobOffer _ -> run' (Proxy :: Proxy JobOfferPage)
+toOutput ∷ PageUrl → (Document → ExceptT String Effect Output)
+toOutput = case _ of
+  UrlProjects _ -> run (Proxy :: Proxy ProjectsPage)
+  UrlSkills _ -> run (Proxy :: Proxy SkillsPage)
+  UrlWorkExperience _ -> run (Proxy :: Proxy WorkExperiencesPage)
+  UrlJobOffer _ -> run (Proxy :: Proxy JobOfferPage)
   _ -> const $ except $ Left "Not handled yet"

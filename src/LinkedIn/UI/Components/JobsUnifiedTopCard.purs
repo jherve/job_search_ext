@@ -2,6 +2,7 @@ module LinkedIn.UI.Components.JobsUnifiedTopCard where
 
 import Prelude
 
+import Control.Alt ((<|>))
 import Control.Monad.Error.Class (throwError)
 import Data.Foldable (class Foldable, foldMap, foldlDefault, foldrDefault)
 import Data.Generic.Rep (class Generic)
@@ -12,7 +13,7 @@ import Data.Maybe (Maybe(..))
 import Data.Show.Generic (genericShow)
 import Data.Traversable (class Traversable, sequence, traverse, traverseDefault)
 import Data.Tuple (Tuple(..))
-import LinkedIn.QueryRunner (QueryError(..), QueryRunner, chooseOne, chooseOne3, ignoreNotFound, queryAll, queryOne, queryText)
+import LinkedIn.QueryRunner (QueryError(..), QueryRunner, ignoreNotFound, queryAll, queryOne, queryText)
 import Type.Proxy (Proxy(..))
 import Web.DOM (Node)
 import Web.DOM.Node as N
@@ -194,7 +195,7 @@ queryTopCardSecondaryInsightPlain n = pure $ TopCardSecondaryInsightPlain n
 
 queryTopCardSecondaryInsight :: QueryRunner (TopCardSecondaryInsight Node)
 queryTopCardSecondaryInsight n =
-  chooseOne queryTopCardSecondaryInsightNested queryTopCardSecondaryInsightPlain n
+  queryTopCardSecondaryInsightNested n <|> queryTopCardSecondaryInsightPlain n
 
 queryTopCardInsightContentSingle :: QueryRunner (TopCardInsightContent Node)
 queryTopCardInsightContentSingle n = pure $ TopCardInsightContentSingle n
@@ -216,17 +217,19 @@ queryTopCardInsightContentSecondary n = do
 
 queryTopCardInsightContent :: QueryRunner (TopCardInsightContent Node)
 queryTopCardInsightContent n =
-  chooseOne3 queryTopCardInsightContentSecondary queryTopCardInsightContentButton queryTopCardInsightContentSingle n
+  queryTopCardInsightContentSecondary n
+  <|> queryTopCardInsightContentButton n
+  <|> queryTopCardInsightContentSingle n
 
 queryTopCardInsight :: QueryRunner (TopCardInsight Node)
 queryTopCardInsight n = do
-  icon <- chooseOne (queryOne ":scope li-icon") (queryOne ":scope svg") n
+  icon <- queryOne ":scope li-icon" n <|> queryOne ":scope svg" n
   content <- queryTopCardInsightContent =<< getContentNode n
 
   pure $ TopCardInsight {icon, content}
 
   where
-    getContentNode = chooseOne (queryOne ":scope > span") (queryOne ":scope > button")
+    getContentNode n' = queryOne ":scope > span" n' <|> queryOne ":scope > button" n'
 
 queryTopCardPrimaryDescription :: QueryRunner (TopCardPrimaryDescription Node)
 queryTopCardPrimaryDescription n = do

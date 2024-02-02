@@ -8,7 +8,7 @@ import Data.List.NonEmpty (NonEmptyList(..))
 import Data.Maybe (Maybe(..), fromJust)
 import Data.NonEmpty (NonEmpty(..))
 import Data.Traversable (traverse)
-import Effect (Effect)
+import Effect.Class (liftEffect)
 import LinkedIn.DetachedNode (DetachedNode(..), toDetached)
 import LinkedIn.Extractible (query)
 import LinkedIn.Jobs.JobOffer (JobOffer(..))
@@ -19,124 +19,123 @@ import LinkedIn.UI.Basic.Types (JobFlexibility(..))
 import LinkedIn.UI.Components.JobsUnifiedTopCard (JobsUnifiedTopCardElement(..), TopCardAction(..), TopCardInsight(..), TopCardInsightContent(..), TopCardPrimaryDescription(..), TopCardSecondaryInsight(..))
 import Node.JsDom (jsDomFromFile)
 import Partial.Unsafe (unsafePartial)
-import Test.Assert (assert, assertEqual)
+import Test.Spec (Spec, describe, it)
+import Test.Spec.Assertions (shouldEqual)
 import Test.Utils (fromDetachedToUI)
 
-main :: Effect Unit
-main = do
-  dom <- jsDomFromFile "test/examples/job_offer.html"
+jobsUnifiedTopCardSpec :: Spec Unit
+jobsUnifiedTopCardSpec = do
+  describe "Jobs top card parsing" do
+    it "works" do
+      dom <- liftEffect $ jsDomFromFile "test/examples/job_offer.html"
+      wep <- liftEffect $ runQuery $ query @JobOfferPage dom
 
-  wep <- runQuery $ query dom
+      isRight wep `shouldEqual` true
 
-  assert $ isRight wep
+      let
+        JobOfferPage jobCard = unsafePartial $ fromJust $ hush wep
 
-  let
-    JobOfferPage jobCard = unsafePartial $ fromJust $ hush wep
+      topCard <- liftEffect $ traverse toDetached jobCard
 
-  topCard <- traverse toDetached jobCard
-
-  assertEqual {
-    actual: topCard,
-    expected:  JobsUnifiedTopCardElement {
-      actions: (Just (NonEmptyList
-        (NonEmpty (TopCardActionButton (DetachedButton {
-          classes: ("jobs-apply-button" : "artdeco-button" : "artdeco-button--3" : "artdeco-button--primary" : "ember-view" : Nil),
-          content: "Candidature simplifiée",
-          role: Nothing
-        })) ((TopCardActionButton (DetachedButton {
-          classes: ("jobs-save-button" : "artdeco-button" : "artdeco-button--3" : "artdeco-button--secondary" : Nil),
-          content: "Enregistrer Enregistrer Data Engineer H/F - Secteur Energie chez LINCOLN",
-          role: Nothing
-        })) : Nil)))),
-      header: (DetachedElement {
-        classes: ("t-24" : "t-bold" : "job-details-jobs-unified-top-card__job-title" : Nil),
-        content: "Data Engineer H/F - Secteur Energie",
-        id: Nothing,
-        tag: "H1"
-      }),
-      insights: (Just (NonEmptyList
-        (NonEmpty (TopCardInsight {
-          content: (TopCardInsightContentSecondary {
-            primary: (DetachedElement {
-              classes: Nil,
-              content: "Sur site",
-              id: Nothing,
-              tag: "SPAN"
-            }),
-            secondary: (NonEmptyList (NonEmpty (TopCardSecondaryInsightNested
-              (DetachedElement {
+      topCard `shouldEqual` JobsUnifiedTopCardElement {
+        actions: (Just (NonEmptyList
+          (NonEmpty (TopCardActionButton (DetachedButton {
+            classes: ("jobs-apply-button" : "artdeco-button" : "artdeco-button--3" : "artdeco-button--primary" : "ember-view" : Nil),
+            content: "Candidature simplifiée",
+            role: Nothing
+          })) ((TopCardActionButton (DetachedButton {
+            classes: ("jobs-save-button" : "artdeco-button" : "artdeco-button--3" : "artdeco-button--secondary" : Nil),
+            content: "Enregistrer Enregistrer Data Engineer H/F - Secteur Energie chez LINCOLN",
+            role: Nothing
+          })) : Nil)))),
+        header: (DetachedElement {
+          classes: ("t-24" : "t-bold" : "job-details-jobs-unified-top-card__job-title" : Nil),
+          content: "Data Engineer H/F - Secteur Energie",
+          id: Nothing,
+          tag: "H1"
+        }),
+        insights: (Just (NonEmptyList
+          (NonEmpty (TopCardInsight {
+            content: (TopCardInsightContentSecondary {
+              primary: (DetachedElement {
                 classes: Nil,
-                content: "Temps plein",
+                content: "Sur site",
                 id: Nothing,
                 tag: "SPAN"
-              })) ((TopCardSecondaryInsightPlain
-              (DetachedElement {
-                classes: ("job-details-jobs-unified-top-card__job-insight-view-model-secondary" : Nil),
-                content: "Confirmé",
-                id: Nothing,
-                tag: "SPAN"
-              })) : Nil))) }),
-            icon: DetachedLiIcon "job"
-        }) ((TopCardInsight {
-          content: (TopCardInsightContentSingle (DetachedElement {
-            classes: Nil,
-            content: "201-500 employés · Technologies et services de l’information",
-            id: Nothing,
-            tag: "SPAN" })),
-          icon: DetachedLiIcon "company"
-        }) : (TopCardInsight {
+              }),
+              secondary: (NonEmptyList (NonEmpty (TopCardSecondaryInsightNested
+                (DetachedElement {
+                  classes: Nil,
+                  content: "Temps plein",
+                  id: Nothing,
+                  tag: "SPAN"
+                })) ((TopCardSecondaryInsightPlain
+                (DetachedElement {
+                  classes: ("job-details-jobs-unified-top-card__job-insight-view-model-secondary" : Nil),
+                  content: "Confirmé",
+                  id: Nothing,
+                  tag: "SPAN"
+                })) : Nil))) }),
+              icon: DetachedLiIcon "job"
+          }) ((TopCardInsight {
             content: (TopCardInsightContentSingle (DetachedElement {
               classes: Nil,
-              content: "2 anciens élèves travaillent ici",
+              content: "201-500 employés · Technologies et services de l’information",
               id: Nothing,
               tag: "SPAN" })),
-            icon: DetachedLiIcon "people"
-            }) : (TopCardInsight {
+            icon: DetachedLiIcon "company"
+          }) : (TopCardInsight {
               content: (TopCardInsightContentSingle (DetachedElement {
                 classes: Nil,
-                content: "Découvrez comment vous vous positionnez par rapport à 87 candidats. Essai Premium pour 0 EUR",
+                content: "2 anciens élèves travaillent ici",
                 id: Nothing,
                 tag: "SPAN" })),
-              icon: (DetachedSvgElement { dataTestIcon: (Just "lightbulb-medium"), id: Nothing, tag: "svg" })
-            }) : (TopCardInsight {
-              content: (TopCardInsightContentButton (DetachedButton {
-                classes: ("job-details-jobs-unified-top-card__job-insight-text-button" : Nil),
-                content: "9 compétences sur 11 correspondent à votre profil, vous pourriez bien convenir pour ce poste",
-                role: Nothing
-              })),
-              icon: (DetachedSvgElement { dataTestIcon: (Just "checklist-medium"), id: Nothing, tag: "svg" })
-            }) : Nil)))),
-      primaryDescription: (TopCardPrimaryDescription {
-        link: (DetachedA { content: "LINCOLN", href: "https://www.linkedin.com/company/lincoln-/life" }),
-        text: (DetachedText "· Boulogne-Billancourt, Île-de-France, France"),
-        tvmText: (Just (NonEmptyList
-          (NonEmpty (DetachedElement {
-            classes: ("tvm__text" : "tvm__text--neutral" : Nil),
-            content: "il y a 2 semaines",
-            id: Nothing,
-            tag: "SPAN"
-          }) ((DetachedElement {
-            classes: ("tvm__text" : "tvm__text--neutral" : Nil),
-            content: "·",
-            id: Nothing,
-            tag: "SPAN"
-          }) : (DetachedElement {
-            classes: ("tvm__text" : "tvm__text--neutral" : Nil),
-            content: "87 candidats",
-            id: Nothing,
-            tag: "SPAN"
-          }) : Nil
+              icon: DetachedLiIcon "people"
+              }) : (TopCardInsight {
+                content: (TopCardInsightContentSingle (DetachedElement {
+                  classes: Nil,
+                  content: "Découvrez comment vous vous positionnez par rapport à 87 candidats. Essai Premium pour 0 EUR",
+                  id: Nothing,
+                  tag: "SPAN" })),
+                icon: (DetachedSvgElement { dataTestIcon: (Just "lightbulb-medium"), id: Nothing, tag: "svg" })
+              }) : (TopCardInsight {
+                content: (TopCardInsightContentButton (DetachedButton {
+                  classes: ("job-details-jobs-unified-top-card__job-insight-text-button" : Nil),
+                  content: "9 compétences sur 11 correspondent à votre profil, vous pourriez bien convenir pour ce poste",
+                  role: Nothing
+                })),
+                icon: (DetachedSvgElement { dataTestIcon: (Just "checklist-medium"), id: Nothing, tag: "svg" })
+              }) : Nil)))),
+        primaryDescription: (TopCardPrimaryDescription {
+          link: (DetachedA { content: "LINCOLN", href: "https://www.linkedin.com/company/lincoln-/life" }),
+          text: (DetachedText "· Boulogne-Billancourt, Île-de-France, France"),
+          tvmText: (Just (NonEmptyList
+            (NonEmpty (DetachedElement {
+              classes: ("tvm__text" : "tvm__text--neutral" : Nil),
+              content: "il y a 2 semaines",
+              id: Nothing,
+              tag: "SPAN"
+            }) ((DetachedElement {
+              classes: ("tvm__text" : "tvm__text--neutral" : Nil),
+              content: "·",
+              id: Nothing,
+              tag: "SPAN"
+            }) : (DetachedElement {
+              classes: ("tvm__text" : "tvm__text--neutral" : Nil),
+              content: "87 candidats",
+              id: Nothing,
+              tag: "SPAN"
+            }) : Nil
+            ))
           ))
-        ))
-      })
-    }
-  }
+        })
+      }
 
 
-  assertEqual {
-    actual: (JJO.fromUI <=< fromDetachedToUI) topCard,
-    expected:
-      Right (JobOffer {
+      let
+        jobOffer = (JJO.fromUI <=< fromDetachedToUI) topCard
+
+      jobOffer `shouldEqual` Right (JobOffer {
         companyDomain: (Just "Technologies et services de l’information"),
         companyLink: "https://www.linkedin.com/company/lincoln-/life",
         companyName: "LINCOLN",
@@ -146,4 +145,3 @@ main = do
         flexibility: (Just JobFlexOnSite),
         title: "Data Engineer H/F - Secteur Energie"
       })
-  }

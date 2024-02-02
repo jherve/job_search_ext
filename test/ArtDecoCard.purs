@@ -10,7 +10,7 @@ import Data.List.NonEmpty as NEL
 import Data.Maybe (Maybe(..), fromJust)
 import Data.NonEmpty (NonEmpty(..))
 import Data.Traversable (traverse)
-import Effect (Effect)
+import Effect.Class (liftEffect)
 import LinkedIn.DetachedNode (DetachedNode(..), toDetached)
 import LinkedIn.Extractible (query)
 import LinkedIn.Page.WorkExperiences (WorkExperiencesPage(..))
@@ -22,26 +22,25 @@ import LinkedIn.UI.Components.ArtDeco (ArtDecoCenter(..), ArtDecoCenterContent(.
 import LinkedIn.UI.Components.ArtDecoCard (ArtDecoCardElement(..))
 import Node.JsDom (jsDomFromFile)
 import Partial.Unsafe (unsafePartial)
-import Test.Assert (assert, assertEqual)
+import Test.Spec (Spec, describe, it)
+import Test.Spec.Assertions (shouldEqual)
 import Test.Utils (toMonthYear', fromDetachedToUI)
 
-testArtDecoCards :: Effect Unit
-testArtDecoCards = do
-  dom <- jsDomFromFile "test/examples/andrew_ng_experiences.html"
-  wep <- runQuery $ query dom
+artDecoCardsSpec :: Spec Unit
+artDecoCardsSpec = do
+  describe "Art deco cards parsing" do
+    it "works" do
+      dom <- liftEffect $ jsDomFromFile "test/examples/andrew_ng_experiences.html"
+      wep <- liftEffect $ runQuery $ query @WorkExperiencesPage dom
+      isRight wep `shouldEqual` true
 
-  assert $ isRight wep
+      let
+        WorkExperiencesPage cards = unsafePartial $ fromJust $ hush wep
+        head = NEL.head cards
 
-  let
-    WorkExperiencesPage cards = unsafePartial $ fromJust $ hush wep
-    head = NEL.head cards
+      headCard <- liftEffect $ traverse toDetached head
 
-  headCard <- traverse toDetached head
-
-  assertEqual {
-    actual: headCard,
-    expected:
-      ArtDecoCardElement {
+      headCard `shouldEqual` ArtDecoCardElement {
         pvs_entity: (ArtDecoPvsEntity {
           center: (ArtDecoCenter {
             content: (ArtDecoCenterContent
@@ -81,12 +80,11 @@ testArtDecoCards = do
           side: unit
         })
       }
-  }
 
-  assertEqual {
-    actual: (PWE.fromUI <=< fromDetachedToUI) headCard,
-    expected:
-      Right (WorkExperience {
+      let
+        jobOffer = (PWE.fromUI <=< fromDetachedToUI) headCard
+
+      jobOffer `shouldEqual` Right (WorkExperience {
         company: Just "DeepLearning.AI",
         contractType: Nothing,
         description: Just "DeepLearning.AI provides\ntechnical training on Generative AI, Machine Learning, Deep Learning,\nand other topics. We also offer a widely read newsletter, The Batch\n(thebatch.ai), that covers what matters in AI right now. Our courses are often created with industry-leading AI companies (AWS,\nGoogle, OpenAI, etc.), and we offer both short courses that can be\ncompleted in an hour, and longer courses and specializations hosted on\nCoursera that give you a solid foundation in some aspect of AI. These\ncourses are designed to offer hands-on practice with AI technologies,\nand you will gain practical, job-ready skills. Whether you are just starting out in AI or seeking to further an existing\ncareer, come see if we can help, at http://deeplearning.ai!",
@@ -94,8 +92,3 @@ testArtDecoCards = do
         position: "Founder",
         timeSpan: Just (TimeSpanToToday (toMonthYear' June 2017))
       })
-  }
-
-main :: Effect Unit
-main = do
-  testArtDecoCards

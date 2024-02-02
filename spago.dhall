@@ -4,11 +4,11 @@ You can edit this file as you like.
 -}
 { name = "web-extension"
 , dependencies =
-  [ "argonaut-codecs"
+  [ "aff"
+  , "argonaut-codecs"
   , "argonaut-core"
   , "argonaut-generic"
   , "arrays"
-  , "assert"
   , "console"
   , "control"
   , "datetime"
@@ -29,6 +29,7 @@ You can edit this file as you like.
   , "partial"
   , "prelude"
   , "profunctor-lenses"
+  , "spec"
   , "strings"
   , "transformers"
   , "tuples"

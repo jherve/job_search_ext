@@ -3,12 +3,17 @@ module Test.Main where
 import Prelude
 
 import Effect (Effect)
-import Test.ArtDecoCard as ArtDecoCard
-import Test.JobsUnifiedTopCard as JobsUnifiedTopCard
-import Test.UIStringParser as UIStringParser
+import Effect.Aff (launchAff_)
+import Test.ArtDecoCard (artDecoCardsSpec)
+import Test.JobsUnifiedTopCard (jobsUnifiedTopCardSpec)
+import Test.PageUrl (pageUrlSpec)
+import Test.Spec.Reporter.Console (consoleReporter)
+import Test.Spec.Runner (runSpec)
+import Test.UIStringParser (uiStringParserSpec)
 
 main :: Effect Unit
-main = do
-  ArtDecoCard.main
-  JobsUnifiedTopCard.main
-  UIStringParser.main
+main = launchAff_ $ runSpec [consoleReporter] do
+  pageUrlSpec
+  uiStringParserSpec
+  artDecoCardsSpec
+  jobsUnifiedTopCardSpec

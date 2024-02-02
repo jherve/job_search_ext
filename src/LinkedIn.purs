@@ -1,4 +1,4 @@
-module LinkedIn (APIError(..), encodeToJson, getContext, extractFromDocument, extractFromDocumentInContext) where
+module LinkedIn (APIError(..), encodeToJson, getContext, extractFromDocument, forceExtract) where
 
 import Prelude
 
@@ -10,11 +10,14 @@ import Data.Either (Either(..))
 import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe(..))
 import Data.Show.Generic (genericShow)
+import Data.Traversable (class Traversable)
 import Effect (Effect)
-import LinkedIn.Output (OutputError, toOutput)
+import LinkedIn.Extractible (class Extractible)
+import LinkedIn.Output (OutputError, run, toOutput)
 import LinkedIn.Output.Types (Output)
 import LinkedIn.PageUrl (PageUrl, pageUrlP)
 import Parsing (runParser)
+import Type.Proxy (Proxy)
 import Web.DOM (Document)
 import Web.DOM.Document (url)
 import Web.URL as U
@@ -50,11 +53,19 @@ extractFromDocument' dom = do
   ctx <- getContext' dom
   toOutput' ctx dom
 
-extractFromDocumentInContext :: PageUrl -> Document -> Effect (Either APIError Output)
-extractFromDocumentInContext url dom = runExceptT $ toOutput' url dom
-
 toOutput' ∷ PageUrl → Document → ExceptT APIError Effect Output
 toOutput' ctx dom = withExceptT (\err -> ErrorExtraction err) $ toOutput ctx dom
 
 encodeToJson :: Either String Output -> Json
 encodeToJson = encodeJson
+
+-- | Force extraction of data from a page, when the context given by the URL is imprecise
+-- | or plain wrong (e.g. for local files).
+-- | Can be call e.g. `forceExtract (Proxy :: Proxy JobOfferPage) dom`
+forceExtract ∷ ∀ t.
+  Traversable t
+  ⇒ Extractible t
+  ⇒ Proxy t
+  → Document
+  → Effect (Either OutputError Output)
+forceExtract p = runExceptT <<< run p

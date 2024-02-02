@@ -21,6 +21,7 @@ data Output =
   | OutJobOffer JO.JobOffer
 
 derive instance Generic Output _
+derive instance Eq Output
 instance Show Output where
   show = genericShow
 instance EncodeJson Output where
@@ -34,6 +35,7 @@ data OutputError =
   | ErrorUrlNotSupported PageUrl
 
 derive instance Generic OutputError _
+derive instance Eq OutputError
 instance Show OutputError where
   show = genericShow
 instance EncodeJson OutputError where

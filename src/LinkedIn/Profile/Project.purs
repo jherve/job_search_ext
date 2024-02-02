@@ -21,6 +21,7 @@ data Project = Project {
 }
 
 derive instance Generic Project _
+derive instance Eq Project
 instance Show Project where
   show = genericShow
 instance EncodeJson Project where

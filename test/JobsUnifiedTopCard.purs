@@ -2,42 +2,33 @@ module Test.JobsUnifiedTopCard where
 
 import Prelude
 
-import Data.Either (Either(..), hush, isRight)
+import Control.Monad.Except (runExceptT)
+import Data.Either (Either(..))
 import Data.List (List(..), (:))
 import Data.List.NonEmpty (NonEmptyList(..))
-import Data.Maybe (Maybe(..), fromJust)
+import Data.Maybe (Maybe(..))
 import Data.NonEmpty (NonEmpty(..))
-import Data.Traversable (traverse)
 import Effect.Class (liftEffect)
-import LinkedIn.DetachedNode (DetachedNode(..), toDetached)
-import LinkedIn.Extractible (query)
+import LinkedIn.DetachedNode (DetachedNode(..))
 import LinkedIn.Jobs.JobOffer (JobOffer(..))
-import LinkedIn.Jobs.JobOffer as JJO
+import LinkedIn.Output (run, runToDetached)
+import LinkedIn.Output.Types (Output(..))
 import LinkedIn.Page.JobOffer (JobOfferPage(..))
-import LinkedIn.QueryRunner (runQuery)
 import LinkedIn.UI.Basic.Types (JobFlexibility(..))
 import LinkedIn.UI.Components.JobsUnifiedTopCard (JobsUnifiedTopCardElement(..), TopCardAction(..), TopCardInsight(..), TopCardInsightContent(..), TopCardPrimaryDescription(..), TopCardSecondaryInsight(..))
 import Node.JsDom (jsDomFromFile)
-import Partial.Unsafe (unsafePartial)
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual)
-import Test.Utils (fromDetachedToUI)
+import Type.Proxy (Proxy(..))
 
 jobsUnifiedTopCardSpec :: Spec Unit
 jobsUnifiedTopCardSpec = do
   describe "Jobs top card parsing" do
-    it "works" do
+    it "reads well as a JobOfferPage DetachedNode" do
       dom <- liftEffect $ jsDomFromFile "test/examples/job_offer.html"
-      wep <- liftEffect $ runQuery $ query @JobOfferPage dom
+      topCard <- liftEffect $ runExceptT $ runToDetached (Proxy :: Proxy JobOfferPage) dom
 
-      isRight wep `shouldEqual` true
-
-      let
-        JobOfferPage jobCard = unsafePartial $ fromJust $ hush wep
-
-      topCard <- liftEffect $ traverse toDetached jobCard
-
-      topCard `shouldEqual` JobsUnifiedTopCardElement {
+      topCard `shouldEqual` Right(JobOfferPage (JobsUnifiedTopCardElement {
         actions: (Just (NonEmptyList
           (NonEmpty (TopCardActionButton (DetachedButton {
             classes: ("jobs-apply-button" : "artdeco-button" : "artdeco-button--3" : "artdeco-button--primary" : "ember-view" : Nil),
@@ -129,13 +120,13 @@ jobsUnifiedTopCardSpec = do
             ))
           ))
         })
-      }
+      }))
 
+    it "reads the JobOffer" do
+      dom <- liftEffect $ jsDomFromFile "test/examples/job_offer.html"
+      jobOffer <- liftEffect $ runExceptT $ run (Proxy :: Proxy JobOfferPage) dom
 
-      let
-        jobOffer = (JJO.fromUI <=< fromDetachedToUI) topCard
-
-      jobOffer `shouldEqual` Right (JobOffer {
+      jobOffer `shouldEqual` Right (OutJobOffer (JobOffer {
         companyDomain: (Just "Technologies et services de l’information"),
         companyLink: "https://www.linkedin.com/company/lincoln-/life",
         companyName: "LINCOLN",
@@ -144,4 +135,4 @@ jobsUnifiedTopCardSpec = do
         location: (Just "Boulogne-Billancourt, Île-de-France, France"),
         flexibility: (Just JobFlexOnSite),
         title: "Data Engineer H/F - Secteur Energie"
-      })
+      }))

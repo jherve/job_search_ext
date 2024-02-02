@@ -17,6 +17,7 @@ data Skill = Skill {
 }
 
 derive instance Generic Skill _
+derive instance Eq Skill
 instance Show Skill where
   show = genericShow
 instance EncodeJson Skill where

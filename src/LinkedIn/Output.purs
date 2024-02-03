@@ -5,6 +5,8 @@ import Prelude
 import Control.Monad.Except (ExceptT, except, lift, throwError, withExceptT)
 import Data.Traversable (class Traversable, traverse)
 import Effect (Effect)
+import LinkedIn.CanBeQueried (class CanBeQueried)
+import LinkedIn.CanBeQueried as CBQ
 import LinkedIn.DetachedNode (DetachedNode, toDetached)
 import LinkedIn.Extractible (class Extractible)
 import LinkedIn.Extractible as LE
@@ -20,25 +22,26 @@ import Parsing (parseErrorMessage)
 import Type.Proxy (Proxy(..))
 import Web.DOM (Document)
 
-run :: forall t.
+run :: forall root t.
   Traversable t
+  => CanBeQueried root t
   => Extractible t
   => Proxy t
-  -> Document
+  -> root
   -> ExceptT OutputError Effect Output
 run prox dom = do
   detached <- withExceptT (\err -> ErrorOnDetach err) $ runToDetached prox dom
   asUI <- withExceptT (\err -> ErrorOnUIConversion $ parseErrorMessage err) $ except $ traverse toUIElement detached
   withExceptT (\err -> ErrorOnExtract err) $ except $ LE.extract asUI
 
-runToDetached :: forall t.
+runToDetached :: forall root t.
   Traversable t
-  => Extractible t
+  => CanBeQueried root t
   => Proxy t
-  -> Document
+  -> root
   -> ExceptT QueryError Effect (t DetachedNode)
 runToDetached _ dom = do
-  qRes <- LE.query @t dom
+  qRes <- CBQ.query' dom
   lift $ traverse toDetached qRes
 
 toOutput ∷ PageUrl → (Document → ExceptT OutputError Effect Output)

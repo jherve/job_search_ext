@@ -6,11 +6,13 @@ import Data.Foldable (class Foldable, foldMap, foldlDefault, foldrDefault)
 import Data.Generic.Rep (class Generic)
 import Data.Show.Generic (genericShow)
 import Data.Traversable (class Traversable, sequence, traverseDefault)
+import LinkedIn.CanBeQueried (class CanBeQueried)
 import LinkedIn.Extractible (class Extractible)
 import LinkedIn.Jobs.JobOffer as JJO
 import LinkedIn.Output.Types (Output(..))
 import LinkedIn.QueryRunner (subQueryOne)
 import LinkedIn.UI.Components.JobsUnifiedTopCard (JobsUnifiedTopCardElement, queryJobsUnifiedTopCardElement)
+import Web.DOM (Document)
 
 data JobOfferPage a = JobOfferPage (JobsUnifiedTopCardElement a)
 
@@ -32,6 +34,11 @@ instance Traversable JobOfferPage where
   in JobOfferPage tc
 
   traverse = \x -> traverseDefault x
+
+instance CanBeQueried Document JobOfferPage where
+  query' n = do
+    card <- subQueryOne queryJobsUnifiedTopCardElement "div.jobs-unified-top-card" n
+    pure $ JobOfferPage card
 
 instance Extractible JobOfferPage where
   query n = do

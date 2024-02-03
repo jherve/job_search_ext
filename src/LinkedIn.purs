@@ -12,6 +12,7 @@ import Data.Maybe (Maybe(..))
 import Data.Show.Generic (genericShow)
 import Data.Traversable (class Traversable)
 import Effect (Effect)
+import LinkedIn.CanBeQueried (class CanBeQueried)
 import LinkedIn.Extractible (class Extractible)
 import LinkedIn.Output (OutputError, run, toOutput)
 import LinkedIn.Output.Types (Output)
@@ -62,10 +63,11 @@ encodeToJson = encodeJson
 -- | Force extraction of data from a page, when the context given by the URL is imprecise
 -- | or plain wrong (e.g. for local files).
 -- | Can be call e.g. `forceExtract (Proxy :: Proxy JobOfferPage) dom`
-forceExtract ∷ ∀ t.
+forceExtract ∷ ∀ root t.
   Traversable t
+  ⇒ CanBeQueried root t
   ⇒ Extractible t
   ⇒ Proxy t
-  → Document
+  → root
   → Effect (Either OutputError Output)
 forceExtract p = runExceptT <<< run p

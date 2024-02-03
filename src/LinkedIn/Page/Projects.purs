@@ -2,21 +2,18 @@ module LinkedIn.Page.Projects where
 
 import Prelude
 
-import Data.Either (Either)
 import Data.Foldable (class Foldable, foldMap, foldlDefault, foldrDefault)
 import Data.Generic.Rep (class Generic)
 import Data.List.Types (NonEmptyList)
 import Data.Show.Generic (genericShow)
 import Data.Traversable (class Traversable, sequence, traverse, traverseDefault)
-import LinkedIn.CanBeQueried (class CanBeQueried)
+import LinkedIn.CanBeQueried (class CanBeQueried, query)
 import LinkedIn.Extractible (class Extractible)
 import LinkedIn.Output.Types (Output(..))
-import LinkedIn.Profile.Project (Project)
 import LinkedIn.Profile.Project as PP
-import LinkedIn.QueryRunner (QueryRunner', subQueryMany)
-import LinkedIn.UI.Components.ArtDecoCard (ArtDecoCardElement, queryArtDecoCard)
-import LinkedIn.UI.Elements.Types (UIElement)
-import Web.DOM (Document, Node)
+import LinkedIn.QueryRunner (subQueryMany)
+import LinkedIn.UI.Components.ArtDecoCard (ArtDecoCardElement)
+import Web.DOM (Document)
 
 data ProjectsPage a = ProjectsPage (NonEmptyList (ArtDecoCardElement a))
 
@@ -39,10 +36,9 @@ instance Traversable ProjectsPage where
 
   traverse = \x -> traverseDefault x
 
-
 instance CanBeQueried Document ProjectsPage where
   query n = do
-    cards <- subQueryMany queryArtDecoCard "section.artdeco-card > div ~ div > div > div > ul > li" n
+    cards <- subQueryMany query "section.artdeco-card > div ~ div > div > div > ul > li" n
     pure $ ProjectsPage cards
 
 instance Extractible ProjectsPage where

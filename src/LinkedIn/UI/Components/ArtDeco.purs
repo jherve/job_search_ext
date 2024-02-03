@@ -11,7 +11,7 @@ import Data.Maybe (Maybe)
 import Data.Show.Generic (genericShow)
 import Data.Traversable (class Traversable, sequence, traverseDefault)
 import Data.Tuple (Tuple(..))
-import LinkedIn.CanBeQueried (class CanBeQueried)
+import LinkedIn.CanBeQueried (class CanBeQueried, query)
 import LinkedIn.QueryRunner (QueryRunner', ignoreNotFound, queryAll, queryOne, subQueryMany, subQueryOne)
 import LinkedIn.Queryable (class Queryable)
 import Type.Proxy (Proxy(..))
@@ -59,7 +59,9 @@ instance Traversable ArtDecoPvsEntitySubComponent where
   traverse = \x -> traverseDefault x
 
 instance Queryable q => CanBeQueried q ArtDecoPvsEntitySubComponent where
-  query = queryArtDecoPvsEntitySubComponent
+  query n = do
+    content <- ignoreNotFound $ queryOne "span[aria-hidden=true]" n
+    pure $ ArtDecoPvsEntitySubComponent content
 
 derive instance Generic (ArtDecoCenterContent a) _
 derive instance Eq a => Eq(ArtDecoCenterContent a)
@@ -81,7 +83,9 @@ instance Traversable ArtDecoCenterContent where
   traverse = \x -> traverseDefault x
 
 instance Queryable q => CanBeQueried q ArtDecoCenterContent where
-  query = queryArtDecoCenterContent
+  query n = do
+    sc <- subQueryMany query ":scope > ul > li" n
+    pure $ ArtDecoCenterContent sc
 
 derive instance Generic (ArtDecoCenterHeader a) _
 derive instance Eq a => Eq(ArtDecoCenterHeader a)
@@ -105,7 +109,16 @@ instance Traversable ArtDecoCenterHeader where
   traverse = \x -> traverseDefault x
 
 instance Queryable q => CanBeQueried q ArtDecoCenterHeader where
-  query = queryArtDecoCenterHeader
+  query n = do
+    bold <- queryOne ":scope div.t-bold > span[aria-hidden=true]" n
+    normal <-
+      ignoreNotFound $
+      queryOne ":scope span.t-normal:not(t-black--light) > span[aria-hidden=true]" n
+    light <-
+      ignoreNotFound $
+      queryAll ":scope span.t-black--light > span[aria-hidden=true]" n
+
+    pure $ ArtDecoCenterHeader {bold, normal, light}
 
 derive instance Generic (ArtDecoCenter a) _
 derive instance Eq a => Eq(ArtDecoCenter a)
@@ -128,7 +141,11 @@ instance Traversable ArtDecoCenter where
   traverse = \x -> traverseDefault x
 
 instance Queryable q => CanBeQueried q ArtDecoCenter where
-  query = queryArtDecoCenter
+  query n = do
+    header <- subQueryOne query ":scope > div" n
+    content <- subQueryOne query ":scope > div.pvs-entity__sub-components" n
+
+    pure $ ArtDecoCenter {header, content}
 
 derive instance Generic (ArtDecoPvsEntity a) _
 derive instance Eq a => Eq(ArtDecoPvsEntity a)
@@ -151,41 +168,9 @@ instance Traversable ArtDecoPvsEntity where
   traverse = \x -> traverseDefault x
 
 instance Queryable q => CanBeQueried q ArtDecoPvsEntity where
-  query = queryArtDecoPvsEntity
-
-queryArtDecoPvsEntitySubComponent ∷ forall q. Queryable q=> QueryRunner' q (ArtDecoPvsEntitySubComponent Node)
-queryArtDecoPvsEntitySubComponent n = do
-  content <- ignoreNotFound $ queryOne "span[aria-hidden=true]" n
-  pure $ ArtDecoPvsEntitySubComponent content
-
-queryArtDecoCenterContent :: forall q. Queryable q => QueryRunner' q (ArtDecoCenterContent Node)
-queryArtDecoCenterContent n = do
-  sc <- subQueryMany queryArtDecoPvsEntitySubComponent ":scope > ul > li" n
-  pure $ ArtDecoCenterContent sc
-
-queryArtDecoCenterHeader :: forall q. Queryable q => QueryRunner' q (ArtDecoCenterHeader Node)
-queryArtDecoCenterHeader n = do
-  bold <- queryOne ":scope div.t-bold > span[aria-hidden=true]" n
-  normal <-
-    ignoreNotFound $
-    queryOne ":scope span.t-normal:not(t-black--light) > span[aria-hidden=true]" n
-  light <-
-    ignoreNotFound $
-    queryAll ":scope span.t-black--light > span[aria-hidden=true]" n
-
-  pure $ ArtDecoCenterHeader {bold, normal, light}
-
-queryArtDecoCenter :: forall q. Queryable q => QueryRunner' q (ArtDecoCenter Node)
-queryArtDecoCenter n = do
-  header <- subQueryOne queryArtDecoCenterHeader ":scope > div" n
-  content <- subQueryOne queryArtDecoCenterContent ":scope > div.pvs-entity__sub-components" n
-
-  pure $ ArtDecoCenter {header, content}
-
-queryArtDecoPvsEntity :: forall q. Queryable q => QueryRunner' q (ArtDecoPvsEntity Node)
-queryArtDecoPvsEntity n = do
-  center <- subQueryOne queryArtDecoCenter ":scope > div.display-flex" n
-  pure $ ArtDecoPvsEntity {side: unit, center}
+  query n = do
+    center <- subQueryOne query ":scope > div.display-flex" n
+    pure $ ArtDecoPvsEntity {side: unit, center}
 
 _pvs_entity :: forall a. Lens' (ArtDecoPvsEntity a) { center ∷ ArtDecoCenter a , side ∷ Unit }
 _pvs_entity = lens'

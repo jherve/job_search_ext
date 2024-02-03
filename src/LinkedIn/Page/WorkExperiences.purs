@@ -7,12 +7,12 @@ import Data.Generic.Rep (class Generic)
 import Data.List.Types (NonEmptyList)
 import Data.Show.Generic (genericShow)
 import Data.Traversable (class Traversable, sequence, traverse, traverseDefault)
-import LinkedIn.CanBeQueried (class CanBeQueried)
+import LinkedIn.CanBeQueried (class CanBeQueried, query)
 import LinkedIn.Extractible (class Extractible)
 import LinkedIn.Output.Types (Output(..))
 import LinkedIn.Profile.WorkExperience as PWE
 import LinkedIn.QueryRunner (subQueryMany)
-import LinkedIn.UI.Components.ArtDecoCard (ArtDecoCardElement, queryArtDecoCard)
+import LinkedIn.UI.Components.ArtDecoCard (ArtDecoCardElement)
 import Web.DOM (Document)
 
 data WorkExperiencesPage a = WorkExperiencesPage (NonEmptyList (ArtDecoCardElement a))
@@ -38,7 +38,7 @@ instance Traversable WorkExperiencesPage where
 
 instance CanBeQueried Document WorkExperiencesPage where
   query n = do
-    cards <- subQueryMany queryArtDecoCard "section.artdeco-card > div ~ div > div > div > ul > li" n
+    cards <- subQueryMany query "section.artdeco-card > div ~ div > div > div > ul > li" n
     pure $ WorkExperiencesPage cards
 
 instance Extractible WorkExperiencesPage where

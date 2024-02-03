@@ -81,6 +81,9 @@ traverseMayNel :: forall m t a. Traversable t => Applicative m => Maybe(NonEmpty
 traverseMayNel (Just o) = map pure (sequence (map sequence o))
 traverseMayNel Nothing = pure Nothing
 
+instance Queryable q => CanBeQueried q JobsUnifiedTopCardElement where
+  query = queryJobsUnifiedTopCardElement
+
 derive instance Generic (TopCardPrimaryDescription a) _
 derive instance Eq a => Eq (TopCardPrimaryDescription a)
 instance Show a => Show (TopCardPrimaryDescription a) where

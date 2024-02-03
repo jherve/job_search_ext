@@ -13,8 +13,9 @@ import Data.Maybe (Maybe)
 import Data.Show.Generic (genericShow)
 import Data.Traversable (class Traversable, sequence, traverseDefault)
 import Data.Tuple (Tuple(..))
+import LinkedIn.QueryRunner (QueryRunner', subQueryOne)
+import LinkedIn.Queryable (class Queryable)
 import LinkedIn.UI.Components.ArtDeco (ArtDecoPvsEntity, _pvs_to_header_bold, _pvs_to_header_light, _pvs_to_header_normal, _pvs_to_subcomponents, queryArtDecoPvsEntity)
-import LinkedIn.QueryRunner (QueryRunner, subQueryOne)
 import Type.Proxy (Proxy(..))
 import Web.DOM (Node)
 
@@ -42,7 +43,7 @@ instance Traversable ArtDecoCardElement where
 
   traverse = \x -> traverseDefault x
 
-queryArtDecoCard :: QueryRunner (ArtDecoCardElement Node)
+queryArtDecoCard :: forall q. Queryable q => QueryRunner' q (ArtDecoCardElement Node)
 queryArtDecoCard n = do
   pvs_entity <- subQueryOne queryArtDecoPvsEntity ":scope div.pvs-entity--padded" n
   pure $ ArtDecoCardElement {pvs_entity}

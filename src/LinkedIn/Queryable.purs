@@ -17,6 +17,7 @@ import Web.DOM.ParentNode (QuerySelector(..), querySelector, querySelectorAll)
 -- A light abstraction layer above the DOM query API
 
 class Queryable a where
+  toNode :: a -> Node
   toParentNode :: a -> ParentNode
   toChildrenArray :: a -> Effect (Array Node)
 
@@ -29,11 +30,14 @@ instance Queryable Node where
           he <- E.fromNode node
           pure $ E.toParentNode he
 
+  toNode = identity
+
   toChildrenArray n = do
     children <- N.childNodes n
     NL.toArray children
 
 instance Queryable Document where
+  toNode = D.toNode
   toParentNode = D.toParentNode
   toChildrenArray d = toChildrenArray $ D.toNode d
 

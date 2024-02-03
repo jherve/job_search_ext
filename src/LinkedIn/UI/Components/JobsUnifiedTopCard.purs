@@ -13,7 +13,8 @@ import Data.Maybe (Maybe(..))
 import Data.Show.Generic (genericShow)
 import Data.Traversable (class Traversable, sequence, traverse, traverseDefault)
 import Data.Tuple (Tuple(..))
-import LinkedIn.QueryRunner (QueryError(..), QueryRunner, ignoreNotFound, queryAll, queryOne, queryText)
+import LinkedIn.QueryRunner (QueryError(..), QueryRunner, QueryRunner', ignoreNotFound, queryAll, queryOne, querySelf, queryText)
+import LinkedIn.Queryable (class Queryable, toNode)
 import Type.Proxy (Proxy(..))
 import Web.DOM (Node)
 import Web.DOM.Node as N
@@ -182,46 +183,54 @@ instance Traversable TopCardAction where
 
   traverse = \x -> traverseDefault x
 
-queryTopCardAction :: QueryRunner (TopCardAction Node)
-queryTopCardAction n = pure $ TopCardActionButton n
+queryTopCardAction :: forall q. Queryable q => QueryRunner' q (TopCardAction Node)
+queryTopCardAction n = do
+  n' <- querySelf n
+  pure $ TopCardActionButton n'
 
-queryTopCardSecondaryInsightNested :: QueryRunner (TopCardSecondaryInsight Node)
+queryTopCardSecondaryInsightNested :: forall q. Queryable q => QueryRunner' q (TopCardSecondaryInsight Node)
 queryTopCardSecondaryInsightNested n = do
   nested <- queryOne ":scope span[aria-hidden=true]" n
   pure $ TopCardSecondaryInsightNested nested
 
-queryTopCardSecondaryInsightPlain :: QueryRunner (TopCardSecondaryInsight Node)
-queryTopCardSecondaryInsightPlain n = pure $ TopCardSecondaryInsightPlain n
+queryTopCardSecondaryInsightPlain :: forall q. Queryable q => QueryRunner' q (TopCardSecondaryInsight Node)
+queryTopCardSecondaryInsightPlain n = do
+  n' <- querySelf n
+  pure $ TopCardSecondaryInsightPlain n'
 
-queryTopCardSecondaryInsight :: QueryRunner (TopCardSecondaryInsight Node)
+queryTopCardSecondaryInsight :: forall q. Queryable q => QueryRunner' q (TopCardSecondaryInsight Node)
 queryTopCardSecondaryInsight n =
   queryTopCardSecondaryInsightNested n <|> queryTopCardSecondaryInsightPlain n
 
-queryTopCardInsightContentSingle :: QueryRunner (TopCardInsightContent Node)
-queryTopCardInsightContentSingle n = pure $ TopCardInsightContentSingle n
+queryTopCardInsightContentSingle :: forall q. Queryable q => QueryRunner' q (TopCardInsightContent Node)
+queryTopCardInsightContentSingle n = do
+  n' <- querySelf n
+  pure $ TopCardInsightContentSingle n'
 
-queryTopCardInsightContentButton :: QueryRunner (TopCardInsightContent Node)
+queryTopCardInsightContentButton :: forall q. Queryable q => QueryRunner' q (TopCardInsightContent Node)
 queryTopCardInsightContentButton n =
   if type_ == "BUTTON"
-  then pure $ TopCardInsightContentButton n
+  then do
+    n' <- querySelf n
+    pure $ TopCardInsightContentButton n'
   else throwError (QNodeUnexpectedType "BUTTON" type_)
 
-  where type_ = N.nodeName n
+  where type_ = N.nodeName $ toNode n
 
-queryTopCardInsightContentSecondary :: QueryRunner (TopCardInsightContent Node)
+queryTopCardInsightContentSecondary :: forall q. Queryable q => QueryRunner' q (TopCardInsightContent Node)
 queryTopCardInsightContentSecondary n = do
   primary <- queryOne ":scope > span:first-child span[aria-hidden=true]" n
   secondary <- traverse queryTopCardSecondaryInsight
                 =<< queryAll ":scope > span.job-details-jobs-unified-top-card__job-insight-view-model-secondary" n
   pure $ TopCardInsightContentSecondary {primary, secondary}
 
-queryTopCardInsightContent :: QueryRunner (TopCardInsightContent Node)
+queryTopCardInsightContent :: forall q. Queryable q => QueryRunner' q (TopCardInsightContent Node)
 queryTopCardInsightContent n =
   queryTopCardInsightContentSecondary n
   <|> queryTopCardInsightContentButton n
   <|> queryTopCardInsightContentSingle n
 
-queryTopCardInsight :: QueryRunner (TopCardInsight Node)
+queryTopCardInsight :: forall q. Queryable q => QueryRunner' q (TopCardInsight Node)
 queryTopCardInsight n = do
   icon <- queryOne ":scope li-icon" n <|> queryOne ":scope svg" n
   content <- queryTopCardInsightContent =<< getContentNode n
@@ -231,7 +240,7 @@ queryTopCardInsight n = do
   where
     getContentNode n' = queryOne ":scope > span" n' <|> queryOne ":scope > button" n'
 
-queryTopCardPrimaryDescription :: QueryRunner (TopCardPrimaryDescription Node)
+queryTopCardPrimaryDescription :: forall q. Queryable q => QueryRunner' q (TopCardPrimaryDescription Node)
 queryTopCardPrimaryDescription n = do
   link <- queryOne ":scope > a" n
   text <- queryText 1 n
@@ -239,7 +248,7 @@ queryTopCardPrimaryDescription n = do
 
   pure $ TopCardPrimaryDescription {link, text, tvmText: tvmText}
 
-queryJobsUnifiedTopCardElement :: QueryRunner (JobsUnifiedTopCardElement Node)
+queryJobsUnifiedTopCardElement :: forall q. Queryable q => QueryRunner' q (JobsUnifiedTopCardElement Node)
 queryJobsUnifiedTopCardElement n = do
   header <- queryOne "h1.job-details-jobs-unified-top-card__job-title" n
   primaryDescription <- queryTopCardPrimaryDescription

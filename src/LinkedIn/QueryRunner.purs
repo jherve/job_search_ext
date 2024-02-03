@@ -2,8 +2,7 @@ module LinkedIn.QueryRunner where
 
 import Prelude
 
-import Control.Alt ((<|>))
-import Control.Monad.Except (ExceptT(..), mapExceptT, runExceptT)
+import Control.Monad.Except (ExceptT(..), except, mapExceptT, runExceptT)
 import Data.Argonaut.Encode (class EncodeJson)
 import Data.Argonaut.Encode.Generic (genericEncodeJson)
 import Data.Array as A
@@ -14,7 +13,7 @@ import Data.Maybe (Maybe(..))
 import Data.Show.Generic (genericShow)
 import Data.Traversable (traverse)
 import Effect (Effect)
-import LinkedIn.Queryable (class Queryable, getChildrenArray, queryAllNodes, queryOneNode)
+import LinkedIn.Queryable (class Queryable, getChildrenArray, queryAllNodes, queryOneNode, toNode)
 import Web.DOM (Node)
 import Web.DOM.Text as T
 
@@ -57,6 +56,9 @@ ignoreErrors = mapExceptT (map ignoreErrors')
     ignoreErrors' = case _ of
       (Left _) -> Right Nothing
       (Right n') -> Right (Just n')
+
+querySelf ∷ forall q. Queryable q => QueryRunner' q Node
+querySelf node = except $ Right $ toNode node
 
 queryOne ∷ forall q. Queryable q => String → QueryRunner' q Node
 queryOne selector node = ExceptT $ do

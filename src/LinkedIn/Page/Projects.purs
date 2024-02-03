@@ -38,13 +38,6 @@ instance Traversable ProjectsPage where
 
   traverse = \x -> traverseDefault x
 
-query :: QueryRunner' Document (ProjectsPage Node)
-query n = do
-  cards <- subQueryMany queryArtDecoCard "section.artdeco-card > div ~ div > div > div > ul > li" n
-  pure $ ProjectsPage cards
-
-extract ∷ ProjectsPage UIElement → Either String (NonEmptyList Project)
-extract (ProjectsPage cards) = traverse PP.fromUI cards
 
 instance Extractible ProjectsPage where
   query n = do

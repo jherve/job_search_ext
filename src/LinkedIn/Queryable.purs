@@ -19,7 +19,6 @@ import Web.DOM.ParentNode (QuerySelector(..), querySelector, querySelectorAll)
 class Queryable a where
   toNode :: a -> Node
   toParentNode :: a -> ParentNode
-  toChildrenArray :: a -> Effect (Array Node)
 
 instance Queryable Node where
   toParentNode :: Node -> ParentNode
@@ -32,14 +31,9 @@ instance Queryable Node where
 
   toNode = identity
 
-  toChildrenArray n = do
-    children <- N.childNodes n
-    NL.toArray children
-
 instance Queryable Document where
   toNode = D.toNode
   toParentNode = D.toParentNode
-  toChildrenArray d = toChildrenArray $ D.toNode d
 
 queryOneNode :: forall a. Queryable a => String -> a -> Effect (Maybe Node)
 queryOneNode selector n = do
@@ -54,4 +48,6 @@ queryAllNodes selector n = do
   liftA1 NEL.fromFoldable $ NL.toArray found
 
 getChildrenArray :: forall a. Queryable a => a -> Effect (Array Node)
-getChildrenArray = toChildrenArray
+getChildrenArray n = do
+    children <- N.childNodes $ toNode n
+    NL.toArray children

@@ -13,7 +13,8 @@ import Data.Maybe (Maybe(..))
 import Data.Show.Generic (genericShow)
 import Data.Traversable (class Traversable, sequence, traverse, traverseDefault)
 import Data.Tuple (Tuple(..))
-import LinkedIn.QueryRunner (QueryError(..), QueryRunner, QueryRunner', ignoreNotFound, queryAll, queryOne, querySelf, queryText)
+import LinkedIn.CanBeQueried (class CanBeQueried)
+import LinkedIn.QueryRunner (QueryError(..), QueryRunner', ignoreNotFound, queryAll, queryOne, querySelf, queryText)
 import LinkedIn.Queryable (class Queryable, toNode)
 import Type.Proxy (Proxy(..))
 import Web.DOM (Node)
@@ -101,6 +102,9 @@ instance Traversable TopCardPrimaryDescription where
 
   traverse = \x -> traverseDefault x
 
+instance Queryable q => CanBeQueried q TopCardPrimaryDescription where
+  query' = queryTopCardPrimaryDescription
+
 derive instance Generic (TopCardInsight a) _
 derive instance Eq a => Eq (TopCardInsight a)
 instance Show a => Show (TopCardInsight a) where
@@ -120,6 +124,9 @@ instance Traversable TopCardInsight where
   in TopCardInsight {icon: i, content: c}
 
   traverse = \x -> traverseDefault x
+
+instance Queryable q => CanBeQueried q TopCardInsight where
+  query' = queryTopCardInsight
 
 derive instance Generic (TopCardInsightContent a) _
 derive instance Eq a => Eq (TopCardInsightContent a)
@@ -145,6 +152,9 @@ instance Traversable TopCardInsightContent where
 
   traverse = \x -> traverseDefault x
 
+instance Queryable q => CanBeQueried q TopCardInsightContent where
+  query' = queryTopCardInsightContent
+
 derive instance Generic (TopCardSecondaryInsight a) _
 derive instance Eq a => Eq (TopCardSecondaryInsight a)
 instance Show a => Show (TopCardSecondaryInsight a) where
@@ -164,6 +174,9 @@ instance Traversable TopCardSecondaryInsight where
 
   traverse = \x -> traverseDefault x
 
+instance Queryable q => CanBeQueried q TopCardSecondaryInsight where
+  query' = queryTopCardSecondaryInsight
+
 derive instance Generic (TopCardAction a) _
 derive instance Eq a => Eq (TopCardAction a)
 instance Show a => Show (TopCardAction a) where
@@ -182,6 +195,9 @@ instance Traversable TopCardAction where
   in TopCardActionButton a
 
   traverse = \x -> traverseDefault x
+
+instance Queryable q => CanBeQueried q TopCardAction where
+  query' = queryTopCardAction
 
 queryTopCardAction :: forall q. Queryable q => QueryRunner' q (TopCardAction Node)
 queryTopCardAction n = do

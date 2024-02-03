@@ -14,11 +14,10 @@ import Data.Show.Generic (genericShow)
 import Data.Traversable (class Traversable, sequence, traverseDefault)
 import Data.Tuple (Tuple(..))
 import LinkedIn.CanBeQueried (class CanBeQueried, query)
-import LinkedIn.QueryRunner (QueryRunner', subQueryOne)
+import LinkedIn.QueryRunner (subQueryOne)
 import LinkedIn.Queryable (class Queryable)
-import LinkedIn.UI.Components.ArtDeco (ArtDecoPvsEntity, _pvs_to_header_bold, _pvs_to_header_light, _pvs_to_header_normal, _pvs_to_subcomponents, queryArtDecoPvsEntity)
+import LinkedIn.UI.Components.ArtDeco (ArtDecoPvsEntity, _pvs_to_header_bold, _pvs_to_header_light, _pvs_to_header_normal, _pvs_to_subcomponents)
 import Type.Proxy (Proxy(..))
-import Web.DOM (Node)
 
 
 data ArtDecoCardElement a = ArtDecoCardElement {

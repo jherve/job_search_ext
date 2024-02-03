@@ -82,7 +82,21 @@ traverseMayNel (Just o) = map pure (sequence (map sequence o))
 traverseMayNel Nothing = pure Nothing
 
 instance Queryable q => CanBeQueried q JobsUnifiedTopCardElement where
-  query = queryJobsUnifiedTopCardElement
+  query n = do
+    header <- queryOne "h1.job-details-jobs-unified-top-card__job-title" n
+    primaryDescription <- query
+                            =<< queryOne "div.job-details-jobs-unified-top-card__primary-description-container > div" n
+    insights <- ignoreNotFound
+                  <<< traverse query
+                  =<< queryAll "li.job-details-jobs-unified-top-card__job-insight" n
+    actions <- ignoreNotFound <<< traverse query =<< queryAll ".mt5 button" n
+
+    pure $ JobsUnifiedTopCardElement {
+      header,
+      primaryDescription,
+      insights,
+      actions
+    }
 
 derive instance Generic (TopCardPrimaryDescription a) _
 derive instance Eq a => Eq (TopCardPrimaryDescription a)
@@ -173,6 +187,26 @@ instance Queryable q => CanBeQueried q TopCardInsightContent where
     <|> queryTopCardInsightContentButton n
     <|> queryTopCardInsightContentSingle n
 
+    where
+      queryTopCardInsightContentSingle n = do
+        n' <- querySelf n
+        pure $ TopCardInsightContentSingle n'
+
+      queryTopCardInsightContentButton n =
+        if type_ == "BUTTON"
+        then do
+          n' <- querySelf n
+          pure $ TopCardInsightContentButton n'
+        else throwError (QNodeUnexpectedType "BUTTON" type_)
+
+        where type_ = N.nodeName $ toNode n
+
+      queryTopCardInsightContentSecondary n = do
+        primary <- queryOne ":scope > span:first-child span[aria-hidden=true]" n
+        secondary <- traverse query
+                      =<< queryAll ":scope > span.job-details-jobs-unified-top-card__job-insight-view-model-secondary" n
+        pure $ TopCardInsightContentSecondary {primary, secondary}
+
 derive instance Generic (TopCardSecondaryInsight a) _
 derive instance Eq a => Eq (TopCardSecondaryInsight a)
 instance Show a => Show (TopCardSecondaryInsight a) where
@@ -194,6 +228,14 @@ instance Traversable TopCardSecondaryInsight where
 
 instance Queryable q => CanBeQueried q TopCardSecondaryInsight where
   query n = queryTopCardSecondaryInsightNested n <|> queryTopCardSecondaryInsightPlain n
+    where
+      queryTopCardSecondaryInsightNested n = do
+        nested <- queryOne ":scope span[aria-hidden=true]" n
+        pure $ TopCardSecondaryInsightNested nested
+
+      queryTopCardSecondaryInsightPlain n = do
+        n' <- querySelf n
+        pure $ TopCardSecondaryInsightPlain n'
 
 derive instance Generic (TopCardAction a) _
 derive instance Eq a => Eq (TopCardAction a)
@@ -218,55 +260,6 @@ instance Queryable q => CanBeQueried q TopCardAction where
   query n = do
     n' <- querySelf n
     pure $ TopCardActionButton n'
-
-queryTopCardSecondaryInsightNested :: forall q. Queryable q => QueryRunner' q (TopCardSecondaryInsight Node)
-queryTopCardSecondaryInsightNested n = do
-  nested <- queryOne ":scope span[aria-hidden=true]" n
-  pure $ TopCardSecondaryInsightNested nested
-
-queryTopCardSecondaryInsightPlain :: forall q. Queryable q => QueryRunner' q (TopCardSecondaryInsight Node)
-queryTopCardSecondaryInsightPlain n = do
-  n' <- querySelf n
-  pure $ TopCardSecondaryInsightPlain n'
-
-queryTopCardInsightContentSingle :: forall q. Queryable q => QueryRunner' q (TopCardInsightContent Node)
-queryTopCardInsightContentSingle n = do
-  n' <- querySelf n
-  pure $ TopCardInsightContentSingle n'
-
-queryTopCardInsightContentButton :: forall q. Queryable q => QueryRunner' q (TopCardInsightContent Node)
-queryTopCardInsightContentButton n =
-  if type_ == "BUTTON"
-  then do
-    n' <- querySelf n
-    pure $ TopCardInsightContentButton n'
-  else throwError (QNodeUnexpectedType "BUTTON" type_)
-
-  where type_ = N.nodeName $ toNode n
-
-queryTopCardInsightContentSecondary :: forall q. Queryable q => QueryRunner' q (TopCardInsightContent Node)
-queryTopCardInsightContentSecondary n = do
-  primary <- queryOne ":scope > span:first-child span[aria-hidden=true]" n
-  secondary <- traverse query
-                =<< queryAll ":scope > span.job-details-jobs-unified-top-card__job-insight-view-model-secondary" n
-  pure $ TopCardInsightContentSecondary {primary, secondary}
-
-queryJobsUnifiedTopCardElement :: forall q. Queryable q => QueryRunner' q (JobsUnifiedTopCardElement Node)
-queryJobsUnifiedTopCardElement n = do
-  header <- queryOne "h1.job-details-jobs-unified-top-card__job-title" n
-  primaryDescription <- query
-                          =<< queryOne "div.job-details-jobs-unified-top-card__primary-description-container > div" n
-  insights <- ignoreNotFound
-                <<< traverse query
-                =<< queryAll "li.job-details-jobs-unified-top-card__job-insight" n
-  actions <- ignoreNotFound <<< traverse query =<< queryAll ".mt5 button" n
-
-  pure $ JobsUnifiedTopCardElement {
-    header,
-    primaryDescription,
-    insights,
-    actions
-  }
 
 toHeader ∷ forall a. JobsUnifiedTopCardElement a → a
 toHeader = view $ _top_card <<< prop (Proxy :: Proxy "header")

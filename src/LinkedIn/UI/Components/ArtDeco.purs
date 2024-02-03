@@ -12,10 +12,9 @@ import Data.Show.Generic (genericShow)
 import Data.Traversable (class Traversable, sequence, traverseDefault)
 import Data.Tuple (Tuple(..))
 import LinkedIn.CanBeQueried (class CanBeQueried, query)
-import LinkedIn.QueryRunner (QueryRunner', ignoreNotFound, queryAll, queryOne, subQueryMany, subQueryOne)
+import LinkedIn.QueryRunner (ignoreNotFound, queryAll, queryOne, subQueryMany, subQueryOne)
 import LinkedIn.Queryable (class Queryable)
 import Type.Proxy (Proxy(..))
-import Web.DOM (Node)
 
 
 data ArtDecoPvsEntity a = ArtDecoPvsEntity {

@@ -5,4 +5,4 @@ import LinkedIn.Queryable (class Queryable)
 import Web.DOM (Node)
 
 class Queryable root <= CanBeQueried root t where
-  query' :: QueryRunner' root (t Node)
+  query :: QueryRunner' root (t Node)

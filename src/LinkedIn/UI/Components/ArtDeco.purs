@@ -59,7 +59,7 @@ instance Traversable ArtDecoPvsEntitySubComponent where
   traverse = \x -> traverseDefault x
 
 instance Queryable q => CanBeQueried q ArtDecoPvsEntitySubComponent where
-  query' = queryArtDecoPvsEntitySubComponent
+  query = queryArtDecoPvsEntitySubComponent
 
 derive instance Generic (ArtDecoCenterContent a) _
 derive instance Eq a => Eq(ArtDecoCenterContent a)
@@ -81,7 +81,7 @@ instance Traversable ArtDecoCenterContent where
   traverse = \x -> traverseDefault x
 
 instance Queryable q => CanBeQueried q ArtDecoCenterContent where
-  query' = queryArtDecoCenterContent
+  query = queryArtDecoCenterContent
 
 derive instance Generic (ArtDecoCenterHeader a) _
 derive instance Eq a => Eq(ArtDecoCenterHeader a)
@@ -105,7 +105,7 @@ instance Traversable ArtDecoCenterHeader where
   traverse = \x -> traverseDefault x
 
 instance Queryable q => CanBeQueried q ArtDecoCenterHeader where
-  query' = queryArtDecoCenterHeader
+  query = queryArtDecoCenterHeader
 
 derive instance Generic (ArtDecoCenter a) _
 derive instance Eq a => Eq(ArtDecoCenter a)
@@ -128,7 +128,7 @@ instance Traversable ArtDecoCenter where
   traverse = \x -> traverseDefault x
 
 instance Queryable q => CanBeQueried q ArtDecoCenter where
-  query' = queryArtDecoCenter
+  query = queryArtDecoCenter
 
 derive instance Generic (ArtDecoPvsEntity a) _
 derive instance Eq a => Eq(ArtDecoPvsEntity a)
@@ -151,7 +151,7 @@ instance Traversable ArtDecoPvsEntity where
   traverse = \x -> traverseDefault x
 
 instance Queryable q => CanBeQueried q ArtDecoPvsEntity where
-  query' = queryArtDecoPvsEntity
+  query = queryArtDecoPvsEntity
 
 queryArtDecoPvsEntitySubComponent ∷ forall q. Queryable q=> QueryRunner' q (ArtDecoPvsEntitySubComponent Node)
 queryArtDecoPvsEntitySubComponent n = do

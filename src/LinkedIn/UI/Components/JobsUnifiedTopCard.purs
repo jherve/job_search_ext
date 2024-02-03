@@ -103,7 +103,7 @@ instance Traversable TopCardPrimaryDescription where
   traverse = \x -> traverseDefault x
 
 instance Queryable q => CanBeQueried q TopCardPrimaryDescription where
-  query' = queryTopCardPrimaryDescription
+  query = queryTopCardPrimaryDescription
 
 derive instance Generic (TopCardInsight a) _
 derive instance Eq a => Eq (TopCardInsight a)
@@ -126,7 +126,7 @@ instance Traversable TopCardInsight where
   traverse = \x -> traverseDefault x
 
 instance Queryable q => CanBeQueried q TopCardInsight where
-  query' = queryTopCardInsight
+  query = queryTopCardInsight
 
 derive instance Generic (TopCardInsightContent a) _
 derive instance Eq a => Eq (TopCardInsightContent a)
@@ -153,7 +153,7 @@ instance Traversable TopCardInsightContent where
   traverse = \x -> traverseDefault x
 
 instance Queryable q => CanBeQueried q TopCardInsightContent where
-  query' = queryTopCardInsightContent
+  query = queryTopCardInsightContent
 
 derive instance Generic (TopCardSecondaryInsight a) _
 derive instance Eq a => Eq (TopCardSecondaryInsight a)
@@ -175,7 +175,7 @@ instance Traversable TopCardSecondaryInsight where
   traverse = \x -> traverseDefault x
 
 instance Queryable q => CanBeQueried q TopCardSecondaryInsight where
-  query' = queryTopCardSecondaryInsight
+  query = queryTopCardSecondaryInsight
 
 derive instance Generic (TopCardAction a) _
 derive instance Eq a => Eq (TopCardAction a)
@@ -197,7 +197,7 @@ instance Traversable TopCardAction where
   traverse = \x -> traverseDefault x
 
 instance Queryable q => CanBeQueried q TopCardAction where
-  query' = queryTopCardAction
+  query = queryTopCardAction
 
 queryTopCardAction :: forall q. Queryable q => QueryRunner' q (TopCardAction Node)
 queryTopCardAction n = do

@@ -37,13 +37,9 @@ instance Traversable WorkExperiencesPage where
   traverse = \x -> traverseDefault x
 
 instance CanBeQueried Document WorkExperiencesPage where
-  query' n = do
-    cards <- subQueryMany queryArtDecoCard "section.artdeco-card > div ~ div > div > div > ul > li" n
-    pure $ WorkExperiencesPage cards
-
-instance Extractible WorkExperiencesPage where
   query n = do
     cards <- subQueryMany queryArtDecoCard "section.artdeco-card > div ~ div > div > div > ul > li" n
     pure $ WorkExperiencesPage cards
 
+instance Extractible WorkExperiencesPage where
   extract (WorkExperiencesPage cards) = OutWorkExperiences <$> traverse PWE.fromUI cards

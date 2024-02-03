@@ -37,13 +37,9 @@ instance Traversable SkillsPage where
   traverse = \x -> traverseDefault x
 
 instance CanBeQueried Document SkillsPage where
-  query' n = do
-    tabs <- subQueryMany queryArtDecoTab "div.artdeco-tabs > div > div > div > div > ul > li" n
-    pure $ SkillsPage tabs
-
-instance Extractible SkillsPage where
   query n = do
     tabs <- subQueryMany queryArtDecoTab "div.artdeco-tabs > div > div > div > div > ul > li" n
     pure $ SkillsPage tabs
 
+instance Extractible SkillsPage where
   extract (SkillsPage tabs) = OutSkills <$> traverse PS.fromUI tabs

@@ -36,13 +36,9 @@ instance Traversable JobOfferPage where
   traverse = \x -> traverseDefault x
 
 instance CanBeQueried Document JobOfferPage where
-  query' n = do
-    card <- subQueryOne queryJobsUnifiedTopCardElement "div.jobs-unified-top-card" n
-    pure $ JobOfferPage card
-
-instance Extractible JobOfferPage where
   query n = do
     card <- subQueryOne queryJobsUnifiedTopCardElement "div.jobs-unified-top-card" n
     pure $ JobOfferPage card
 
+instance Extractible JobOfferPage where
   extract (JobOfferPage tabs) = OutJobOffer <$> JJO.fromUI tabs

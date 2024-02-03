@@ -41,7 +41,7 @@ runToDetached :: forall root t.
   -> root
   -> ExceptT QueryError Effect (t DetachedNode)
 runToDetached _ dom = do
-  qRes <- CBQ.query' dom
+  qRes <- CBQ.query dom
   lift $ traverse toDetached qRes
 
 toOutput ∷ PageUrl → (Document → ExceptT OutputError Effect Output)

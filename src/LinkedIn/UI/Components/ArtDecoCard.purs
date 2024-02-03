@@ -45,7 +45,7 @@ instance Traversable ArtDecoCardElement where
   traverse = \x -> traverseDefault x
 
 instance Queryable q => CanBeQueried q ArtDecoCardElement where
-  query' = queryArtDecoCard
+  query = queryArtDecoCard
 
 queryArtDecoCard :: forall q. Queryable q => QueryRunner' q (ArtDecoCardElement Node)
 queryArtDecoCard n = do

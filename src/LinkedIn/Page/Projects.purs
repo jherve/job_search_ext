@@ -41,13 +41,9 @@ instance Traversable ProjectsPage where
 
 
 instance CanBeQueried Document ProjectsPage where
-  query' n = do
-    cards <- subQueryMany queryArtDecoCard "section.artdeco-card > div ~ div > div > div > ul > li" n
-    pure $ ProjectsPage cards
-
-instance Extractible ProjectsPage where
   query n = do
     cards <- subQueryMany queryArtDecoCard "section.artdeco-card > div ~ div > div > div > ul > li" n
     pure $ ProjectsPage cards
 
+instance Extractible ProjectsPage where
   extract (ProjectsPage cards) = OutProjects <$> traverse PP.fromUI cards

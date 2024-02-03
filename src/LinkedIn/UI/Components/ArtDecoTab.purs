@@ -45,7 +45,7 @@ instance Traversable ArtDecoTabElement where
   traverse = \x -> traverseDefault x
 
 instance Queryable q => CanBeQueried q ArtDecoTabElement where
-  query' = queryArtDecoTab
+  query = queryArtDecoTab
 
 queryArtDecoTab :: forall q. Queryable q => QueryRunner' q (ArtDecoTabElement Node)
 queryArtDecoTab n = do

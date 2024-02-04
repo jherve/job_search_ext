@@ -1,4 +1,4 @@
-module LinkedIn.Output (module LinkedIn.Output.Types, run, runToDetached, toOutput) where
+module LinkedIn.Output (module LinkedIn.Output.Types, run, runToDetached, runToUI, toOutput) where
 
 import Prelude
 
@@ -18,6 +18,7 @@ import LinkedIn.Page.WorkExperiences (WorkExperiencesPage)
 import LinkedIn.PageUrl (PageUrl(..))
 import LinkedIn.QueryRunner (QueryError)
 import LinkedIn.UI.Elements.Parser (toUIElement)
+import LinkedIn.UI.Elements.Types (UIElement)
 import Parsing (parseErrorMessage)
 import Type.Proxy (Proxy(..))
 import Web.DOM (Document)
@@ -30,8 +31,7 @@ run :: forall root t.
   -> root
   -> ExceptT OutputError Effect Output
 run prox dom = do
-  detached <- withExceptT (\err -> ErrorOnDetach err) $ runToDetached prox dom
-  asUI <- withExceptT (\err -> ErrorOnUIConversion $ parseErrorMessage err) $ except $ traverse toUIElement detached
+  asUI <- runToUI prox dom
   withExceptT (\err -> ErrorOnExtract err) $ except $ LE.extract asUI
 
 runToDetached :: forall root t.
@@ -43,6 +43,16 @@ runToDetached :: forall root t.
 runToDetached _ dom = do
   qRes <- CBQ.query dom
   lift $ traverse toDetached qRes
+
+runToUI :: forall root t.
+  Traversable t
+  => CanBeQueried root t
+  => Proxy t
+  -> root
+  -> ExceptT OutputError Effect (t UIElement)
+runToUI prox dom = do
+  detached <- withExceptT (\err -> ErrorOnDetach err) $ runToDetached prox dom
+  withExceptT (\err -> ErrorOnUIConversion $ parseErrorMessage err) $ except $ traverse toUIElement detached
 
 toOutput ∷ PageUrl → (Document → ExceptT OutputError Effect Output)
 toOutput = case _ of

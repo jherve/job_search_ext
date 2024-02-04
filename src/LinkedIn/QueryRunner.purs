@@ -32,10 +32,7 @@ instance Show QueryError where
 instance Semigroup QueryError where
   append a _ = a
 
--- QueryRunner' is a generalization of QueryRunner for all Queryable instances (e.g. Document)
-type QueryRunner' q a = q → ExceptT QueryError Effect a
-
-type QueryRunner a = QueryRunner' Node a
+type Query q a = q → ExceptT QueryError Effect a
 
 runQuery ∷ ∀ a. ExceptT QueryError Effect a → Effect (Either QueryError a)
 runQuery = runExceptT
@@ -56,15 +53,15 @@ ignoreErrors = mapExceptT (map ignoreErrors')
       (Left _) -> Right Nothing
       (Right n') -> Right (Just n')
 
-querySelf ∷ forall q. Queryable q => QueryRunner' q Node
+querySelf ∷ forall q. Queryable q => Query q Node
 querySelf node = except $ Right $ toNode node
 
-queryOne ∷ forall q. Queryable q => String → QueryRunner' q Node
+queryOne ∷ forall q. Queryable q => String → Query q Node
 queryOne selector node = ExceptT $ do
   maybeNode <- queryOneNode selector node
   pure $ note (QNodeNotFoundError selector) maybeNode
 
-queryText ∷ forall q. Queryable q => Int -> QueryRunner' q Node
+queryText ∷ forall q. Queryable q => Int -> Query q Node
 queryText idx n = ExceptT $ do
   childrenArr <- getChildrenArray n
   let
@@ -75,7 +72,7 @@ queryText idx n = ExceptT $ do
 
   pure $ note QTextNotFoundError $ A.index allTexts idx
 
-queryAll ∷ forall q. Queryable q => String → QueryRunner' q (NonEmptyList Node)
+queryAll ∷ forall q. Queryable q => String → Query q (NonEmptyList Node)
 queryAll selector node = ExceptT $ do
   maybeNodes <- queryAllNodes selector node
   pure $ note (QNodeListNotFoundError selector) maybeNodes

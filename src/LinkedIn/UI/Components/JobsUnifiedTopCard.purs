@@ -11,9 +11,9 @@ import Data.Lens.Record (prop)
 import Data.List.Types (NonEmptyList)
 import Data.Maybe (Maybe(..))
 import Data.Show.Generic (genericShow)
-import Data.Traversable (class Traversable, sequence, traverse, traverseDefault)
+import Data.Traversable (class Traversable, sequence, traverseDefault)
 import Data.Tuple (Tuple(..))
-import LinkedIn.CanBeQueried (class CanBeQueried, query)
+import LinkedIn.CanBeQueried (class CanBeQueried, subQueryMany, subQueryOne)
 import LinkedIn.QueryRunner (QueryError(..), ignoreNotFound, queryAll, queryOne, querySelf, queryText)
 import LinkedIn.Queryable (class Queryable, toNode)
 import Type.Proxy (Proxy(..))
@@ -83,12 +83,9 @@ traverseMayNel Nothing = pure Nothing
 instance Queryable q => CanBeQueried q JobsUnifiedTopCardElement where
   query n = do
     header <- queryOne "h1.job-details-jobs-unified-top-card__job-title" n
-    primaryDescription <- query
-                            =<< queryOne "div.job-details-jobs-unified-top-card__primary-description-container > div" n
-    insights <- ignoreNotFound
-                  <<< traverse query
-                  =<< queryAll "li.job-details-jobs-unified-top-card__job-insight" n
-    actions <- ignoreNotFound <<< traverse query =<< queryAll ".mt5 button" n
+    primaryDescription <- subQueryOne "div.job-details-jobs-unified-top-card__primary-description-container > div" n
+    insights <- ignoreNotFound $ subQueryMany "li.job-details-jobs-unified-top-card__job-insight" n
+    actions <- ignoreNotFound $ subQueryMany ".mt5 button" n
 
     pure $ JobsUnifiedTopCardElement {
       header,
@@ -149,12 +146,9 @@ instance Traversable TopCardInsight where
 instance Queryable q => CanBeQueried q TopCardInsight where
   query n = do
     icon <- queryOne ":scope li-icon" n <|> queryOne ":scope svg" n
-    content <- query =<< getContentNode n
+    content <- subQueryOne ":scope > span" n <|> subQueryOne ":scope > button" n
 
     pure $ TopCardInsight {icon, content}
-
-    where
-      getContentNode n' = queryOne ":scope > span" n' <|> queryOne ":scope > button" n'
 
 derive instance Generic (TopCardInsightContent a) _
 derive instance Eq a => Eq (TopCardInsightContent a)
@@ -202,8 +196,7 @@ instance Queryable q => CanBeQueried q TopCardInsightContent where
 
       queryTopCardInsightContentSecondary n = do
         primary <- queryOne ":scope > span:first-child span[aria-hidden=true]" n
-        secondary <- traverse query
-                      =<< queryAll ":scope > span.job-details-jobs-unified-top-card__job-insight-view-model-secondary" n
+        secondary <- subQueryMany ":scope > span.job-details-jobs-unified-top-card__job-insight-view-model-secondary" n
         pure $ TopCardInsightContentSecondary {primary, secondary}
 
 derive instance Generic (TopCardSecondaryInsight a) _

@@ -11,7 +11,6 @@ import Data.Generic.Rep (class Generic)
 import Data.List.Types (NonEmptyList)
 import Data.Maybe (Maybe(..))
 import Data.Show.Generic (genericShow)
-import Data.Traversable (traverse)
 import Effect (Effect)
 import LinkedIn.Queryable (class Queryable, getChildrenArray, queryAllNodes, queryOneNode, toNode)
 import Web.DOM (Node)
@@ -80,6 +79,3 @@ queryAll ∷ forall q. Queryable q => String → QueryRunner' q (NonEmptyList No
 queryAll selector node = ExceptT $ do
   maybeNodes <- queryAllNodes selector node
   pure $ note (QNodeListNotFoundError selector) maybeNodes
-
-subQueryMany ∷ ∀ a q. Queryable q ⇒ QueryRunner a → String → QueryRunner' q (NonEmptyList a)
-subQueryMany query selector n = traverse query =<< queryAll selector n

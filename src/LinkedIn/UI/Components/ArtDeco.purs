@@ -11,8 +11,8 @@ import Data.Maybe (Maybe)
 import Data.Show.Generic (genericShow)
 import Data.Traversable (class Traversable, sequence, traverseDefault)
 import Data.Tuple (Tuple(..))
-import LinkedIn.CanBeQueried (class CanBeQueried, query, subQueryOne)
-import LinkedIn.QueryRunner (ignoreNotFound, queryAll, queryOne, subQueryMany)
+import LinkedIn.CanBeQueried (class CanBeQueried, subQueryMany, subQueryOne)
+import LinkedIn.QueryRunner (ignoreNotFound, queryAll, queryOne)
 import LinkedIn.Queryable (class Queryable)
 import Type.Proxy (Proxy(..))
 
@@ -83,7 +83,7 @@ instance Traversable ArtDecoCenterContent where
 
 instance Queryable q => CanBeQueried q ArtDecoCenterContent where
   query n = do
-    sc <- subQueryMany query ":scope > ul > li" n
+    sc <- subQueryMany ":scope > ul > li" n
     pure $ ArtDecoCenterContent sc
 
 derive instance Generic (ArtDecoCenterHeader a) _

@@ -20,6 +20,7 @@ import Type.Proxy (Proxy(..))
 
 type TestCase a = { detached ∷ a DetachedNode , filePath ∷ String , output ∷ Output }
 
+-- Original URL : https://www.linkedin.com/jobs/view/3786945580/
 jobOfferPage_3786945580 ∷ TestCase JobOfferPage
 jobOfferPage_3786945580 = {
   filePath: "test/examples/job_offer_3786945580.html",

@@ -23,6 +23,7 @@ import Type.Proxy (Proxy(..))
 
 type TestCase a = { detached ∷ a DetachedNode , filePath ∷ String , output ∷ WorkExperience }
 
+-- Original URL : https://www.linkedin.com/in/andrewyng/details/experience
 andrewNgWorkExperience ∷ TestCase ArtDecoCardElement
 andrewNgWorkExperience = {
   filePath: "test/examples/andrew_ng_experiences.html",
@@ -36,7 +37,7 @@ andrewNgWorkExperience = {
         header: (ArtDecoCenterHeader {
           bold: (DetachedElement {classes: Nil, content: "Founder", id: Nothing, tag: "SPAN" }),
           light: (Just (NonEmptyList (NonEmpty (
-            DetachedElement {classes: ("pvs-entity__caption-wrapper" : Nil), content: "juin 2017 - aujourd’hui · 6 ans 7 mois", id: Nothing,tag: "SPAN"})
+            DetachedElement {classes: ("pvs-entity__caption-wrapper" : Nil), content: "juin 2017 - aujourd’hui · 6 ans 9 mois", id: Nothing,tag: "SPAN"})
             ((DetachedElement {classes: Nil, content: "Palo Alto, California, United States", id: Nothing,tag: "SPAN"}) : Nil)
           ))),
           normal: (Just (DetachedElement {classes: Nil, content: "DeepLearning.AI", id: Nothing, tag: "SPAN" }))
@@ -49,7 +50,7 @@ andrewNgWorkExperience = {
     company: Just "DeepLearning.AI",
     contractType: Nothing,
     description: Just "DeepLearning.AI provides\ntechnical training on Generative AI, Machine Learning, Deep Learning,\nand other topics. We also offer a widely read newsletter, The Batch\n(thebatch.ai), that covers what matters in AI right now. Our courses are often created with industry-leading AI companies (AWS,\nGoogle, OpenAI, etc.), and we offer both short courses that can be\ncompleted in an hour, and longer courses and specializations hosted on\nCoursera that give you a solid foundation in some aspect of AI. These\ncourses are designed to offer hands-on practice with AI technologies,\nand you will gain practical, job-ready skills. Whether you are just starting out in AI or seeking to further an existing\ncareer, come see if we can help, at http://deeplearning.ai!",
-    duration: Just (YearsMonth 6 7),
+    duration: Just (YearsMonth 6 9),
     position: "Founder",
     timeSpan: Just (TimeSpanToToday (toMonthYear' June 2017))
   }

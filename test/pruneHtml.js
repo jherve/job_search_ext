@@ -1,7 +1,8 @@
 #! /usr/bin/env node
 
 // This can be called with e.g. `test/pruneHtml.js path/to/the/file.html`
-// The same file can then be prettified using `npx prettier --parser html --print-width 250 -w path/to/the/file.html`
+// The output file should not be prettified since it would mess up with line breaks and change 
+// the value of both "textContent" / "innerHTML".
 
 const fs = require("fs");
 const url = require("url");

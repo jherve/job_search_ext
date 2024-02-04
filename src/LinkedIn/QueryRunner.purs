@@ -83,6 +83,3 @@ queryAll selector node = ExceptT $ do
 
 subQueryMany ∷ ∀ a q. Queryable q ⇒ QueryRunner a → String → QueryRunner' q (NonEmptyList a)
 subQueryMany query selector n = traverse query =<< queryAll selector n
-
-subQueryOne ∷ ∀ a q. Queryable q ⇒ QueryRunner a → String → QueryRunner' q a
-subQueryOne query selector n = query =<< queryOne selector n

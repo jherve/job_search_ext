@@ -13,8 +13,7 @@ import Data.Maybe (Maybe)
 import Data.Show.Generic (genericShow)
 import Data.Traversable (class Traversable, sequence, traverseDefault)
 import Data.Tuple (Tuple(..))
-import LinkedIn.CanBeQueried (class CanBeQueried, query)
-import LinkedIn.QueryRunner (subQueryOne)
+import LinkedIn.CanBeQueried (class CanBeQueried, subQueryOne)
 import LinkedIn.Queryable (class Queryable)
 import LinkedIn.UI.Components.ArtDeco (ArtDecoPvsEntity, _pvs_to_header_bold, _pvs_to_header_light, _pvs_to_header_normal, _pvs_to_subcomponents)
 import Type.Proxy (Proxy(..))
@@ -45,7 +44,7 @@ instance Traversable ArtDecoTabElement where
 
 instance Queryable q => CanBeQueried q ArtDecoTabElement where
   query n = do
-    pvs_entity <- subQueryOne query ":scope div.pvs-entity--padded" n
+    pvs_entity <- subQueryOne ":scope div.pvs-entity--padded" n
     pure $ ArtDecoTabElement {pvs_entity}
 
 toHeaderBold ∷ ∀ a. ArtDecoTabElement a → a

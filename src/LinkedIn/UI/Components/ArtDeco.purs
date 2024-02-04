@@ -11,8 +11,8 @@ import Data.Maybe (Maybe)
 import Data.Show.Generic (genericShow)
 import Data.Traversable (class Traversable, sequence, traverseDefault)
 import Data.Tuple (Tuple(..))
-import LinkedIn.CanBeQueried (class CanBeQueried, query)
-import LinkedIn.QueryRunner (ignoreNotFound, queryAll, queryOne, subQueryMany, subQueryOne)
+import LinkedIn.CanBeQueried (class CanBeQueried, query, subQueryOne)
+import LinkedIn.QueryRunner (ignoreNotFound, queryAll, queryOne, subQueryMany)
 import LinkedIn.Queryable (class Queryable)
 import Type.Proxy (Proxy(..))
 
@@ -141,8 +141,8 @@ instance Traversable ArtDecoCenter where
 
 instance Queryable q => CanBeQueried q ArtDecoCenter where
   query n = do
-    header <- subQueryOne query ":scope > div" n
-    content <- subQueryOne query ":scope > div.pvs-entity__sub-components" n
+    header <- subQueryOne ":scope > div" n
+    content <- subQueryOne ":scope > div.pvs-entity__sub-components" n
 
     pure $ ArtDecoCenter {header, content}
 
@@ -168,7 +168,7 @@ instance Traversable ArtDecoPvsEntity where
 
 instance Queryable q => CanBeQueried q ArtDecoPvsEntity where
   query n = do
-    center <- subQueryOne query ":scope > div.display-flex" n
+    center <- subQueryOne ":scope > div.display-flex" n
     pure $ ArtDecoPvsEntity {side: unit, center}
 
 _pvs_entity :: forall a. Lens' (ArtDecoPvsEntity a) { center ∷ ArtDecoCenter a , side ∷ Unit }

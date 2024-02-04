@@ -25,94 +25,62 @@ jobsUnifiedTopCardSpec = do
       topCard <- detachFromFile (Proxy :: Proxy JobOfferPage) "test/examples/job_offer.html"
 
       topCard `shouldEqual` Right(JobOfferPage (JobsUnifiedTopCardElement {
-        actions: (Just (NonEmptyList
-          (NonEmpty (TopCardActionButton (DetachedButton {
+        actions: (Just (NonEmptyList (NonEmpty (TopCardActionButton
+          (DetachedButton {
             classes: ("jobs-apply-button" : "artdeco-button" : "artdeco-button--3" : "artdeco-button--primary" : "ember-view" : Nil),
             content: "Candidature simplifiée",
             role: Nothing
-          })) ((TopCardActionButton (DetachedButton {
+          }))
+          ((TopCardActionButton (DetachedButton {
             classes: ("jobs-save-button" : "artdeco-button" : "artdeco-button--3" : "artdeco-button--secondary" : Nil),
             content: "Enregistrer Enregistrer Data Engineer H/F - Secteur Energie chez LINCOLN",
             role: Nothing
-          })) : Nil)))),
+          })) : Nil)
+        ))),
         header: (DetachedElement {
           classes: ("t-24" : "t-bold" : "job-details-jobs-unified-top-card__job-title" : Nil),
           content: "Data Engineer H/F - Secteur Energie",
           id: Nothing,
           tag: "H1"
         }),
-        insights: (Just (NonEmptyList
-          (NonEmpty (TopCardInsight {
+        insights: (Just (NonEmptyList (NonEmpty (TopCardInsight {
             content: (TopCardInsightContentSecondary {
-              primary: (DetachedElement {
-                classes: Nil,
-                content: "Sur site",
-                id: Nothing,
-                tag: "SPAN"
-              }),
+              primary: (DetachedElement {classes: Nil, content: "Sur site", id: Nothing, tag: "SPAN"}),
               secondary: (NonEmptyList (NonEmpty (TopCardSecondaryInsightNested
-                (DetachedElement {
-                  classes: Nil,
-                  content: "Temps plein",
-                  id: Nothing,
-                  tag: "SPAN"
-                })) ((TopCardSecondaryInsightPlain
-                (DetachedElement {
-                  classes: ("job-details-jobs-unified-top-card__job-insight-view-model-secondary" : Nil),
-                  content: "Confirmé",
-                  id: Nothing,
-                  tag: "SPAN"
-                })) : Nil))) }),
-              icon: DetachedLiIcon "job"
+                (DetachedElement {classes: Nil, content: "Temps plein", id: Nothing, tag: "SPAN"}))
+                ((TopCardSecondaryInsightPlain
+                (DetachedElement {classes: ("job-details-jobs-unified-top-card__job-insight-view-model-secondary" : Nil), content: "Confirmé", id: Nothing,tag: "SPAN" })) : Nil))
+              )
+            }),
+            icon: DetachedLiIcon "job"
           }) ((TopCardInsight {
-            content: (TopCardInsightContentSingle (DetachedElement {
-              classes: Nil,
-              content: "201-500 employés · Technologies et services de l’information",
-              id: Nothing,
-              tag: "SPAN" })),
-            icon: DetachedLiIcon "company"
-          }) : (TopCardInsight {
-              content: (TopCardInsightContentSingle (DetachedElement {
-                classes: Nil,
-                content: "2 anciens élèves travaillent ici",
-                id: Nothing,
-                tag: "SPAN" })),
-              icon: DetachedLiIcon "people"
-              }) : (TopCardInsight {
-                content: (TopCardInsightContentSingle (DetachedElement {
-                  classes: Nil,
-                  content: "Découvrez comment vous vous positionnez par rapport à 87 candidats. Essai Premium pour 0 EUR",
-                  id: Nothing,
-                  tag: "SPAN" })),
-                icon: (DetachedSvgElement { dataTestIcon: (Just "lightbulb-medium"), id: Nothing, tag: "svg" })
-              }) : (TopCardInsight {
-                content: (TopCardInsightContentButton (DetachedButton {
-                  classes: ("job-details-jobs-unified-top-card__job-insight-text-button" : Nil),
-                  content: "9 compétences sur 11 correspondent à votre profil, vous pourriez bien convenir pour ce poste",
-                  role: Nothing
-                })),
-                icon: (DetachedSvgElement { dataTestIcon: (Just "checklist-medium"), id: Nothing, tag: "svg" })
-              }) : Nil)))),
+              content: (TopCardInsightContentSingle (
+                DetachedElement {classes: Nil, content: "201-500 employés · Technologies et services de l’information", id: Nothing, tag: "SPAN" }
+              )),
+              icon: DetachedLiIcon "company"
+            }) : (TopCardInsight {
+                content: (TopCardInsightContentSingle (
+                  DetachedElement {classes: Nil, content: "2 anciens élèves travaillent ici", id: Nothing, tag: "SPAN" }
+                )),
+                icon: DetachedLiIcon "people"
+                }) : (TopCardInsight {
+                  content: (TopCardInsightContentSingle (
+                    DetachedElement {classes: Nil, content: "Découvrez comment vous vous positionnez par rapport à 87 candidats. Essai Premium pour 0 EUR", id: Nothing, tag: "SPAN" })),
+                  icon: (DetachedSvgElement { dataTestIcon: (Just "lightbulb-medium"), id: Nothing, tag: "svg" })
+                }) : (TopCardInsight {
+                  content: (TopCardInsightContentButton (
+                    DetachedButton {classes: ("job-details-jobs-unified-top-card__job-insight-text-button" : Nil), content: "9 compétences sur 11 correspondent à votre profil, vous pourriez bien convenir pour ce poste", role: Nothing}
+                  )),
+                  icon: (DetachedSvgElement { dataTestIcon: (Just "checklist-medium"), id: Nothing, tag: "svg" })
+                }) : Nil)))),
         primaryDescription: (TopCardPrimaryDescription {
           link: (DetachedA { content: "LINCOLN", href: "https://www.linkedin.com/company/lincoln-/life" }),
           text: (DetachedText "· Boulogne-Billancourt, Île-de-France, France"),
-          tvmText: (Just (NonEmptyList
-            (NonEmpty (DetachedElement {
-              classes: ("tvm__text" : "tvm__text--neutral" : Nil),
-              content: "il y a 2 semaines",
-              id: Nothing,
-              tag: "SPAN"
-            }) ((DetachedElement {
-              classes: ("tvm__text" : "tvm__text--neutral" : Nil),
-              content: "·",
-              id: Nothing,
-              tag: "SPAN"
-            }) : (DetachedElement {
-              classes: ("tvm__text" : "tvm__text--neutral" : Nil),
-              content: "87 candidats",
-              id: Nothing,
-              tag: "SPAN"
-            }) : Nil
+          tvmText: (Just (NonEmptyList (NonEmpty (
+            DetachedElement {classes: ("tvm__text" : "tvm__text--neutral" : Nil), content: "il y a 2 semaines", id: Nothing, tag: "SPAN"})
+            ((DetachedElement {classes: ("tvm__text" : "tvm__text--neutral" : Nil), content: "·", id: Nothing, tag: "SPAN"})
+              : (DetachedElement {classes: ("tvm__text" : "tvm__text--neutral" : Nil), content: "87 candidats", id: Nothing, tag: "SPAN"})
+              : Nil
             ))
           ))
         })

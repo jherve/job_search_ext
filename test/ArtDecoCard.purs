@@ -35,40 +35,19 @@ artDecoCardsSpec = do
           head `shouldEqual` ArtDecoCardElement {
             pvs_entity: (ArtDecoPvsEntity {
               center: (ArtDecoCenter {
-                content: (ArtDecoCenterContent
-                  (NonEmptyList (NonEmpty
-                    (ArtDecoPvsEntitySubComponent (
-                      DetachedElement {
-                        classes: Nil,
-                        content: "DeepLearning.AI provides\ntechnical training on Generative AI, Machine Learning, Deep Learning,\nand other topics. We also offer a widely read newsletter, The Batch\n(thebatch.ai), that covers what matters in AI right now. Our courses are often created with industry-leading AI companies (AWS,\nGoogle, OpenAI, etc.), and we offer both short courses that can be\ncompleted in an hour, and longer courses and specializations hosted on\nCoursera that give you a solid foundation in some aspect of AI. These\ncourses are designed to offer hands-on practice with AI technologies,\nand you will gain practical, job-ready skills. Whether you are just starting out in AI or seeking to further an existing\ncareer, come see if we can help, at http://deeplearning.ai!",
-                        id: Nothing,
-                        tag: "SPAN"
-                        })) Nil))),
+                content: (ArtDecoCenterContent (NonEmptyList (NonEmpty (ArtDecoPvsEntitySubComponent (
+                  DetachedElement {classes: Nil, content: "DeepLearning.AI provides\ntechnical training on Generative AI, Machine Learning, Deep Learning,\nand other topics. We also offer a widely read newsletter, The Batch\n(thebatch.ai), that covers what matters in AI right now. Our courses are often created with industry-leading AI companies (AWS,\nGoogle, OpenAI, etc.), and we offer both short courses that can be\ncompleted in an hour, and longer courses and specializations hosted on\nCoursera that give you a solid foundation in some aspect of AI. These\ncourses are designed to offer hands-on practice with AI technologies,\nand you will gain practical, job-ready skills. Whether you are just starting out in AI or seeking to further an existing\ncareer, come see if we can help, at http://deeplearning.ai!", id: Nothing, tag: "SPAN"}))
+                  Nil
+                ))),
                 header: (ArtDecoCenterHeader {
-                  bold: (DetachedElement {
-                    classes: Nil,
-                    content: "Founder",
-                    id: Nothing,
-                    tag: "SPAN" }
-                  ), light: (Just (NonEmptyList (
-                    NonEmpty (
-                      DetachedElement {
-                        classes: ("pvs-entity__caption-wrapper" : Nil),
-                        content: "juin 2017 - aujourd’hui · 6 ans 7 mois",
-                        id: Nothing,
-                        tag: "SPAN"
-                      }) ((DetachedElement {
-                        classes: Nil,
-                        content: "Palo Alto, California, United States",
-                        id: Nothing,
-                        tag: "SPAN"
-                      }) : Nil)))),
-                  normal: (Just (DetachedElement {
-                    classes: Nil,
-                    content: "DeepLearning.AI",
-                    id: Nothing,
-                    tag: "SPAN" }))
-                  }) }),
+                  bold: (DetachedElement {classes: Nil, content: "Founder", id: Nothing, tag: "SPAN" }),
+                  light: (Just (NonEmptyList (NonEmpty (
+                    DetachedElement {classes: ("pvs-entity__caption-wrapper" : Nil), content: "juin 2017 - aujourd’hui · 6 ans 7 mois", id: Nothing,tag: "SPAN"})
+                    ((DetachedElement {classes: Nil, content: "Palo Alto, California, United States", id: Nothing,tag: "SPAN"}) : Nil)
+                  ))),
+                  normal: (Just (DetachedElement {classes: Nil, content: "DeepLearning.AI", id: Nothing, tag: "SPAN" }))
+                })
+              }),
               side: unit
             })
           }
@@ -77,7 +56,6 @@ artDecoCardsSpec = do
       wxpPage <- getOutputFromFile (Proxy :: Proxy WorkExperiencesPage) "test/examples/andrew_ng_experiences.html"
 
       case wxpPage of
-        Left _ -> fail "Conversion to UI failed"
         Right (OutWorkExperiences weps) -> do
           let head = NEL.head weps
           head `shouldEqual` WorkExperience {
@@ -88,4 +66,4 @@ artDecoCardsSpec = do
             position: "Founder",
             timeSpan: Just (TimeSpanToToday (toMonthYear' June 2017))
           }
-        Right _ -> fail "Conversion to UI failed"
+        _ -> fail "Test failed"

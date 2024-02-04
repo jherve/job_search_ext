@@ -14,10 +14,9 @@ import Data.Show.Generic (genericShow)
 import Data.Traversable (class Traversable, sequence, traverse, traverseDefault)
 import Data.Tuple (Tuple(..))
 import LinkedIn.CanBeQueried (class CanBeQueried, query)
-import LinkedIn.QueryRunner (QueryError(..), QueryRunner', ignoreNotFound, queryAll, queryOne, querySelf, queryText)
+import LinkedIn.QueryRunner (QueryError(..), ignoreNotFound, queryAll, queryOne, querySelf, queryText)
 import LinkedIn.Queryable (class Queryable, toNode)
 import Type.Proxy (Proxy(..))
-import Web.DOM (Node)
 import Web.DOM.Node as N
 
 data JobsUnifiedTopCardElement a = JobsUnifiedTopCardElement {

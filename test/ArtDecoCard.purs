@@ -2,7 +2,6 @@ module Test.ArtDecoCard where
 
 import Prelude
 
-import Control.Monad.Except (runExceptT)
 import Data.Date (Month(..))
 import Data.Either (Either(..))
 import Data.List (List(..), (:))
@@ -10,27 +9,23 @@ import Data.List.NonEmpty (NonEmptyList(..))
 import Data.List.NonEmpty as NEL
 import Data.Maybe (Maybe(..))
 import Data.NonEmpty (NonEmpty(..))
-import Effect.Class (liftEffect)
 import LinkedIn.DetachedNode (DetachedNode(..))
-import LinkedIn.Output (runToDetached)
 import LinkedIn.Page.WorkExperiences (WorkExperiencesPage(..))
 import LinkedIn.Profile.WorkExperience (WorkExperience(..))
 import LinkedIn.Profile.WorkExperience as PWE
 import LinkedIn.UI.Basic.Types (Duration(..), TimeSpan(..))
 import LinkedIn.UI.Components.ArtDeco (ArtDecoCenter(..), ArtDecoCenterContent(..), ArtDecoCenterHeader(..), ArtDecoPvsEntity(..), ArtDecoPvsEntitySubComponent(..))
 import LinkedIn.UI.Components.ArtDecoCard (ArtDecoCardElement(..))
-import Node.JsDom (jsDomFromFile)
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (fail, shouldEqual)
-import Test.Utils (toMonthYear', fromDetachedToUI)
+import Test.Utils (detachFromFile, detachFromString, fromDetachedToUI, toMonthYear')
 import Type.Proxy (Proxy(..))
 
 artDecoCardsSpec :: Spec Unit
 artDecoCardsSpec = do
   describe "Art deco cards parsing" do
     it "works" do
-      dom <- liftEffect $ jsDomFromFile "test/examples/andrew_ng_experiences.html"
-      cards <- liftEffect $ runExceptT $ runToDetached (Proxy :: Proxy WorkExperiencesPage) dom
+      cards <- detachFromFile (Proxy :: Proxy WorkExperiencesPage) "test/examples/andrew_ng_experiences.html"
 
       case cards of
         Left _ -> fail "Detach operation failed"

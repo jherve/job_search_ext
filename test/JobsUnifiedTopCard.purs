@@ -11,7 +11,7 @@ import Data.NonEmpty (NonEmpty(..))
 import Effect.Class (liftEffect)
 import LinkedIn.DetachedNode (DetachedNode(..))
 import LinkedIn.Jobs.JobOffer (JobOffer(..))
-import LinkedIn.Output (run, runToDetached)
+import LinkedIn.Output (run)
 import LinkedIn.Output.Types (Output(..))
 import LinkedIn.Page.JobOffer (JobOfferPage(..))
 import LinkedIn.UI.Basic.Types (JobFlexibility(..))
@@ -19,14 +19,14 @@ import LinkedIn.UI.Components.JobsUnifiedTopCard (JobsUnifiedTopCardElement(..),
 import Node.JsDom (jsDomFromFile)
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual)
+import Test.Utils (detachFromFile)
 import Type.Proxy (Proxy(..))
 
 jobsUnifiedTopCardSpec :: Spec Unit
 jobsUnifiedTopCardSpec = do
   describe "Jobs top card parsing" do
     it "reads well as a JobOfferPage DetachedNode" do
-      dom <- liftEffect $ jsDomFromFile "test/examples/job_offer.html"
-      topCard <- liftEffect $ runExceptT $ runToDetached (Proxy :: Proxy JobOfferPage) dom
+      topCard <- detachFromFile (Proxy :: Proxy JobOfferPage) "test/examples/job_offer.html"
 
       topCard `shouldEqual` Right(JobOfferPage (JobsUnifiedTopCardElement {
         actions: (Just (NonEmptyList

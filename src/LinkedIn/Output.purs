@@ -1,4 +1,4 @@
-module LinkedIn.Output (module LinkedIn.Output.Types, run, runToDetached, runToUI, toOutput) where
+module LinkedIn.Output (module LinkedIn.Output.Types, run, detachNodes, runToUI, toOutput) where
 
 import Prelude
 
@@ -16,7 +16,6 @@ import LinkedIn.Page.Projects (ProjectsPage)
 import LinkedIn.Page.Skills (SkillsPage)
 import LinkedIn.Page.WorkExperiences (WorkExperiencesPage)
 import LinkedIn.PageUrl (PageUrl(..))
-import LinkedIn.QueryRunner (QueryError)
 import LinkedIn.UI.Elements.Parser (toUIElement)
 import LinkedIn.UI.Elements.Types (UIElement)
 import Parsing (parseErrorMessage)
@@ -30,19 +29,7 @@ run :: forall root t.
   => Proxy t
   -> root
   -> ExceptT OutputError Effect Output
-run prox dom = do
-  asUI <- runToUI prox dom
-  withExceptT (\err -> ErrorOnExtract err) $ except $ LE.extract asUI
-
-runToDetached :: forall root t.
-  Traversable t
-  => CanBeQueried root t
-  => Proxy t
-  -> root
-  -> ExceptT QueryError Effect (t DetachedNode)
-runToDetached _ dom = do
-  qRes <- CBQ.query dom
-  lift $ traverse toDetached qRes
+run prox dom = detachNodes prox dom >>= convertToUI >>= extractData
 
 runToUI :: forall root t.
   Traversable t
@@ -50,9 +37,34 @@ runToUI :: forall root t.
   => Proxy t
   -> root
   -> ExceptT OutputError Effect (t UIElement)
-runToUI prox dom = do
-  detached <- withExceptT (\err -> ErrorOnDetach err) $ runToDetached prox dom
-  withExceptT (\err -> ErrorOnUIConversion $ parseErrorMessage err) $ except $ traverse toUIElement detached
+runToUI prox dom = detachNodes prox dom >>= convertToUI
+
+detachNodes :: forall root t.
+  Traversable t
+  => CanBeQueried root t
+  => Proxy t
+  -> root
+  -> ExceptT OutputError Effect (t DetachedNode)
+detachNodes _ dom = withExceptT (\err -> ErrorOnDetach err) detached
+  where
+    detached = do
+      qRes <- CBQ.query dom
+      lift $ traverse toDetached qRes
+
+convertToUI :: forall t.
+  Traversable t
+  => t DetachedNode
+  -> ExceptT OutputError Effect (t UIElement)
+convertToUI detached = withExceptT
+  (\err -> ErrorOnUIConversion $ parseErrorMessage err) $
+  except $ traverse toUIElement detached
+
+extractData :: forall t.
+  Traversable t
+  => Extractible t
+  => t UIElement
+  -> ExceptT OutputError Effect Output
+extractData asUI = withExceptT (\err -> ErrorOnExtract err) $ except $ LE.extract asUI
 
 toOutput ∷ PageUrl → (Document → ExceptT OutputError Effect Output)
 toOutput = case _ of

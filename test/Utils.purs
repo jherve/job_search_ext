@@ -13,8 +13,7 @@ import Effect.Class (liftEffect)
 import LinkedIn.CanBeQueried (class CanBeQueried)
 import LinkedIn.DetachedNode (DetachedNode)
 import LinkedIn.Extractible (class Extractible)
-import LinkedIn.Output (Output, OutputError, run, runToDetached)
-import LinkedIn.QueryRunner (QueryError)
+import LinkedIn.Output (Output, OutputError, detachNodes, run)
 import LinkedIn.UI.Basic.Parser (toYear)
 import LinkedIn.UI.Basic.Types (MonthYear(..))
 import LinkedIn.UI.Elements.Parser (toUIElement)
@@ -38,20 +37,20 @@ detachFromFile :: forall t.
   => CanBeQueried Document t
   => Proxy t
   -> String
-  -> Aff (Either QueryError (t DetachedNode))
+  -> Aff (Either OutputError (t DetachedNode))
 detachFromFile proxy filePath = do
   dom <- liftEffect $ jsDomFromFile filePath
-  liftEffect $ runExceptT $ runToDetached proxy dom
+  liftEffect $ runExceptT $ detachNodes proxy dom
 
 detachFromString :: forall t.
   Traversable t
   => CanBeQueried Document t
   => Proxy t
   -> String
-  -> Aff (Either QueryError (t DetachedNode))
+  -> Aff (Either OutputError (t DetachedNode))
 detachFromString proxy string = do
   dom <- liftEffect $ jsDomParse string
-  liftEffect $ runExceptT $ runToDetached proxy dom
+  liftEffect $ runExceptT $ detachNodes proxy dom
 
 getOutputFromFile :: forall t.
   Traversable t

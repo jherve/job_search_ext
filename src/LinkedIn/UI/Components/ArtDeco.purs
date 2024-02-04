@@ -35,7 +35,7 @@ data ArtDecoCenterHeader a = ArtDecoCenterHeader {
 
 data ArtDecoCenterContent a = ArtDecoCenterContent (NonEmptyList (ArtDecoPvsEntitySubComponent a))
 
-data ArtDecoPvsEntitySubComponent a = ArtDecoPvsEntitySubComponent (Maybe a)
+data ArtDecoPvsEntitySubComponent a = ArtDecoPvsEntitySubComponent a
 
 
 derive instance Generic (ArtDecoPvsEntitySubComponent a) _
@@ -45,21 +45,21 @@ instance Show a => Show (ArtDecoPvsEntitySubComponent a) where
 derive instance Functor ArtDecoPvsEntitySubComponent
 
 instance Foldable ArtDecoPvsEntitySubComponent where
-  foldMap f (ArtDecoPvsEntitySubComponent sc) = foldMap f sc
+  foldMap f (ArtDecoPvsEntitySubComponent sc) = f sc
 
   foldl = \x -> foldlDefault x
   foldr = \x -> foldrDefault x
 
 instance Traversable ArtDecoPvsEntitySubComponent where
   sequence (ArtDecoPvsEntitySubComponent subComponents) = ado
-    sc <- sequence subComponents
+    sc <- subComponents
   in ArtDecoPvsEntitySubComponent sc
 
   traverse = \x -> traverseDefault x
 
 instance Queryable q => CanBeQueried q ArtDecoPvsEntitySubComponent where
   query n = do
-    content <- ignoreNotFound $ queryOne "span[aria-hidden=true]" n
+    content <- queryOne "span[aria-hidden=true]" n
     pure $ ArtDecoPvsEntitySubComponent content
 
 derive instance Generic (ArtDecoCenterContent a) _
@@ -185,7 +185,7 @@ _header = lens' \(ArtDecoCenterHeader h) -> Tuple h \h' -> ArtDecoCenterHeader h
 _content :: forall a. Lens' (ArtDecoCenterContent a) (NonEmptyList (ArtDecoPvsEntitySubComponent a))
 _content = lens' \(ArtDecoCenterContent cs) -> Tuple cs \cs' -> ArtDecoCenterContent cs'
 
-_sub_component :: forall a. Lens' (ArtDecoPvsEntitySubComponent a) (Maybe a)
+_sub_component :: forall a. Lens' (ArtDecoPvsEntitySubComponent a) a
 _sub_component = lens' \(ArtDecoPvsEntitySubComponent s) -> Tuple s \s' -> ArtDecoPvsEntitySubComponent s'
 
 _pvs_to_header :: forall a. Lens' (ArtDecoPvsEntity a) { bold ∷ a , light ∷ Maybe (NonEmptyList a) , normal ∷ Maybe a }
@@ -195,7 +195,7 @@ _pvs_to_header = _pvs_entity
   <<< prop (Proxy :: Proxy "header")
   <<< _header
 
-_pvs_to_subcomponents ∷ ∀ a. Traversal' (ArtDecoPvsEntity a) (Maybe a)
+_pvs_to_subcomponents ∷ ∀ a. Traversal' (ArtDecoPvsEntity a) a
 _pvs_to_subcomponents = _pvs_entity
   <<< prop (Proxy :: Proxy "center")
   <<< _center

@@ -7,7 +7,6 @@ import Data.Generic.Rep (class Generic)
 import Data.Lens (Lens', lens', toListOf, view)
 import Data.Lens.Record (prop)
 import Data.List (List)
-import Data.List as L
 import Data.List.Types (NonEmptyList)
 import Data.Maybe (Maybe)
 import Data.Show.Generic (genericShow)
@@ -57,7 +56,7 @@ toHeaderLight ∷ ∀ a. ArtDecoCardElement a → Maybe (NonEmptyList a)
 toHeaderLight = view $ _card_to_pvs_entity <<< _pvs_to_header_light
 
 toCenterContent ∷ ∀ a. ArtDecoCardElement a → List a
-toCenterContent c = L.catMaybes $ toContent c
+toCenterContent c = toContent c
   where
     toContent = toListOf $ _card_to_pvs_entity <<< _pvs_to_subcomponents
 

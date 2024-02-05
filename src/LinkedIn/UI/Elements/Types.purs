@@ -12,6 +12,7 @@ data UIElement =
   | UILink String UIString
   | UIButton {role :: Maybe String, label :: UIString, mainClass :: Maybe String}
   | UIIcon String
+  | UIImage String
 
 derive instance Generic UIElement _
 instance Show UIElement where

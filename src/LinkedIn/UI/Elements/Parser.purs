@@ -7,8 +7,8 @@ import Data.Either (Either(..))
 import Data.List as L
 import Data.Maybe (Maybe(..))
 import LinkedIn.DetachedNode (DetachedNode(..))
-import LinkedIn.UI.Strings.Parser (uiStringP)
 import LinkedIn.UI.Elements.Types (UIElement(..))
+import LinkedIn.UI.Strings.Parser (uiStringP)
 import Parsing (ParseError(..), initialPos, runParser)
 
 -- TODO : should certainly use another type than ParseError here
@@ -21,6 +21,8 @@ toUIElement (DetachedSvgElement {id, dataTestIcon, tag: "svg"}) = case id <|> da
   Just i -> Right (UIIcon i)
   Nothing -> Left (ParseError "SVG element could not be identified" initialPos)
 toUIElement (DetachedSvgElement _) = Left (ParseError "SVG element could not be identified" initialPos)
+
+toUIElement (DetachedImg {src}) = Right (UIImage src)
 
 toUIElement (DetachedLiIcon i) = Right (UIIcon i)
 

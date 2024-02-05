@@ -31,7 +31,7 @@ type TestCase a = {
 jobsUnifiedTopCardSpec :: Spec Unit
 jobsUnifiedTopCardSpec = do
   describe "Jobs top card parsing" do
-    for_ [jobOfferPage_3786945580] runTest
+    for_ [jobOfferPage_3786945580, jobOfferPage_3797662873] runTest
 
 runTest ∷ ∀ m. Monad m ⇒ TestCase JobOfferPage → SpecT Aff Unit m Unit
 runTest {detached, filePath, id, output} = do
@@ -116,5 +116,70 @@ jobOfferPage_3786945580 = {
     location: (Just "Boulogne-Billancourt, Île-de-France, France"),
     flexibility: (Just JobFlexOnSite),
     title: "Data Engineer H/F - Secteur Energie"
+  })
+}
+
+jobOfferPage_3797662873 ∷ TestCase JobOfferPage
+jobOfferPage_3797662873 = {
+  id: "3797662873",
+  filePath: "test/examples/job_offer_3797662873.html",
+  url: "https://www.linkedin.com/jobs/view/3797662873/",
+  detached: JobOfferPage (JobsUnifiedTopCardElement {
+    actions: (TopCardActionButton
+      (DetachedButton { classes: ("jobs-apply-button" : "artdeco-button" : "artdeco-button--3" : "artdeco-button--primary" : "ember-view" : Nil), content: "Candidature simplifiée", role: Nothing }))
+      : ((TopCardActionButton (DetachedButton {
+        classes: ("jobs-save-button" : "artdeco-button" : "artdeco-button--3" : "artdeco-button--secondary" : Nil),
+        content: "Enregistrer Enregistrer Data Engineer Confirmé(e)/Senior (CDI) chez CBTW",
+        role: Nothing
+      })) : Nil),
+    header: (DetachedElement {
+      classes: ("t-24" : "t-bold" : "job-details-jobs-unified-top-card__job-title" : Nil),
+      content: "Data Engineer Confirmé(e)/Senior (CDI)",
+      id: Nothing,
+      tag: "H1"
+    }),
+    insights: TopCardInsight {
+        content: (TopCardInsightContentSecondary {
+          primary: (DetachedElement { classes: Nil, content: "Hybride", id: Nothing, tag: "SPAN" }),
+          secondary: (NonEmptyList (NonEmpty (TopCardSecondaryInsightNested
+          (DetachedElement { classes: Nil, content: "Temps plein", id: Nothing, tag: "SPAN" })
+          ) ((TopCardSecondaryInsightPlain (
+            DetachedElement { classes: ("job-details-jobs-unified-top-card__job-insight-view-model-secondary" : Nil), content: "Confirmé", id: Nothing, tag: "SPAN" })) : Nil)))
+        }),
+        icon: (DetachedLiIcon "job")
+      } : TopCardInsight {
+        content: (TopCardInsightContentSingle (DetachedElement { classes: Nil, content: "1 001-5 000 employés · Développement de logiciels", id: Nothing, tag: "SPAN" })),
+        icon: (DetachedLiIcon "company")
+      } : TopCardInsight {
+        content: (TopCardInsightContentSingle (DetachedElement { classes: Nil, content: "Amina Berkane recrute à ce poste", id: Nothing, tag: "SPAN" })),
+        icon: (DetachedImg { classes: ("ivm-view-attr__img--centered" : "EntityPhoto-circle-1" : "evi-image" : "lazy-image" : "ember-view" : Nil), src: "job_offer_2_files/1706175960816.jpg" })
+      } : TopCardInsight {
+        content: (TopCardInsightContentButton (DetachedButton { classes: ("job-details-jobs-unified-top-card__job-insight-text-button" : Nil), content: "8 compétences sur 10 correspondent à votre profil, vous pourriez bien convenir pour ce poste", role: Nothing })),
+        icon: (DetachedSvgElement { dataTestIcon: (Just "checklist-medium"), id: Nothing, tag: "svg" })
+      } : TopCardInsight {
+        content: (TopCardInsightContentSingle (DetachedElement { classes: Nil, content: "Le délai d’évaluation des candidatures est généralement de 4 jours", id: Nothing, tag: "SPAN" })),
+        icon: (DetachedSvgElement { dataTestIcon: (Just "responsive-medium"), id: Nothing, tag: "svg" })
+      } : TopCardInsight {
+        content: (TopCardInsightContentSingle (DetachedElement { classes: Nil, content: "Découvrez comment vous vous positionnez par rapport à 39 candidats. Essai Premium pour 0 EUR", id: Nothing, tag: "SPAN" })),
+        icon: (DetachedSvgElement { dataTestIcon: (Just "lightbulb-medium"), id: Nothing, tag: "svg" })
+      } : Nil,
+    primaryDescription: (TopCardPrimaryDescription {
+      link: (DetachedA { content: "CBTW", href: "https://www.linkedin.com/company/collaboration-betters-the-world/life" }),
+      text: (DetachedText "· Paris et périphérie ·"),
+      tvmText: DetachedElement { classes: ("tvm__text" : "tvm__text--neutral" : Nil), content: "il y a 4 semaines", id: Nothing, tag: "SPAN" }
+        : (DetachedElement { classes: ("tvm__text" : "tvm__text--neutral" : Nil), content: "·", id: Nothing, tag: "SPAN" })
+        : (DetachedElement { classes: ("tvm__text" : "tvm__text--neutral" : Nil), content: "39 candidats", id: Nothing, tag: "SPAN" })
+        : Nil
+    })
+  }),
+  output: OutJobOffer (JobOffer {
+    companyDomain: Just "Développement de logiciels",
+    companyLink: "https://www.linkedin.com/company/collaboration-betters-the-world/life",
+    companyName: "CBTW",
+    companySize: Just "1 001-5 000 employés",
+    flexibility: Just JobFlexHybrid,
+    hasSimplifiedApplicationProcess: true,
+    location: (Just "Paris et périphérie ·"),
+    title: "Data Engineer Confirmé(e)/Senior (CDI)"
   })
 }

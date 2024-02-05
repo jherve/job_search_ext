@@ -3,27 +3,51 @@ module Test.JobsUnifiedTopCard where
 import Prelude
 
 import Data.Either (Either(..))
+import Data.Foldable (for_)
 import Data.List (List(..), (:))
 import Data.List.NonEmpty (NonEmptyList(..))
 import Data.Maybe (Maybe(..))
 import Data.NonEmpty (NonEmpty(..))
+import Effect.Aff (Aff)
 import LinkedIn.DetachedNode (DetachedNode(..))
 import LinkedIn.Jobs.JobOffer (JobOffer(..))
 import LinkedIn.Output.Types (Output(..))
 import LinkedIn.Page.JobOffer (JobOfferPage(..))
 import LinkedIn.UI.Basic.Types (JobFlexibility(..))
 import LinkedIn.UI.Components.JobsUnifiedTopCard (JobsUnifiedTopCardElement(..), TopCardAction(..), TopCardInsight(..), TopCardInsightContent(..), TopCardPrimaryDescription(..), TopCardSecondaryInsight(..))
-import Test.Spec (Spec, describe, it)
+import Test.Spec (Spec, SpecT, describe, it)
 import Test.Spec.Assertions (shouldEqual)
 import Test.Utils (detachFromFile, getOutputFromFile)
 import Type.Proxy (Proxy(..))
 
-type TestCase a = { detached ∷ a DetachedNode , filePath ∷ String , output ∷ Output }
+type TestCase a = {
+  detached ∷ a DetachedNode,
+  filePath ∷ String,
+  id ∷ String,
+  output ∷ Output,
+  url ∷ String
+}
 
--- Original URL : https://www.linkedin.com/jobs/view/3786945580/
+jobsUnifiedTopCardSpec :: Spec Unit
+jobsUnifiedTopCardSpec = do
+  describe "Jobs top card parsing" do
+    for_ [jobOfferPage_3786945580] runTest
+
+runTest ∷ ∀ m. Monad m ⇒ TestCase JobOfferPage → SpecT Aff Unit m Unit
+runTest {detached, filePath, id, output} = do
+  it ("reads well as a JobOfferPage DetachedNode " <> show id) do
+    topCard <- detachFromFile (Proxy :: Proxy JobOfferPage) filePath
+    topCard `shouldEqual` Right(detached)
+
+  it ("reads the JobOffer " <> show id) do
+    jobOffer <- getOutputFromFile (Proxy :: Proxy JobOfferPage) filePath
+    jobOffer `shouldEqual` Right (output)
+
 jobOfferPage_3786945580 ∷ TestCase JobOfferPage
 jobOfferPage_3786945580 = {
+  id: "3786945580",
   filePath: "test/examples/job_offer_3786945580.html",
+  url: "https://www.linkedin.com/jobs/view/3786945580/",
   detached: JobOfferPage (JobsUnifiedTopCardElement {
     actions: (Just (NonEmptyList (NonEmpty (TopCardActionButton
       (DetachedButton {
@@ -96,14 +120,3 @@ jobOfferPage_3786945580 = {
     title: "Data Engineer H/F - Secteur Energie"
   })
 }
-
-jobsUnifiedTopCardSpec :: Spec Unit
-jobsUnifiedTopCardSpec = do
-  describe "Jobs top card parsing" do
-    it "reads well as a JobOfferPage DetachedNode" do
-      topCard <- detachFromFile (Proxy :: Proxy JobOfferPage) jobOfferPage_3786945580.filePath
-      topCard `shouldEqual` Right(jobOfferPage_3786945580.detached)
-
-    it "reads the JobOffer" do
-      jobOffer <- getOutputFromFile (Proxy :: Proxy JobOfferPage) jobOfferPage_3786945580.filePath
-      jobOffer `shouldEqual` Right (jobOfferPage_3786945580.output)

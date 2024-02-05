@@ -8,11 +8,11 @@ import Data.Argonaut.Encode.Generic (genericEncodeJson)
 import Data.Array as A
 import Data.Either (Either(..), note)
 import Data.Generic.Rep (class Generic)
-import Data.List.Types (NonEmptyList)
+import Data.List.Types (List, NonEmptyList)
 import Data.Maybe (Maybe(..))
 import Data.Show.Generic (genericShow)
 import Effect (Effect)
-import LinkedIn.Queryable (class Queryable, getChildrenArray, queryAllNodes, queryOneNode, toNode)
+import LinkedIn.Queryable (class Queryable, getChildrenArray, queryAllNodes, queryAllNodes', queryOneNode, toNode)
 import Web.DOM (Node)
 import Web.DOM.Text as T
 
@@ -76,3 +76,8 @@ queryAll ∷ forall q. Queryable q => String → Query q (NonEmptyList Node)
 queryAll selector node = ExceptT $ do
   maybeNodes <- queryAllNodes selector node
   pure $ note (QNodeListNotFoundError selector) maybeNodes
+
+queryAll' ∷ forall q. Queryable q => String → Query q (List Node)
+queryAll' selector node = ExceptT $ do
+  nodes <- queryAllNodes' selector node
+  pure $ Right nodes

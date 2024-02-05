@@ -8,13 +8,13 @@ import Data.Foldable (class Foldable, foldMap, foldlDefault, foldrDefault)
 import Data.Generic.Rep (class Generic)
 import Data.Lens (Lens', Prism', Traversal', lens', prism', traversed, view)
 import Data.Lens.Record (prop)
-import Data.List.Types (NonEmptyList)
+import Data.List.Types (List, NonEmptyList)
 import Data.Maybe (Maybe(..))
 import Data.Show.Generic (genericShow)
 import Data.Traversable (class Traversable, sequence, traverseDefault)
 import Data.Tuple (Tuple(..))
-import LinkedIn.CanBeQueried (class CanBeQueried, subQueryMany, subQueryOne)
-import LinkedIn.QueryRunner (QueryError(..), ignoreNotFound, queryAll, queryOne, querySelf, queryText)
+import LinkedIn.CanBeQueried (class CanBeQueried, subQueryMany, subQueryMany', subQueryOne)
+import LinkedIn.QueryRunner (QueryError(..), queryAll', queryOne, querySelf, queryText)
 import LinkedIn.Queryable (class Queryable, toNode)
 import Type.Proxy (Proxy(..))
 import Web.DOM.Node as N
@@ -22,14 +22,14 @@ import Web.DOM.Node as N
 data JobsUnifiedTopCardElement a = JobsUnifiedTopCardElement {
   header :: a,
   primaryDescription :: TopCardPrimaryDescription a,
-  insights :: Maybe (NonEmptyList (TopCardInsight a)),
-  actions :: Maybe (NonEmptyList (TopCardAction a))
+  insights :: List (TopCardInsight a),
+  actions :: List (TopCardAction a)
 }
 
 data TopCardPrimaryDescription a = TopCardPrimaryDescription {
   link :: a,
   text :: a,
-  tvmText :: Maybe (NonEmptyList a)
+  tvmText :: List a
 }
 
 data TopCardInsight a = TopCardInsight {
@@ -60,8 +60,8 @@ instance Foldable JobsUnifiedTopCardElement where
   foldMap f (JobsUnifiedTopCardElement {header, primaryDescription, insights, actions}) =
     f header
     <> foldMap f primaryDescription
-    <> foldMap (foldMap (foldMap f)) insights
-    <> foldMap (foldMap (foldMap f)) actions
+    <> foldMap (foldMap f) insights
+    <> foldMap (foldMap f) actions
 
   foldl = \x -> foldlDefault x
   foldr = \x -> foldrDefault x
@@ -70,22 +70,18 @@ instance Traversable JobsUnifiedTopCardElement where
   sequence (JobsUnifiedTopCardElement {header, primaryDescription, insights, actions}) = ado
     h <- header
     pd <- sequence primaryDescription
-    i <- traverseMayNel insights
-    a <- traverseMayNel actions
+    i <- sequence (map sequence insights)
+    a <- sequence (map sequence actions)
   in JobsUnifiedTopCardElement {header: h, primaryDescription: pd, insights: i, actions: a}
 
   traverse = \x -> traverseDefault x
-
-traverseMayNel :: forall m t a. Traversable t => Applicative m => Maybe(NonEmptyList (t (m a))) -> m (Maybe (NonEmptyList (t a)))
-traverseMayNel (Just o) = map pure (sequence (map sequence o))
-traverseMayNel Nothing = pure Nothing
 
 instance Queryable q => CanBeQueried q JobsUnifiedTopCardElement where
   query n = do
     header <- queryOne "h1.job-details-jobs-unified-top-card__job-title" n
     primaryDescription <- subQueryOne "div.job-details-jobs-unified-top-card__primary-description-container > div" n
-    insights <- ignoreNotFound $ subQueryMany "li.job-details-jobs-unified-top-card__job-insight" n
-    actions <- ignoreNotFound $ subQueryMany ".mt5 button" n
+    insights <- subQueryMany' "li.job-details-jobs-unified-top-card__job-insight" n
+    actions <- subQueryMany' ".mt5 button" n
 
     pure $ JobsUnifiedTopCardElement {
       header,
@@ -101,7 +97,7 @@ instance Show a => Show (TopCardPrimaryDescription a) where
 derive instance Functor TopCardPrimaryDescription
 
 instance Foldable TopCardPrimaryDescription where
-  foldMap f (TopCardPrimaryDescription {link, text, tvmText}) = f link <> f text <> foldMap (foldMap f) tvmText
+  foldMap f (TopCardPrimaryDescription {link, text, tvmText}) = f link <> f text <> (foldMap f) tvmText
 
   foldl = \x -> foldlDefault x
   foldr = \x -> foldrDefault x
@@ -110,7 +106,7 @@ instance Traversable TopCardPrimaryDescription where
   sequence (TopCardPrimaryDescription {link, text, tvmText}) = ado
     l <- link
     t <- text
-    tvm <- sequence (map sequence tvmText)
+    tvm <- sequence tvmText
   in TopCardPrimaryDescription {link: l, text: t, tvmText: tvm}
 
   traverse = \x -> traverseDefault x
@@ -119,7 +115,7 @@ instance Queryable q => CanBeQueried q TopCardPrimaryDescription where
   query n = do
     link <- queryOne ":scope > a" n
     text <- queryText 1 n
-    tvmText <- ignoreNotFound $ queryAll "span.tvm__text" n
+    tvmText <- queryAll' "span.tvm__text" n
 
     pure $ TopCardPrimaryDescription {link, text, tvmText: tvmText}
 
@@ -272,7 +268,6 @@ _top_to_insights ∷ ∀ a. Traversal' (JobsUnifiedTopCardElement a) (TopCardIns
 _top_to_insights = _top_card
   <<< prop (Proxy :: Proxy "insights")
   <<< traversed
-  <<< traversed
 
 _insight_to_content = prop (Proxy :: Proxy "content")
   <<< traversed
@@ -281,10 +276,9 @@ _top_to_action_buttons ∷ ∀ a. Traversal' (JobsUnifiedTopCardElement a) a
 _top_to_action_buttons = _top_card
   <<< prop (Proxy :: Proxy "actions")
   <<< traversed
-  <<< traversed
   <<< _action_button
 
-_top_card ∷ forall a. Lens' (JobsUnifiedTopCardElement a) { actions ∷ Maybe (NonEmptyList (TopCardAction a)) , header ∷ a , insights ∷ Maybe (NonEmptyList (TopCardInsight a)) , primaryDescription ∷ TopCardPrimaryDescription a }
+_top_card ∷ forall a. Lens' (JobsUnifiedTopCardElement a) { actions ∷ List (TopCardAction a) , header ∷ a , insights ∷ List (TopCardInsight a) , primaryDescription ∷ TopCardPrimaryDescription a }
 _top_card = lens' \(JobsUnifiedTopCardElement c) -> Tuple c \c' -> JobsUnifiedTopCardElement c'
 
 _insight ∷ forall a. Lens' (TopCardInsight a) { content ∷ TopCardInsightContent a , icon ∷ a }
@@ -293,7 +287,7 @@ _insight = lens' \(TopCardInsight i) -> Tuple i \i' -> TopCardInsight i'
 _action_button ∷ forall a. Lens' (TopCardAction a) a
 _action_button = lens' \(TopCardActionButton i) -> Tuple i \i' -> TopCardActionButton i'
 
-_primary_description ∷ ∀ a. Lens' (TopCardPrimaryDescription a) { link ∷ a , text ∷ a , tvmText ∷ Maybe (NonEmptyList a) }
+_primary_description ∷ ∀ a. Lens' (TopCardPrimaryDescription a) { link ∷ a , text ∷ a , tvmText ∷ List a }
 _primary_description = lens' \(TopCardPrimaryDescription i) -> Tuple i \i' -> TopCardPrimaryDescription i'
 
 _insight_content_single ∷ forall a. Prism' (TopCardInsightContent a) a

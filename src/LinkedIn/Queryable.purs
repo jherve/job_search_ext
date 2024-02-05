@@ -2,9 +2,12 @@ module LinkedIn.Queryable where
 
 import Prelude
 
+import Data.List (List)
+import Data.List as L
 import Data.List.NonEmpty (NonEmptyList)
 import Data.List.NonEmpty as NEL
 import Data.Maybe (Maybe(..), fromJust)
+import Data.Traversable (traverse)
 import Effect (Effect)
 import Partial.Unsafe (unsafePartial)
 import Web.DOM (Document, Node, ParentNode)
@@ -46,6 +49,12 @@ queryAllNodes :: forall a. Queryable a => String -> a -> Effect (Maybe (NonEmpty
 queryAllNodes selector n = do
   found <- querySelectorAll (QuerySelector selector) $ toParentNode n
   liftA1 NEL.fromFoldable $ NL.toArray found
+
+queryAllNodes' :: forall a. Queryable a => String -> a -> Effect (List Node)
+queryAllNodes' selector n = do
+  found <- querySelectorAll (QuerySelector selector) $ toParentNode n
+  foundArr <- NL.toArray found
+  pure $ L.fromFoldable foundArr
 
 getChildrenArray :: forall a. Queryable a => a -> Effect (Array Node)
 getChildrenArray n = do

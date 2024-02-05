@@ -49,25 +49,25 @@ jobOfferPage_3786945580 = {
   filePath: "test/examples/job_offer_3786945580.html",
   url: "https://www.linkedin.com/jobs/view/3786945580/",
   detached: JobOfferPage (JobsUnifiedTopCardElement {
-    actions: (Just (NonEmptyList (NonEmpty (TopCardActionButton
+    actions: TopCardActionButton
       (DetachedButton {
         classes: ("jobs-apply-button" : "artdeco-button" : "artdeco-button--3" : "artdeco-button--primary" : "ember-view" : Nil),
         content: "Candidature simplifiée",
         role: Nothing
-      }))
-      ((TopCardActionButton (DetachedButton {
+      })
+      : TopCardActionButton (DetachedButton {
         classes: ("jobs-save-button" : "artdeco-button" : "artdeco-button--3" : "artdeco-button--secondary" : Nil),
         content: "Enregistrer Enregistrer Data Engineer H/F - Secteur Energie chez LINCOLN",
         role: Nothing
-      })) : Nil)
-    ))),
+      })
+      : Nil,
     header: (DetachedElement {
       classes: ("t-24" : "t-bold" : "job-details-jobs-unified-top-card__job-title" : Nil),
       content: "Data Engineer H/F - Secteur Energie",
       id: Nothing,
       tag: "H1"
     }),
-    insights: (Just (NonEmptyList (NonEmpty (TopCardInsight {
+    insights: (TopCardInsight {
         content: (TopCardInsightContentSecondary {
           primary: (DetachedElement {classes: Nil, content: "Sur site", id: Nothing, tag: "SPAN"}),
           secondary: (NonEmptyList (NonEmpty (TopCardSecondaryInsightNested
@@ -77,7 +77,7 @@ jobOfferPage_3786945580 = {
           )
         }),
         icon: DetachedLiIcon "job"
-      }) ((TopCardInsight {
+      }) : (TopCardInsight {
           content: (TopCardInsightContentSingle (
             DetachedElement {classes: Nil, content: "201-500 employés · Technologies et services de l’information", id: Nothing, tag: "SPAN" }
           )),
@@ -96,17 +96,15 @@ jobOfferPage_3786945580 = {
                 DetachedButton {classes: ("job-details-jobs-unified-top-card__job-insight-text-button" : Nil), content: "9 compétences sur 11 correspondent à votre profil, vous pourriez bien convenir pour ce poste", role: Nothing}
               )),
               icon: (DetachedSvgElement { dataTestIcon: (Just "checklist-medium"), id: Nothing, tag: "svg" })
-            }) : Nil)))),
+            }) : Nil,
     primaryDescription: (TopCardPrimaryDescription {
       link: (DetachedA { content: "LINCOLN", href: "https://www.linkedin.com/company/lincoln-/life" }),
       text: (DetachedText "· Boulogne-Billancourt, Île-de-France, France"),
-      tvmText: (Just (NonEmptyList (NonEmpty (
-        DetachedElement {classes: ("tvm__text" : "tvm__text--neutral" : Nil), content: "il y a 2 semaines", id: Nothing, tag: "SPAN"})
-        ((DetachedElement {classes: ("tvm__text" : "tvm__text--neutral" : Nil), content: "·", id: Nothing, tag: "SPAN"})
-          : (DetachedElement {classes: ("tvm__text" : "tvm__text--neutral" : Nil), content: "87 candidats", id: Nothing, tag: "SPAN"})
-          : Nil
-        ))
-      ))
+      tvmText:
+        DetachedElement {classes: ("tvm__text" : "tvm__text--neutral" : Nil), content: "il y a 2 semaines", id: Nothing, tag: "SPAN"}
+        : DetachedElement {classes: ("tvm__text" : "tvm__text--neutral" : Nil), content: "·", id: Nothing, tag: "SPAN"}
+        : DetachedElement {classes: ("tvm__text" : "tvm__text--neutral" : Nil), content: "87 candidats", id: Nothing, tag: "SPAN"}
+        : Nil
     })
   }),
   output: OutJobOffer (JobOffer {

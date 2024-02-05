@@ -9,8 +9,10 @@ const url = require("url");
 const jsdom = require("jsdom");
 const {JSDOM} = jsdom;
 
+const options = {encoding: "utf8"};
+
 const [_1, _2, filePath] = process.argv;
-const content = fs.readFileSync(filePath);
+const content = fs.readFileSync(filePath, options);
 const dom = new JSDOM(content);
 
 function removeTrackers(link) {
@@ -28,4 +30,4 @@ dom.window.document.querySelectorAll("meta").forEach(el => el.remove());
 dom.window.document.querySelectorAll("script").forEach(el => el.remove());
 dom.window.document.querySelectorAll("a").forEach(el => el.href = removeTrackers(el.href));
 
-fs.writeFileSync(filePath, dom.window.document.documentElement.innerHTML);
+fs.writeFileSync(filePath, dom.window.document.documentElement.innerHTML, options);

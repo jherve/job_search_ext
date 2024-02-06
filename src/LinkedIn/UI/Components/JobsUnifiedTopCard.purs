@@ -141,7 +141,7 @@ instance Traversable TopCardInsight where
 
 instance Queryable q => CanBeQueried q TopCardInsight where
   query n = do
-    icon <- queryOne ":scope li-icon" n <|> queryOne ":scope svg" n
+    icon <- queryOne ":scope li-icon" n <|> queryOne ":scope svg" n <|> queryOne ":scope img" n
     content <- subQueryOne ":scope > span" n <|> subQueryOne ":scope > button" n
 
     pure $ TopCardInsight {icon, content}

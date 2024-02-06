@@ -4,7 +4,7 @@ import Prelude
 
 import Control.Alt ((<|>))
 import Data.Either (hush)
-import Data.Tuple (Tuple(..))
+import Data.Traversable (traverse)
 import LinkedIn.UI.Basic.Parser (durationP, jobFlexP, medianDotSeparated, timeSpanP)
 import LinkedIn.UI.Strings.Types (UIString(..))
 import Parsing (Parser, liftMaybe, runParser)
@@ -21,16 +21,15 @@ uiStringWithoutMedianDotP = do
 
 uiStringdotSeparatedP ∷ Parser String UIString
 uiStringdotSeparatedP = do
-  Tuple s1 s2 <- medianDotSeparated
+  stringsNel <- medianDotSeparated
 
   let
     intoUiElement :: String -> Parser String UIString
     intoUiElement s = liftMaybe (\_ -> "could not convert to ui element") $ hush $ runParser s uiStringSingleP
 
-  s1' <- intoUiElement s1
-  s2' <- intoUiElement s2
+  stringsNel' <- traverse intoUiElement stringsNel
 
-  pure $ UIStringDotSeparated s1' s2'
+  pure $ UIStringDotSeparated stringsNel'
 
 uiStringSingleP ∷ Parser String UIString
 uiStringSingleP = (try uiStringDurationP) <|> (try uiStringTimeSpanP) <|> (try uiStringJobFlexP) <|> uiStringPlainP

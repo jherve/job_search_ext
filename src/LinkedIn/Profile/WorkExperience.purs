@@ -7,8 +7,11 @@ import Data.Argonaut.Encode.Generic (genericEncodeJson)
 import Data.Either (Either, note)
 import Data.Foldable (findMap)
 import Data.Generic.Rep (class Generic)
+import Data.List ((:))
 import Data.List as L
+import Data.List.Types (NonEmptyList(..))
 import Data.Maybe (Maybe(..))
+import Data.NonEmpty ((:|))
 import Data.Show.Generic (genericShow)
 import LinkedIn.UI.Basic.Types (Duration, TimeSpan)
 import LinkedIn.UI.Components.ArtDecoCard (ArtDecoCardElement, toCenterContent, toHeaderBold, toHeaderLight, toHeaderNormal)
@@ -57,23 +60,23 @@ extractPosition = case _ of
 extractCompany ∷ UIElement → Maybe String
 extractCompany = case _ of
   UIElement (UIStringPlain str) -> Just str
-  UIElement (UIStringDotSeparated (UIStringPlain str) _) -> Just str
+  UIElement (UIStringDotSeparated (NonEmptyList(UIStringPlain str :| _))) -> Just str
   _ -> Nothing
 
 extractContractType ∷ UIElement → Maybe String
 extractContractType = case _ of
-  UIElement (UIStringDotSeparated _ (UIStringPlain str)) -> Just str
+  UIElement (UIStringDotSeparated (NonEmptyList(_ :| UIStringPlain str : _))) -> Just str
   _ -> Nothing
 
 extractTimeSpan ∷ UIElement → Maybe TimeSpan
 extractTimeSpan = case _ of
   UIElement (UIStringTimeSpan s) -> Just s
-  UIElement (UIStringDotSeparated (UIStringTimeSpan s) _) -> Just s
+  UIElement (UIStringDotSeparated (NonEmptyList(UIStringTimeSpan s :| _))) -> Just s
   _ -> Nothing
 
 extractDuration ∷ UIElement → Maybe Duration
 extractDuration = case _ of
-  UIElement (UIStringDotSeparated _ (UIStringDuration d)) -> Just d
+  UIElement (UIStringDotSeparated (NonEmptyList(_ :| UIStringDuration d : _))) -> Just d
   _ -> Nothing
 
 extractDescription ∷ UIElement → Maybe String

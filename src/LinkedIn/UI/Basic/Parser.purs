@@ -20,7 +20,7 @@ import Data.Tuple (Tuple(..))
 import LinkedIn.UI.Basic.Types (Duration(..), JobFlexibility(..), MonthYear(..), MonthYearOrToday(..), TimeSpan(..))
 import Parsing (Parser, ParserT, fail)
 import Parsing.Combinators (choice, try)
-import Parsing.String (char, rest, string)
+import Parsing.String (char, string)
 import Parsing.String.Basic (intDecimal, number, space, takeWhile)
 
 monthStrToMonth :: Map String Month
@@ -153,8 +153,14 @@ sepBy2 p sep = do
 commaSeparated ∷ Parser String (NonEmptyList String)
 commaSeparated = stringWithoutCommaP `sepBy2` commaP
 
-medianDotSeparated ∷ Parser String (Tuple String String)
+medianDotSeparated ∷ Parser String (NonEmptyList String)
 medianDotSeparated = do
-  a0 <- stringWithoutMedianDotP
-  a1 <- medianDotP *> rest
-  pure $ Tuple (S.trim a0) (S.trim a1)
+  strings <- stringWithoutMedianDotP `sepBy2` medianDotP
+  case  NEL.fromList $ NEL.mapMaybe toMaybeTrimmedNotEmpty strings of
+    Nothing -> fail "Nope"
+    Just strings' -> pure strings'
+
+  where
+    toMaybeTrimmedNotEmpty s = case S.trim s of
+      "" -> Nothing
+      s' -> Just s'

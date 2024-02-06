@@ -4,7 +4,10 @@ import Prelude
 
 import Data.Date (Month(..))
 import Data.Either (Either(..))
-import LinkedIn.UI.Basic.Parser (durationP, monthYearP, timeSpanP)
+import Data.List (List(..), (:))
+import Data.List.Types (NonEmptyList(..))
+import Data.NonEmpty (NonEmpty(..))
+import LinkedIn.UI.Basic.Parser (durationP, medianDotSeparated, monthYearP, timeSpanP)
 import LinkedIn.UI.Basic.Types (Duration(..), TimeSpan(..))
 import LinkedIn.UI.Strings.Parser (uiStringDurationP, uiStringdotSeparatedP)
 import LinkedIn.UI.Strings.Types (UIString(..))
@@ -39,6 +42,16 @@ uiStringParserSpec = do
       run "3 ans" `shouldEqual` Right(Years 3)
       run "1 an" `shouldEqual` Right(Years 1)
 
+  describe "dot separated strings parser" do
+    let run s = runParser s medianDotSeparated
+
+    it "works" do
+      run "some text 1 · some text 2" `shouldEqual` Right(NonEmptyList(NonEmpty "some text 1" ("some text 2" : Nil)))
+      run "· some text after a dot" `shouldEqual` Right(NonEmptyList(NonEmpty "some text after a dot" Nil))
+      run "some text before a dot ·" `shouldEqual` Right(NonEmptyList(NonEmpty "some text before a dot" Nil))
+      run "string with no dot" `shouldEqual` (Left (ParseError "Expected '•'" (Position { column: 19, index: 18, line: 1 })))
+      run "· some text in between dots ·" `shouldEqual` Right(NonEmptyList(NonEmpty "some text in between dots" Nil))
+
   describe "UI duration parser" do
     let run s = runParser s uiStringDurationP
 
@@ -49,7 +62,4 @@ uiStringParserSpec = do
     let run s = runParser s uiStringdotSeparatedP
 
     it "works" do
-      run "some text 1 · some text 2" `shouldEqual` Right(UIStringDotSeparated (UIStringPlain "some text 1") (UIStringPlain "some text 2"))
-      run "· some text after a dot" `shouldEqual` Right(UIStringDotSeparated (UIStringPlain "") (UIStringPlain "some text after a dot"))
-      run "some text before a dot ·" `shouldEqual` Right(UIStringDotSeparated (UIStringPlain "some text before a dot") (UIStringPlain ""))
-      run "string with no dot" `shouldEqual` (Left (ParseError "Expected '•'" (Position { column: 19, index: 18, line: 1 })))
+      run "some text 1 · some text 2" `shouldEqual` Right(UIStringDotSeparated (NonEmptyList(NonEmpty (UIStringPlain "some text 1") ((UIStringPlain "some text 2") : Nil))))

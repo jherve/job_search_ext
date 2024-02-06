@@ -7,7 +7,10 @@ import Data.Argonaut.Encode.Generic (genericEncodeJson)
 import Data.Either (Either, note)
 import Data.Generic.Rep (class Generic)
 import Data.Lens (findOf)
+import Data.List (List(..), (:))
+import Data.List.Types (NonEmptyList(..))
 import Data.Maybe (Maybe(..), isJust)
+import Data.NonEmpty ((:|))
 import Data.Show.Generic (genericShow)
 import LinkedIn.UI.Basic.Types (JobFlexibility)
 import LinkedIn.UI.Components.JobsUnifiedTopCard (JobsUnifiedTopCardElement, TopCardInsight(..), TopCardInsightContent(..), _top_to_action_buttons, _top_to_insights, toHeader, toPrimaryDescriptionLink, toPrimaryDescriptionText)
@@ -84,17 +87,17 @@ extractCompanyLink = case _ of
 
 extractCompanyDomain ∷ TopCardInsight UIElement → Maybe String
 extractCompanyDomain = case _ of
-  TopCardInsight {content: TopCardInsightContentSingle (UIElement (UIStringDotSeparated _ (UIStringPlain str)))} -> Just str
+  TopCardInsight {content: TopCardInsightContentSingle (UIElement (UIStringDotSeparated (NonEmptyList (_ :| (UIStringPlain str) : _))))} -> Just str
   _ -> Nothing
 
 extractCompanySize ∷ TopCardInsight UIElement → Maybe String
 extractCompanySize = case _ of
-  TopCardInsight {content: TopCardInsightContentSingle (UIElement (UIStringDotSeparated (UIStringPlain str) _))} -> Just str
+  TopCardInsight {content: TopCardInsightContentSingle (UIElement (UIStringDotSeparated (NonEmptyList(UIStringPlain str :| _))))} -> Just str
   _ -> Nothing
 
 extractLocation :: UIElement -> Maybe String
 extractLocation = case _ of
-  UIElement (UIStringDotSeparated _ (UIStringPlain str)) -> Just str
+  UIElement (UIStringDotSeparated (NonEmptyList ((UIStringPlain str) :| Nil))) -> Just str
   _ -> Nothing
 
 extractJobRemote :: TopCardInsight UIElement -> Maybe JobFlexibility

@@ -179,7 +179,7 @@ jobOfferPage_3797662873 = {
     companySize: Just "1 001-5 000 employés",
     flexibility: Just JobFlexHybrid,
     hasSimplifiedApplicationProcess: true,
-    location: (Just "Paris et périphérie ·"),
+    location: (Just "Paris et périphérie"),
     title: "Data Engineer Confirmé(e)/Senior (CDI)"
   })
 }

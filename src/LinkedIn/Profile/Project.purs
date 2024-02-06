@@ -7,6 +7,8 @@ import Data.Argonaut.Encode.Generic (genericEncodeJson)
 import Data.Either (Either, note)
 import Data.Generic.Rep (class Generic)
 import Data.List as L
+import Data.List.Types (NonEmptyList(..))
+import Data.NonEmpty ((:|))
 import Data.Maybe (Maybe(..))
 import Data.Show.Generic (genericShow)
 import LinkedIn.UI.Basic.Types (TimeSpan)
@@ -49,7 +51,7 @@ extractName = case _ of
 extractTimeSpan ∷ UIElement → Maybe TimeSpan
 extractTimeSpan = case _ of
   UIElement (UIStringTimeSpan s) -> Just s
-  UIElement (UIStringDotSeparated (UIStringTimeSpan s) _) -> Just s
+  UIElement (UIStringDotSeparated (NonEmptyList(UIStringTimeSpan s :| _))) -> Just s
   _ -> Nothing
 
 extractDescription ∷ UIElement → Maybe String

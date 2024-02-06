@@ -39,8 +39,8 @@ fromUI card = ado
     position,
     company: extractCompany =<< normal,
     contractType: extractContractType =<< normal,
-    timeSpan: findMap extractTimeSpan =<< light,
-    duration: findMap extractDuration =<< light,
+    timeSpan: findMap extractTimeSpan light,
+    duration: findMap extractDuration light,
     description: extractDescription =<< L.index content 0
   }
   where

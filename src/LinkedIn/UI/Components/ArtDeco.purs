@@ -6,13 +6,14 @@ import Data.Foldable (class Foldable, foldMap, foldlDefault, foldrDefault)
 import Data.Generic.Rep (class Generic)
 import Data.Lens (Lens', Traversal', lens', traversed)
 import Data.Lens.Record (prop)
+import Data.List (List)
 import Data.List.NonEmpty (NonEmptyList)
 import Data.Maybe (Maybe)
 import Data.Show.Generic (genericShow)
 import Data.Traversable (class Traversable, sequence, traverseDefault)
 import Data.Tuple (Tuple(..))
 import LinkedIn.CanBeQueried (class CanBeQueried, subQueryMany, subQueryOne)
-import LinkedIn.QueryRunner (ignoreNotFound, queryAll, queryOne)
+import LinkedIn.QueryRunner (ignoreNotFound, queryAll', queryOne)
 import LinkedIn.Queryable (class Queryable)
 import Type.Proxy (Proxy(..))
 
@@ -30,7 +31,7 @@ data ArtDecoCenter a = ArtDecoCenter {
 data ArtDecoCenterHeader a = ArtDecoCenterHeader {
   bold :: a,
   normal :: Maybe a,
-  light :: Maybe (NonEmptyList a)
+  light :: List a
 }
 
 data ArtDecoCenterContent a = ArtDecoCenterContent (NonEmptyList (ArtDecoPvsEntitySubComponent a))
@@ -93,7 +94,7 @@ instance Show a => Show(ArtDecoCenterHeader a) where
 derive instance Functor ArtDecoCenterHeader
 
 instance Foldable ArtDecoCenterHeader where
-  foldMap f (ArtDecoCenterHeader {bold, normal, light}) = f bold <> foldMap f normal <> foldMap (foldMap f) light
+  foldMap f (ArtDecoCenterHeader {bold, normal, light}) = f bold <> foldMap f normal <> foldMap f light
 
   foldl = \x -> foldlDefault x
   foldr = \x -> foldrDefault x
@@ -102,7 +103,7 @@ instance Traversable ArtDecoCenterHeader where
   sequence (ArtDecoCenterHeader {bold, normal, light}) = ado
     b <- bold
     n <- sequence normal
-    l <- sequence (map sequence light)
+    l <- sequence light
   in ArtDecoCenterHeader {bold: b, normal: n, light: l}
 
   traverse = \x -> traverseDefault x
@@ -114,8 +115,7 @@ instance Queryable q => CanBeQueried q ArtDecoCenterHeader where
       ignoreNotFound $
       queryOne ":scope span.t-normal:not(t-black--light) > span[aria-hidden=true]" n
     light <-
-      ignoreNotFound $
-      queryAll ":scope span.t-black--light > span[aria-hidden=true]" n
+      queryAll' ":scope span.t-black--light > span[aria-hidden=true]" n
 
     pure $ ArtDecoCenterHeader {bold, normal, light}
 
@@ -179,7 +179,7 @@ _center :: forall a. Lens' (ArtDecoCenter a) { content ∷ ArtDecoCenterContent 
 _center = lens'
   \(ArtDecoCenter center) -> Tuple center \center' -> ArtDecoCenter center'
 
-_header :: forall a. Lens' (ArtDecoCenterHeader a) { bold ∷ a , light ∷ Maybe (NonEmptyList a) , normal ∷ Maybe a }
+_header :: forall a. Lens' (ArtDecoCenterHeader a) { bold ∷ a , light ∷ List a , normal ∷ Maybe a }
 _header = lens' \(ArtDecoCenterHeader h) -> Tuple h \h' -> ArtDecoCenterHeader h'
 
 _content :: forall a. Lens' (ArtDecoCenterContent a) (NonEmptyList (ArtDecoPvsEntitySubComponent a))
@@ -188,7 +188,7 @@ _content = lens' \(ArtDecoCenterContent cs) -> Tuple cs \cs' -> ArtDecoCenterCon
 _sub_component :: forall a. Lens' (ArtDecoPvsEntitySubComponent a) a
 _sub_component = lens' \(ArtDecoPvsEntitySubComponent s) -> Tuple s \s' -> ArtDecoPvsEntitySubComponent s'
 
-_pvs_to_header :: forall a. Lens' (ArtDecoPvsEntity a) { bold ∷ a , light ∷ Maybe (NonEmptyList a) , normal ∷ Maybe a }
+_pvs_to_header :: forall a. Lens' (ArtDecoPvsEntity a) { bold ∷ a , light ∷ List a , normal ∷ Maybe a }
 _pvs_to_header = _pvs_entity
   <<< prop (Proxy :: Proxy "center")
   <<< _center
@@ -210,5 +210,5 @@ _pvs_to_header_bold = _pvs_to_header <<< prop (Proxy :: Proxy "bold")
 _pvs_to_header_normal :: forall a. Lens' (ArtDecoPvsEntity a) (Maybe a)
 _pvs_to_header_normal = _pvs_to_header <<< prop (Proxy :: Proxy "normal")
 
-_pvs_to_header_light :: forall a. Lens' (ArtDecoPvsEntity a) (Maybe (NonEmptyList a))
+_pvs_to_header_light :: forall a. Lens' (ArtDecoPvsEntity a) (List a)
 _pvs_to_header_light = _pvs_to_header <<< prop (Proxy :: Proxy "light")

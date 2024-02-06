@@ -36,10 +36,10 @@ andrewNgWorkExperience = {
         ))),
         header: (ArtDecoCenterHeader {
           bold: (DetachedElement {classes: Nil, content: "Founder", id: Nothing, tag: "SPAN" }),
-          light: (Just (NonEmptyList (NonEmpty (
-            DetachedElement {classes: ("pvs-entity__caption-wrapper" : Nil), content: "juin 2017 - aujourd’hui · 6 ans 9 mois", id: Nothing,tag: "SPAN"})
-            ((DetachedElement {classes: Nil, content: "Palo Alto, California, United States", id: Nothing,tag: "SPAN"}) : Nil)
-          ))),
+          light:
+            DetachedElement {classes: ("pvs-entity__caption-wrapper" : Nil), content: "juin 2017 - aujourd’hui · 6 ans 9 mois", id: Nothing,tag: "SPAN"}
+            : DetachedElement {classes: Nil, content: "Palo Alto, California, United States", id: Nothing,tag: "SPAN"}
+            : Nil,
           normal: (Just (DetachedElement {classes: Nil, content: "DeepLearning.AI", id: Nothing, tag: "SPAN" }))
         })
       }),

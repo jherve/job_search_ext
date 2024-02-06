@@ -7,7 +7,6 @@ import Data.Generic.Rep (class Generic)
 import Data.Lens (Lens', lens', toListOf, view)
 import Data.Lens.Record (prop)
 import Data.List (List)
-import Data.List.Types (NonEmptyList)
 import Data.Maybe (Maybe)
 import Data.Show.Generic (genericShow)
 import Data.Traversable (class Traversable, sequence, traverseDefault)
@@ -52,7 +51,7 @@ toHeaderBold = view $ _tab_to_pvs_entity <<< _pvs_to_header_bold
 toHeaderNormal ∷ ∀ a. ArtDecoTabElement a → Maybe a
 toHeaderNormal = view $ _tab_to_pvs_entity <<< _pvs_to_header_normal
 
-toHeaderLight ∷ ∀ a. ArtDecoTabElement a → Maybe (NonEmptyList a)
+toHeaderLight ∷ ∀ a. ArtDecoTabElement a → List a
 toHeaderLight = view $ _tab_to_pvs_entity <<< _pvs_to_header_light
 
 toCenterContent ∷ ∀ a. ArtDecoTabElement a → List a

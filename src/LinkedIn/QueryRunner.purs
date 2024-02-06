@@ -72,12 +72,12 @@ queryText idx n = ExceptT $ do
 
   pure $ note QTextNotFoundError $ A.index allTexts idx
 
-queryAll ∷ forall q. Queryable q => String → Query q (NonEmptyList Node)
-queryAll selector node = ExceptT $ do
+queryNEL ∷ forall q. Queryable q => String → Query q (NonEmptyList Node)
+queryNEL selector node = ExceptT $ do
   maybeNodes <- queryAllNodes selector node
   pure $ note (QNodeListNotFoundError selector) maybeNodes
 
-queryAll' ∷ forall q. Queryable q => String → Query q (List Node)
-queryAll' selector node = ExceptT $ do
+queryList ∷ forall q. Queryable q => String → Query q (List Node)
+queryList selector node = ExceptT $ do
   nodes <- queryAllNodes' selector node
   pure $ Right nodes

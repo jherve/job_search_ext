@@ -13,8 +13,8 @@ import Data.Maybe (Maybe(..))
 import Data.Show.Generic (genericShow)
 import Data.Traversable (class Traversable, sequence, traverseDefault)
 import Data.Tuple (Tuple(..))
-import LinkedIn.CanBeQueried (class CanBeQueried, subQueryMany, subQueryMany', subQueryOne)
-import LinkedIn.QueryRunner (QueryError(..), queryAll', queryOne, querySelf, queryText)
+import LinkedIn.CanBeQueried (class CanBeQueried, subQueryNEL, subQueryList, subQueryOne)
+import LinkedIn.QueryRunner (QueryError(..), queryList, queryOne, querySelf, queryText)
 import LinkedIn.Queryable (class Queryable, toNode)
 import Type.Proxy (Proxy(..))
 import Web.DOM.Node as N
@@ -80,8 +80,8 @@ instance Queryable q => CanBeQueried q JobsUnifiedTopCardElement where
   query n = do
     header <- queryOne "h1.job-details-jobs-unified-top-card__job-title" n
     primaryDescription <- subQueryOne "div.job-details-jobs-unified-top-card__primary-description-container > div" n
-    insights <- subQueryMany' "li.job-details-jobs-unified-top-card__job-insight" n
-    actions <- subQueryMany' ".mt5 button" n
+    insights <- subQueryList "li.job-details-jobs-unified-top-card__job-insight" n
+    actions <- subQueryList ".mt5 button" n
 
     pure $ JobsUnifiedTopCardElement {
       header,
@@ -115,7 +115,7 @@ instance Queryable q => CanBeQueried q TopCardPrimaryDescription where
   query n = do
     link <- queryOne ":scope > a" n
     text <- queryText 1 n
-    tvmText <- queryAll' "span.tvm__text" n
+    tvmText <- queryList "span.tvm__text" n
 
     pure $ TopCardPrimaryDescription {link, text, tvmText: tvmText}
 
@@ -192,7 +192,7 @@ instance Queryable q => CanBeQueried q TopCardInsightContent where
 
       queryTopCardInsightContentSecondary n = do
         primary <- queryOne ":scope > span:first-child span[aria-hidden=true]" n
-        secondary <- subQueryMany ":scope > span.job-details-jobs-unified-top-card__job-insight-view-model-secondary" n
+        secondary <- subQueryNEL ":scope > span.job-details-jobs-unified-top-card__job-insight-view-model-secondary" n
         pure $ TopCardInsightContentSecondary {primary, secondary}
 
 derive instance Generic (TopCardSecondaryInsight a) _

@@ -7,7 +7,7 @@ import Data.Generic.Rep (class Generic)
 import Data.List.Types (NonEmptyList)
 import Data.Show.Generic (genericShow)
 import Data.Traversable (class Traversable, sequence, traverse, traverseDefault)
-import LinkedIn.CanBeQueried (class CanBeQueried, subQueryMany)
+import LinkedIn.CanBeQueried (class CanBeQueried, subQueryNEL)
 import LinkedIn.Extractible (class Extractible)
 import LinkedIn.Output.Types (Output(..))
 import LinkedIn.Profile.Skill as PS
@@ -37,7 +37,7 @@ instance Traversable SkillsPage where
 
 instance CanBeQueried Document SkillsPage where
   query n = do
-    tabs <- subQueryMany "div.artdeco-tabs > div > div > div > div > ul > li" n
+    tabs <- subQueryNEL "div.artdeco-tabs > div > div > div > div > ul > li" n
     pure $ SkillsPage tabs
 
 instance Extractible SkillsPage where

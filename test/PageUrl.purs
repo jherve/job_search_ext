@@ -31,5 +31,9 @@ pageUrlSpec = do
       runParser "/in/username/details/education/" pageUrlP `shouldEqual` Right(UrlEducation "username")
     it "jobs page" do
       runParser "/jobs/view/3764313323/" pageUrlP `shouldEqual` Right(UrlJobOffer (JobOfferId (toI64 "3764313323")))
+    it "recommended jobs page" do
+      runParser "/jobs/collections/recommended/" pageUrlP `shouldEqual` Right(UrlListRecommendedJobOffers)
+    it "jobs search page" do
+      runParser "/jobs/search/" pageUrlP `shouldEqual` Right(UrlSearchJobOffers)
     it "not an url" do
       runParser "/not/a/supported/url/" pageUrlP `shouldSatisfy` isLeft

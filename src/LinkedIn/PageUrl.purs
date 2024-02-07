@@ -24,6 +24,8 @@ data PageUrl =
   | UrlEducation String
   | UrlLanguage String
   | UrlJobOffer JobOfferId
+  | UrlListRecommendedJobOffers
+  | UrlSearchJobOffers
 
 derive instance Eq PageUrl
 derive instance Generic PageUrl _
@@ -94,6 +96,19 @@ jobViewP = do
     Nothing -> fail "Not an int"
     Just i -> pure $ UrlJobOffer (JobOfferId i)
 
+recommendedJobsP :: Parser String PageUrl
+recommendedJobsP = do
+  _ <- pathComponentP("jobs")
+  _ <- pathComponentP("collections")
+  _ <- pathComponentP("recommended")
+  pure UrlListRecommendedJobOffers
+
+jobSearchP :: Parser String PageUrl
+jobSearchP = do
+  _ <- pathComponentP("jobs")
+  _ <- pathComponentP("search")
+  pure UrlSearchJobOffers
+
 pageUrlP ∷ Parser String PageUrl
 pageUrlP = try projectP
   <|> try skillsP
@@ -102,3 +117,5 @@ pageUrlP = try projectP
   <|> try languagesP
   <|> try profileMainP
   <|> try jobViewP
+  <|> try recommendedJobsP
+  <|> try jobSearchP

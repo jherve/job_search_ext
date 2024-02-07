@@ -1,4 +1,4 @@
-module LinkedIn (APIError(..), encodeToJson, getContext, extractFromDocument, forceExtract) where
+module LinkedIn (APIError(..), encodeToJson, getContext, getContextJson, extractFromDocument, extractFromDocumentJson, forceExtract) where
 
 import Prelude
 
@@ -37,6 +37,9 @@ instance EncodeJson APIError where
 getContext ∷ Document → Effect (Either APIError PageUrl)
 getContext = runExceptT <<< getContext'
 
+getContextJson ∷ Document → Effect Json
+getContextJson d = getContext d >>= (pure <<< encodeJson)
+
 getContext' ∷ Document → ExceptT APIError Effect PageUrl
 getContext' dom = do
   u <- lift $ url dom
@@ -48,6 +51,9 @@ getContext' dom = do
 
 extractFromDocument :: Document -> Effect (Either APIError Output)
 extractFromDocument = runExceptT <<< extractFromDocument'
+
+extractFromDocumentJson ∷ Document → Effect Json
+extractFromDocumentJson d = extractFromDocument d >>= (pure <<< encodeJson)
 
 extractFromDocument' ∷ Document → ExceptT APIError Effect Output
 extractFromDocument' dom = do

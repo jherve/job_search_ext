@@ -1,7 +1,7 @@
 {
-  "name": "web-extension-ps-example",
+  "name": "linkedin-parser",
   "version": "0.1.0",
-  "description": "Firefox extension written in PureScript",
+  "description": "Parser for LinkedIn page content",
   "directories": {
     "test": "test"
   },
@@ -9,10 +9,12 @@
     "parcel": "parcel",
     "dev": "concurrently --kill-others \"spago build --watch\" \"parcel watch src/background.js src/content.js --dist-dir extension/\"",
     "build": "spago build && parcel build src/background.js src/content.js --dist-dir extension/",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "build-lib": "spago bundle-module -m LinkedIn",
+    "test": "spago test",
     "clean": "rm -rf .cache .psci_modules modules dist extension/background.js extension/background.js.map extension/content.js extension/content.js.map",
     "start:firefox": "web-ext run --source-dir ./extension",
-    "sign": "web-ext sign --source-dir ./extension"
+    "sign": "web-ext sign --source-dir ./extension",
+    "postinstall": "npm run build-lib"
   },
   "author": "",
   "license": "ISC",

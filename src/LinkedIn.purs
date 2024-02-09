@@ -1,4 +1,4 @@
-module LinkedIn (APIError(..), encodeToJson, getContext, getContextJson, extractFromDocument, extractFromDocumentJson, forceExtract) where
+module LinkedIn (APIError(..), encodeToJson, getContext, getContextJson, extractFromDocument, extractFromDocumentJson, forceExtract, loopUntilElementAppears) where
 
 import Prelude
 
@@ -14,10 +14,12 @@ import Data.Traversable (class Traversable)
 import Effect (Effect)
 import LinkedIn.CanBeQueried (class CanBeQueried)
 import LinkedIn.Extractible (class Extractible)
+import LinkedIn.Loadable (waitFor)
 import LinkedIn.Output (OutputError, run, toOutput)
 import LinkedIn.Output.Types (Output)
 import LinkedIn.PageUrl (PageUrl, pageUrlP)
 import Parsing (runParser)
+import Promise.Aff (Promise, fromAff)
 import Type.Proxy (Proxy)
 import Web.DOM (Document)
 import Web.DOM.Document (url)
@@ -65,6 +67,9 @@ toOutput' ctx dom = withExceptT (\err -> ErrorExtraction err) $ toOutput ctx dom
 
 encodeToJson :: Either String Output -> Json
 encodeToJson = encodeJson
+
+loopUntilElementAppears ∷ String → Document → Effect (Promise Boolean)
+loopUntilElementAppears selector q = fromAff $ waitFor 200 50 selector q
 
 -- | Force extraction of data from a page, when the context given by the URL is imprecise
 -- | or plain wrong (e.g. for local files).

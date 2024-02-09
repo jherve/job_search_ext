@@ -19,6 +19,8 @@ You can edit this file as you like.
   , "free"
   , "int64"
   , "integers"
+  , "js-promise"
+  , "js-promise-aff"
   , "lists"
   , "maybe"
   , "node-buffer"

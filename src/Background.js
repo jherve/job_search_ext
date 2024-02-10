@@ -1,9 +1,7 @@
-export function onClickedAddListener (fn) {
-  return function () {
-    return browser.browserAction.onClicked.addListener(fn);
-  }
+export function onClickedAddListenerImpl (fn) {
+  return browser.browserAction.onClicked.addListener(fn);
 }
 
-export function tabsSendMessage (tabId, message) {
+export function tabsSendMessageImpl (tabId, message) {
   return browser.tabs.sendMessage(tabId, message);
 }

@@ -8,6 +8,9 @@
       "id": "new_ext@mozilla.org"
     }
   },
+  "browser_action": {
+    "default_title": "Test"
+  },
   "content_scripts": [
     {
       "matches": ["<all_urls>"],

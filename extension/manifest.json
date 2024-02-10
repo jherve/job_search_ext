@@ -21,5 +21,5 @@
     "scripts": ["background.js"],
     "persistent": true
   },
-  "permissions": ["tabs", "storage"]
+  "permissions": ["activeTab", "tabs", "storage"]
 }

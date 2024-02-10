@@ -3,22 +3,24 @@ module ExampleWebExt.Background where
 import Prelude
 
 import Effect (Effect)
-import Effect.Aff (Aff, launchAff_)
-import Effect.Class.Console (log)
+import Effect.Class.Console (log, logShow)
+import Effect.Uncurried (EffectFn1, mkEffectFn1)
 
-type Listener0 = Effect Unit
-type Listener a = (a -> Effect Unit)
+type Tab = { id :: Int, index :: Int }
 
-foreign import onClickedAddListener :: Listener0 -> Effect Unit
-foreign import onClickedAddListener1 :: forall a. Listener a -> Effect Unit
+type Listener a = EffectFn1 a Unit
 
-foreign import mkListenerOne :: forall a. (Listener a) -> Effect (Listener a)
+foreign import onClickedAddListener :: Listener Tab -> Effect Unit
 
 main :: Effect Unit
 main = do
-  listener <- mkListenerOne $ \e -> do
-    log "Clicked PS 1"
+  let
+    listenerEff = mkEffectFn1 $ \e -> do
+      logShow e
+      log "Executed listener mkEffectFn1"
+
   log "[bg] starting up"
-  onClickedAddListener $ log "Clicked PS 0"
-  onClickedAddListener1 listener
+
+  onClickedAddListener listenerEff
+
   log "[bg] registered"

@@ -13,7 +13,7 @@ import LinkedIn.Output.Types (Output(..))
 import LinkedIn.UI.Components.JobsUnifiedTopCard (JobsUnifiedTopCardElement)
 import Web.DOM (Document)
 
-data JobOfferPage a = JobOfferPage (JobsUnifiedTopCardElement a)
+newtype JobOfferPage a = JobOfferPage (JobsUnifiedTopCardElement a)
 
 derive instance Generic (JobOfferPage a) _
 derive instance Eq a => Eq (JobOfferPage a)

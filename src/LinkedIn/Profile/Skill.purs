@@ -13,7 +13,7 @@ import LinkedIn.UI.Elements.Types (UIElement(..))
 import LinkedIn.UI.Strings.Types (UIString(..))
 
 type SkillObject = { name :: String }
-data Skill = Skill SkillObject
+newtype Skill = Skill SkillObject
 
 derive instance Generic Skill _
 derive instance Eq Skill

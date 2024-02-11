@@ -14,7 +14,7 @@ import LinkedIn.Profile.Skill as PS
 import LinkedIn.UI.Components.ArtDecoTab (ArtDecoTabElement)
 import Web.DOM (Document)
 
-data SkillsPage a = SkillsPage (NonEmptyList (ArtDecoTabElement a))
+newtype SkillsPage a = SkillsPage (NonEmptyList (ArtDecoTabElement a))
 
 derive instance Generic (SkillsPage a) _
 derive instance Eq a => Eq (SkillsPage a)

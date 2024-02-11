@@ -26,7 +26,7 @@ type WorkExperienceObject = {
   duration :: Maybe Duration,
   description :: Maybe String
 }
-data WorkExperience = WorkExperience WorkExperienceObject
+newtype WorkExperience = WorkExperience WorkExperienceObject
 
 derive instance Generic WorkExperience _
 derive instance Eq WorkExperience

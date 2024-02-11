@@ -25,13 +25,13 @@ type JobsUnifiedTopCardElementObject a = {
   insights :: List (TopCardInsight a),
   actions :: List (TopCardAction a)
 }
-data JobsUnifiedTopCardElement a = JobsUnifiedTopCardElement (JobsUnifiedTopCardElementObject a)
+newtype JobsUnifiedTopCardElement a = JobsUnifiedTopCardElement (JobsUnifiedTopCardElementObject a)
 
 type TopCardPrimaryDescriptionObject a = { link :: a, text :: a, tvmText :: List a }
-data TopCardPrimaryDescription a = TopCardPrimaryDescription (TopCardPrimaryDescriptionObject a)
+newtype TopCardPrimaryDescription a = TopCardPrimaryDescription (TopCardPrimaryDescriptionObject a)
 
 type TopCardInsightObject a = { icon :: a, content :: TopCardInsightContent a }
-data TopCardInsight a = TopCardInsight (TopCardInsightObject a)
+newtype TopCardInsight a = TopCardInsight (TopCardInsightObject a)
 
 data TopCardInsightContent a =
   TopCardInsightContentSingle a

@@ -18,17 +18,17 @@ import LinkedIn.Queryable (class Queryable)
 import Type.Proxy (Proxy(..))
 
 type ArtDecoPvsEntityObject a = { side :: Unit, center :: ArtDecoCenter a }
-data ArtDecoPvsEntity a = ArtDecoPvsEntity (ArtDecoPvsEntityObject a)
+newtype ArtDecoPvsEntity a = ArtDecoPvsEntity (ArtDecoPvsEntityObject a)
 
 type ArtDecoCenterObject a = { header :: ArtDecoCenterHeader a, content :: ArtDecoCenterContent a}
-data ArtDecoCenter a = ArtDecoCenter (ArtDecoCenterObject a)
+newtype ArtDecoCenter a = ArtDecoCenter (ArtDecoCenterObject a)
 
 type ArtDecoCenterHeaderObject a = { bold :: a, normal :: Maybe a, light :: List a}
-data ArtDecoCenterHeader a = ArtDecoCenterHeader (ArtDecoCenterHeaderObject a)
+newtype ArtDecoCenterHeader a = ArtDecoCenterHeader (ArtDecoCenterHeaderObject a)
 
-data ArtDecoCenterContent a = ArtDecoCenterContent (NonEmptyList (ArtDecoPvsEntitySubComponent a))
+newtype ArtDecoCenterContent a = ArtDecoCenterContent (NonEmptyList (ArtDecoPvsEntitySubComponent a))
 
-data ArtDecoPvsEntitySubComponent a = ArtDecoPvsEntitySubComponent a
+newtype ArtDecoPvsEntitySubComponent a = ArtDecoPvsEntitySubComponent a
 
 
 derive instance Generic (ArtDecoPvsEntitySubComponent a) _

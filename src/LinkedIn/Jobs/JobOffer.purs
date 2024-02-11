@@ -27,7 +27,7 @@ type JobOfferObject = {
   companySize :: Maybe String,
   hasSimplifiedApplicationProcess :: Boolean
 }
-data JobOffer = JobOffer JobOfferObject
+newtype JobOffer = JobOffer JobOfferObject
 
 derive instance Eq JobOffer
 derive instance Generic JobOffer _

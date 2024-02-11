@@ -21,7 +21,7 @@ type ProjectObject = {
   timeSpan :: Maybe TimeSpan,
   description :: Maybe String
 }
-data Project = Project ProjectObject
+newtype Project = Project ProjectObject
 
 derive instance Generic Project _
 derive instance Eq Project

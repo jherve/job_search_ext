@@ -14,7 +14,7 @@ import LinkedIn.Profile.Project as PP
 import LinkedIn.UI.Components.ArtDecoCard (ArtDecoCardElement)
 import Web.DOM (Document)
 
-data ProjectsPage a = ProjectsPage (NonEmptyList (ArtDecoCardElement a))
+newtype ProjectsPage a = ProjectsPage (NonEmptyList (ArtDecoCardElement a))
 
 derive instance Generic (ProjectsPage a) _
 derive instance Eq a => Eq (ProjectsPage a)

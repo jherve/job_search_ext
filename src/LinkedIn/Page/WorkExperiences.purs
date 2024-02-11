@@ -14,7 +14,7 @@ import LinkedIn.Profile.WorkExperience as PWE
 import LinkedIn.UI.Components.ArtDecoCard (ArtDecoCardElement)
 import Web.DOM (Document)
 
-data WorkExperiencesPage a = WorkExperiencesPage (NonEmptyList (ArtDecoCardElement a))
+newtype WorkExperiencesPage a = WorkExperiencesPage (NonEmptyList (ArtDecoCardElement a))
 
 derive instance Generic (WorkExperiencesPage a) _
 derive instance Eq a => Eq (WorkExperiencesPage a)

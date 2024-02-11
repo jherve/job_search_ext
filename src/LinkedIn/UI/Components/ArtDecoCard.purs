@@ -17,7 +17,7 @@ import LinkedIn.UI.Components.ArtDeco (ArtDecoPvsEntity, _pvs_to_header_bold, _p
 import Type.Proxy (Proxy(..))
 
 type ArtDecoCardElementObject a = { pvs_entity :: ArtDecoPvsEntity a }
-data ArtDecoCardElement a = ArtDecoCardElement (ArtDecoCardElementObject a)
+newtype ArtDecoCardElement a = ArtDecoCardElement (ArtDecoCardElementObject a)
 
 derive instance Generic (ArtDecoCardElement a) _
 derive instance Eq a => Eq (ArtDecoCardElement a)

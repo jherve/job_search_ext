@@ -1,4 +1,4 @@
-module Browser.Runtime (
+module Browser.WebExt.Runtime (
   Tab,
   TabId,
   Message,

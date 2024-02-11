@@ -2,7 +2,7 @@ module ExampleWebExt.Background where
 
 import Prelude
 
-import Browser.Runtime (Tab, mkListener, onClickedAddListener, onMessageAddListener, tabsSendMessage)
+import Browser.WebExt.Runtime (Tab, mkListener, onClickedAddListener, onMessageAddListener, tabsSendMessage)
 import Effect (Effect)
 import Effect.Class (class MonadEffect)
 import Effect.Class.Console (log)

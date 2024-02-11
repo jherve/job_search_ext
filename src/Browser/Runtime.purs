@@ -4,6 +4,7 @@ module Browser.Runtime (
   Message,
   Listener,
   tabsSendMessage,
+  runtimeSendMessage,
   onClickedAddListener,
   onMessageAddListener,
   mkListener
@@ -24,6 +25,7 @@ type Listener a = EffectFn1 a Unit
 foreign import onClickedAddListenerImpl :: EffectFn1 (Listener Tab) Unit
 foreign import tabsSendMessageImpl :: EffectFn2 TabId Message (Promise Message)
 foreign import onMessageAddListenerImpl :: EffectFn1 (Listener Message) Unit
+foreign import runtimeSendMessageImpl :: EffectFn1 Message (Promise Message)
 
 onClickedAddListener ∷ Listener Tab → Effect Unit
 onClickedAddListener = runEffectFn1 onClickedAddListenerImpl
@@ -33,6 +35,9 @@ tabsSendMessage = runEffectFn2 tabsSendMessageImpl
 
 onMessageAddListener ∷ Listener Message → Effect Unit
 onMessageAddListener = runEffectFn1 onMessageAddListenerImpl
+
+runtimeSendMessage ∷ Message → Effect (Promise Message)
+runtimeSendMessage = runEffectFn1 runtimeSendMessageImpl
 
 mkListener :: forall a. (a -> Effect Unit) -> Listener a
 mkListener = mkEffectFn1

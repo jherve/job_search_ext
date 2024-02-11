@@ -2,26 +2,22 @@ module ExampleWebExt.Background where
 
 import Prelude
 
-import Browser.Runtime (mkListener, onClickedAddListener, onMessageAddListener, tabsSendMessage)
+import Browser.Runtime (Tab, mkListener, onClickedAddListener, onMessageAddListener, tabsSendMessage)
 import Effect (Effect)
 import Effect.Class (class MonadEffect)
-import Effect.Class.Console (log, logShow)
+import Effect.Class.Console (log)
 
 main :: Effect Unit
 main = do
-  let
-    listenerEff = mkListener $ \e -> do
-      logShow e
-      log "Executed listener mkEffectFn1"
-      _ <- tabsSendMessage e.id "message from PS"
-      pure unit
-
   log "[bg] starting up"
 
-  onClickedAddListener listenerEff
+  onClickedAddListener $ mkListener browserActionOnClickedHandler
   onMessageAddListener $ mkListener contentScriptMessageHandler
 
-  log "[bg] registered"
+browserActionOnClickedHandler :: Tab -> Effect Unit
+browserActionOnClickedHandler tab = do
+  _ <- tabsSendMessage tab.id "Clicked browser action"
+  pure unit
 
 contentScriptMessageHandler ∷ ∀ m (a ∷ Type). MonadEffect m ⇒ Show a ⇒ a → m Unit
 contentScriptMessageHandler m = log $ "[bg] received msg from content : " <> show m

@@ -2,7 +2,11 @@ module ExampleWebExt.Background where
 
 import Prelude
 
-import Browser.WebExt.Runtime (Tab, mkListener, onClickedAddListener, onMessageAddListener, tabsSendMessage)
+import Browser.WebExt.BrowserAction (onClickedAddListener)
+import Browser.WebExt.Listener (mkListener)
+import Browser.WebExt.Runtime (onMessageAddListener)
+import Browser.WebExt.Tabs (Tab)
+import Browser.WebExt.Tabs as Tabs
 import Effect (Effect)
 import Effect.Class (class MonadEffect)
 import Effect.Class.Console (log)
@@ -16,7 +20,7 @@ main = do
 
 browserActionOnClickedHandler :: Tab -> Effect Unit
 browserActionOnClickedHandler tab = do
-  _ <- tabsSendMessage tab.id "Clicked browser action"
+  _ <- Tabs.sendMessage tab.id "Clicked browser action"
   pure unit
 
 contentScriptMessageHandler ∷ ∀ m (a ∷ Type). MonadEffect m ⇒ Show a ⇒ a → m Unit

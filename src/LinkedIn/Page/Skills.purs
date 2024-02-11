@@ -18,8 +18,7 @@ data SkillsPage a = SkillsPage (NonEmptyList (ArtDecoTabElement a))
 
 derive instance Generic (SkillsPage a) _
 derive instance Eq a => Eq (SkillsPage a)
-instance Show a => Show (SkillsPage a) where
-  show = genericShow
+instance Show a => Show (SkillsPage a) where show = genericShow
 derive instance Functor SkillsPage
 
 instance Foldable SkillsPage where

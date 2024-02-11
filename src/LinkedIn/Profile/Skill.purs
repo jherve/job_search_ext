@@ -18,10 +18,8 @@ data Skill = Skill {
 
 derive instance Generic Skill _
 derive instance Eq Skill
-instance Show Skill where
-  show = genericShow
-instance EncodeJson Skill where
-  encodeJson a = genericEncodeJson a
+instance Show Skill where show = genericShow
+instance EncodeJson Skill where encodeJson a = genericEncodeJson a
 
 fromUI ∷ ArtDecoTabElement UIElement → Either String Skill
 fromUI tab = ado

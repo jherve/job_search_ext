@@ -37,8 +37,7 @@ data DetachedNode =
 
 derive instance Generic DetachedNode _
 derive instance Eq DetachedNode
-instance Show DetachedNode where
-  show = genericShow
+instance Show DetachedNode where show = genericShow
 
 toDetached :: Node -> Effect DetachedNode
 toDetached node = unsafePartial $ toDetached' (nodeType node) node where

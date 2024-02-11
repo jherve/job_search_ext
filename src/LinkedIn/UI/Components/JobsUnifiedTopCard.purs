@@ -52,8 +52,7 @@ data TopCardAction a = TopCardActionButton a
 
 derive instance Generic (JobsUnifiedTopCardElement a) _
 derive instance Eq a => Eq (JobsUnifiedTopCardElement a)
-instance Show a => Show (JobsUnifiedTopCardElement a) where
-  show = genericShow
+instance Show a => Show (JobsUnifiedTopCardElement a) where show = genericShow
 derive instance Functor JobsUnifiedTopCardElement
 
 instance Foldable JobsUnifiedTopCardElement where
@@ -92,8 +91,7 @@ instance Queryable q => CanBeQueried q JobsUnifiedTopCardElement where
 
 derive instance Generic (TopCardPrimaryDescription a) _
 derive instance Eq a => Eq (TopCardPrimaryDescription a)
-instance Show a => Show (TopCardPrimaryDescription a) where
-  show = genericShow
+instance Show a => Show (TopCardPrimaryDescription a) where show = genericShow
 derive instance Functor TopCardPrimaryDescription
 
 instance Foldable TopCardPrimaryDescription where
@@ -121,8 +119,7 @@ instance Queryable q => CanBeQueried q TopCardPrimaryDescription where
 
 derive instance Generic (TopCardInsight a) _
 derive instance Eq a => Eq (TopCardInsight a)
-instance Show a => Show (TopCardInsight a) where
-  show = genericShow
+instance Show a => Show (TopCardInsight a) where show = genericShow
 derive instance Functor TopCardInsight
 
 instance Foldable TopCardInsight where
@@ -148,8 +145,7 @@ instance Queryable q => CanBeQueried q TopCardInsight where
 
 derive instance Generic (TopCardInsightContent a) _
 derive instance Eq a => Eq (TopCardInsightContent a)
-instance Show a => Show (TopCardInsightContent a) where
-  show = genericShow
+instance Show a => Show (TopCardInsightContent a) where show = genericShow
 derive instance Functor TopCardInsightContent
 
 instance Foldable TopCardInsightContent where
@@ -197,8 +193,7 @@ instance Queryable q => CanBeQueried q TopCardInsightContent where
 
 derive instance Generic (TopCardSecondaryInsight a) _
 derive instance Eq a => Eq (TopCardSecondaryInsight a)
-instance Show a => Show (TopCardSecondaryInsight a) where
-  show = genericShow
+instance Show a => Show (TopCardSecondaryInsight a) where show = genericShow
 derive instance Functor TopCardSecondaryInsight
 
 instance Foldable TopCardSecondaryInsight where
@@ -227,8 +222,7 @@ instance Queryable q => CanBeQueried q TopCardSecondaryInsight where
 
 derive instance Generic (TopCardAction a) _
 derive instance Eq a => Eq (TopCardAction a)
-instance Show a => Show (TopCardAction a) where
-  show = genericShow
+instance Show a => Show (TopCardAction a) where show = genericShow
 derive instance Functor TopCardAction
 
 instance Foldable TopCardAction where

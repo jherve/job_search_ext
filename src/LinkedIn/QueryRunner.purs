@@ -22,15 +22,12 @@ data QueryError =
   | QNodeUnexpectedType String String
   | QTextNotFoundError
   | QChooseError
-instance EncodeJson QueryError where
-  encodeJson a = genericEncodeJson a
+instance EncodeJson QueryError where encodeJson a = genericEncodeJson a
 
 derive instance Generic QueryError _
 derive instance Eq QueryError
-instance Show QueryError where
-  show = genericShow
-instance Semigroup QueryError where
-  append a _ = a
+instance Show QueryError where show = genericShow
+instance Semigroup QueryError where append a _ = a
 
 type Query q a = q → ExceptT QueryError Effect a
 

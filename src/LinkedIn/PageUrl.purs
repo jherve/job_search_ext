@@ -29,10 +29,8 @@ data PageUrl =
 
 derive instance Eq PageUrl
 derive instance Generic PageUrl _
-instance Show PageUrl where
-  show = genericShow
-instance EncodeJson PageUrl where
-  encodeJson a = genericEncodeJson a
+instance Show PageUrl where show = genericShow
+instance EncodeJson PageUrl where encodeJson a = genericEncodeJson a
 
 pathComponentP :: String -> Parser String Unit
 pathComponentP s = do

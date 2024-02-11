@@ -23,8 +23,7 @@ data ArtDecoCardElement a = ArtDecoCardElement {
 
 derive instance Generic (ArtDecoCardElement a) _
 derive instance Eq a => Eq (ArtDecoCardElement a)
-instance Show a => Show (ArtDecoCardElement a) where
-  show = genericShow
+instance Show a => Show (ArtDecoCardElement a) where show = genericShow
 derive instance Functor ArtDecoCardElement
 
 instance Foldable ArtDecoCardElement where

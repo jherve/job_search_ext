@@ -31,10 +31,8 @@ data APIError =
   | ErrorUnexpectedUrl
 
 derive instance Generic APIError _
-instance Show APIError where
-  show = genericShow
-instance EncodeJson APIError where
-  encodeJson a = genericEncodeJson a
+instance Show APIError where show = genericShow
+instance EncodeJson APIError where encodeJson a = genericEncodeJson a
 
 getContext ∷ Document → Effect (Either APIError PageUrl)
 getContext = runExceptT <<< getContext'

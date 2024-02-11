@@ -15,5 +15,4 @@ data UIElement =
   | UIImage String
 
 derive instance Generic UIElement _
-instance Show UIElement where
-  show = genericShow
+instance Show UIElement where show = genericShow

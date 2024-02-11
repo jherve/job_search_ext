@@ -41,8 +41,7 @@ data ArtDecoPvsEntitySubComponent a = ArtDecoPvsEntitySubComponent a
 
 derive instance Generic (ArtDecoPvsEntitySubComponent a) _
 derive instance Eq a => Eq (ArtDecoPvsEntitySubComponent a)
-instance Show a => Show (ArtDecoPvsEntitySubComponent a) where
-  show = genericShow
+instance Show a => Show (ArtDecoPvsEntitySubComponent a) where show = genericShow
 derive instance Functor ArtDecoPvsEntitySubComponent
 
 instance Foldable ArtDecoPvsEntitySubComponent where
@@ -65,8 +64,7 @@ instance Queryable q => CanBeQueried q ArtDecoPvsEntitySubComponent where
 
 derive instance Generic (ArtDecoCenterContent a) _
 derive instance Eq a => Eq(ArtDecoCenterContent a)
-instance Show a => Show(ArtDecoCenterContent a) where
-  show = genericShow
+instance Show a => Show(ArtDecoCenterContent a) where show = genericShow
 derive instance Functor ArtDecoCenterContent
 
 instance Foldable ArtDecoCenterContent where
@@ -89,8 +87,7 @@ instance Queryable q => CanBeQueried q ArtDecoCenterContent where
 
 derive instance Generic (ArtDecoCenterHeader a) _
 derive instance Eq a => Eq(ArtDecoCenterHeader a)
-instance Show a => Show(ArtDecoCenterHeader a) where
-  show = genericShow
+instance Show a => Show(ArtDecoCenterHeader a) where show = genericShow
 derive instance Functor ArtDecoCenterHeader
 
 instance Foldable ArtDecoCenterHeader where
@@ -121,8 +118,7 @@ instance Queryable q => CanBeQueried q ArtDecoCenterHeader where
 
 derive instance Generic (ArtDecoCenter a) _
 derive instance Eq a => Eq(ArtDecoCenter a)
-instance Show a => Show(ArtDecoCenter a) where
-  show = genericShow
+instance Show a => Show(ArtDecoCenter a) where show = genericShow
 derive instance Functor ArtDecoCenter
 
 instance Foldable ArtDecoCenter where
@@ -148,8 +144,7 @@ instance Queryable q => CanBeQueried q ArtDecoCenter where
 
 derive instance Generic (ArtDecoPvsEntity a) _
 derive instance Eq a => Eq(ArtDecoPvsEntity a)
-instance Show a => Show(ArtDecoPvsEntity a) where
-  show = genericShow
+instance Show a => Show(ArtDecoPvsEntity a) where show = genericShow
 derive instance Functor ArtDecoPvsEntity
 
 instance Foldable ArtDecoPvsEntity where

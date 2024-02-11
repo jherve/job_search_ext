@@ -24,10 +24,8 @@ data Project = Project {
 
 derive instance Generic Project _
 derive instance Eq Project
-instance Show Project where
-  show = genericShow
-instance EncodeJson Project where
-  encodeJson a = genericEncodeJson a
+instance Show Project where show = genericShow
+instance EncodeJson Project where encodeJson a = genericEncodeJson a
 
 fromUI ∷ ArtDecoCardElement UIElement → Either String Project
 fromUI card = ado

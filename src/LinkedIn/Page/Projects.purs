@@ -18,8 +18,7 @@ data ProjectsPage a = ProjectsPage (NonEmptyList (ArtDecoCardElement a))
 
 derive instance Generic (ProjectsPage a) _
 derive instance Eq a => Eq (ProjectsPage a)
-instance Show a => Show (ProjectsPage a) where
-  show = genericShow
+instance Show a => Show (ProjectsPage a) where show = genericShow
 derive instance Functor ProjectsPage
 
 instance Foldable ProjectsPage where

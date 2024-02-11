@@ -30,10 +30,8 @@ data JobOffer = JobOffer {
 
 derive instance Eq JobOffer
 derive instance Generic JobOffer _
-instance Show JobOffer where
-  show = genericShow
-instance EncodeJson JobOffer where
-  encodeJson a = genericEncodeJson a
+instance Show JobOffer where show = genericShow
+instance EncodeJson JobOffer where encodeJson a = genericEncodeJson a
 
 fromUI ∷ JobsUnifiedTopCardElement UIElement → Either String JobOffer
 fromUI card = ado

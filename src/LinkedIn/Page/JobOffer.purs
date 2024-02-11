@@ -17,8 +17,7 @@ data JobOfferPage a = JobOfferPage (JobsUnifiedTopCardElement a)
 
 derive instance Generic (JobOfferPage a) _
 derive instance Eq a => Eq (JobOfferPage a)
-instance Show a => Show (JobOfferPage a) where
-  show = genericShow
+instance Show a => Show (JobOfferPage a) where show = genericShow
 derive instance Functor JobOfferPage
 
 instance Foldable JobOfferPage where

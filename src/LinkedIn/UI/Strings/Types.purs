@@ -16,5 +16,4 @@ data UIString =
 
 derive instance Eq UIString
 derive instance Generic UIString _
-instance Show UIString where
-  show u = genericShow u
+instance Show UIString where show u = genericShow u

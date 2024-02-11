@@ -23,8 +23,7 @@ data ArtDecoTabElement a = ArtDecoTabElement {
 
 derive instance Generic (ArtDecoTabElement a) _
 derive instance Eq a => Eq (ArtDecoTabElement a)
-instance Show a => Show (ArtDecoTabElement a) where
-  show = genericShow
+instance Show a => Show (ArtDecoTabElement a) where show = genericShow
 derive instance Functor ArtDecoTabElement
 
 instance Foldable ArtDecoTabElement where

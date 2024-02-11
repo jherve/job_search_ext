@@ -29,10 +29,8 @@ data WorkExperience = WorkExperience {
 
 derive instance Generic WorkExperience _
 derive instance Eq WorkExperience
-instance Show WorkExperience where
-  show = genericShow
-instance EncodeJson WorkExperience where
-  encodeJson a = genericEncodeJson a
+instance Show WorkExperience where show = genericShow
+instance EncodeJson WorkExperience where encodeJson a = genericEncodeJson a
 
 fromUI ∷ ArtDecoCardElement UIElement → Either String WorkExperience
 fromUI card = ado

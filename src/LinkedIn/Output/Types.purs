@@ -22,10 +22,8 @@ data Output =
 
 derive instance Generic Output _
 derive instance Eq Output
-instance Show Output where
-  show = genericShow
-instance EncodeJson Output where
-  encodeJson a = genericEncodeJson a
+instance Show Output where show = genericShow
+instance EncodeJson Output where encodeJson a = genericEncodeJson a
 
 
 data OutputError =
@@ -36,7 +34,5 @@ data OutputError =
 
 derive instance Generic OutputError _
 derive instance Eq OutputError
-instance Show OutputError where
-  show = genericShow
-instance EncodeJson OutputError where
-  encodeJson a = genericEncodeJson a
+instance Show OutputError where show = genericShow
+instance EncodeJson OutputError where encodeJson a = genericEncodeJson a

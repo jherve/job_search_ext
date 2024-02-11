@@ -18,8 +18,7 @@ data WorkExperiencesPage a = WorkExperiencesPage (NonEmptyList (ArtDecoCardEleme
 
 derive instance Generic (WorkExperiencesPage a) _
 derive instance Eq a => Eq (WorkExperiencesPage a)
-instance Show a => Show (WorkExperiencesPage a) where
-  show = genericShow
+instance Show a => Show (WorkExperiencesPage a) where show = genericShow
 derive instance Functor WorkExperiencesPage
 
 instance Foldable WorkExperiencesPage where

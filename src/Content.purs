@@ -3,24 +3,26 @@ module ExampleWebExt.Content where
 import Prelude
 
 import Browser.DOM (getBrowserDom)
-import Browser.WebExt.Listener (mkListener)
-import Browser.WebExt.Message (Message, displayMessage, mkMessage)
-import Browser.WebExt.Runtime as Runtime
+import Data.Either (Either(..))
 import Effect (Effect)
 import Effect.Class.Console (logShow)
 import Effect.Console (log)
+import ExampleWebExt.RuntimeMessage (RuntimeMessage(..), sendMessageToBackground)
 import LinkedIn (extractFromDocument, getContext)
 
 main :: Effect Unit
 main = do
   log "[content] starting up"
 
-  Runtime.onMessageAddListener $ mkListener messageListener
-  _ <- Runtime.sendMessage $ mkMessage { simpleMessage: "hello from content" }
+  _ <- sendMessageToBackground RuntimeMessageContentInit
 
   dom <- getBrowserDom
   getContext dom >>= logShow
   extractFromDocument dom >>= logShow
 
-messageListener ∷ Message → Effect Unit
-messageListener m = log $ "[content] Received message " <> displayMessage m
+  ctx <- getContext dom
+  case ctx of
+    Right ctx' -> do
+      _ <- sendMessageToBackground $ RuntimeMessageContext ctx'
+      pure unit
+    Left _ -> log "Could not send context"

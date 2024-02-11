@@ -2,10 +2,13 @@ module LinkedIn.UI.Basic.Types where
 
 import Prelude
 
+import Data.Argonaut.Decode (class DecodeJson, JsonDecodeError(..))
+import Data.Argonaut.Decode.Decoders (decodeNumber)
 import Data.Argonaut.Encode (class EncodeJson)
 import Data.Argonaut.Encode.Encoders (encodeNumber, encodeString)
 import Data.Argonaut.Encode.Generic (genericEncodeJson)
 import Data.Date (Month, Year)
+import Data.Either (note)
 import Data.Generic.Rep (class Generic)
 import Data.Int64 (Int64)
 import Data.Int64 as I64
@@ -18,6 +21,11 @@ derive instance Generic JobOfferId _
 instance Show JobOfferId where show = genericShow
 instance EncodeJson JobOfferId where
   encodeJson (JobOfferId a) = encodeNumber $ I64.toNumber a
+instance DecodeJson JobOfferId where
+  decodeJson json = do
+    nb <- decodeNumber json
+    i64 <- note (UnexpectedValue json) $ I64.fromNumber nb
+    pure $ JobOfferId i64
 
 data MonthYear = MonthYear Month Year
 

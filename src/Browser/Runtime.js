@@ -5,3 +5,7 @@ export function onClickedAddListenerImpl (fn) {
 export function tabsSendMessageImpl (tabId, message) {
   return browser.tabs.sendMessage(tabId, message);
 }
+
+export function onMessageAddListenerImpl(fn) {
+  return browser.runtime.onMessage.addListener(fn);
+}

@@ -5,6 +5,7 @@ module Browser.Runtime (
   Listener,
   tabsSendMessage,
   onClickedAddListener,
+  onMessageAddListener,
   mkListener
 ) where
 
@@ -22,12 +23,16 @@ type Listener a = EffectFn1 a Unit
 
 foreign import onClickedAddListenerImpl :: EffectFn1 (Listener Tab) Unit
 foreign import tabsSendMessageImpl :: EffectFn2 TabId Message (Promise Message)
+foreign import onMessageAddListenerImpl :: EffectFn1 (Listener Message) Unit
 
 onClickedAddListener ∷ Listener Tab → Effect Unit
 onClickedAddListener = runEffectFn1 onClickedAddListenerImpl
 
 tabsSendMessage ∷ TabId → Message → Effect (Promise Message)
 tabsSendMessage = runEffectFn2 tabsSendMessageImpl
+
+onMessageAddListener ∷ Listener Message → Effect Unit
+onMessageAddListener = runEffectFn1 onMessageAddListenerImpl
 
 mkListener :: forall a. (a -> Effect Unit) -> Listener a
 mkListener = mkEffectFn1

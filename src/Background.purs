@@ -4,6 +4,7 @@ import Prelude
 
 import Browser.WebExt.BrowserAction (onClickedAddListener)
 import Browser.WebExt.Listener (mkListener)
+import Browser.WebExt.Message (Message, mkMessage, displayMessage)
 import Browser.WebExt.Runtime (onMessageAddListener)
 import Browser.WebExt.Tabs (Tab)
 import Browser.WebExt.Tabs as Tabs
@@ -20,8 +21,8 @@ main = do
 
 browserActionOnClickedHandler :: Tab -> Effect Unit
 browserActionOnClickedHandler tab = do
-  _ <- Tabs.sendMessage tab.id "Clicked browser action"
+  _ <- Tabs.sendMessage tab.id $ mkMessage { clicked: tab.id }
   pure unit
 
-contentScriptMessageHandler ∷ ∀ m (a ∷ Type). MonadEffect m ⇒ Show a ⇒ a → m Unit
-contentScriptMessageHandler m = log $ "[bg] received msg from content : " <> show m
+contentScriptMessageHandler ∷ ∀ m. MonadEffect m ⇒ Message → m Unit
+contentScriptMessageHandler m = log $ "[bg] received msg from content : " <> displayMessage m

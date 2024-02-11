@@ -18,7 +18,7 @@ import LinkedIn.UI.Components.ArtDecoCard (ArtDecoCardElement, toCenterContent, 
 import LinkedIn.UI.Elements.Types (UIElement(..))
 import LinkedIn.UI.Strings.Types (UIString(..))
 
-data WorkExperience = WorkExperience {
+type WorkExperienceObject = {
   position :: String,
   company :: Maybe String,
   contractType :: Maybe String,
@@ -26,6 +26,7 @@ data WorkExperience = WorkExperience {
   duration :: Maybe Duration,
   description :: Maybe String
 }
+data WorkExperience = WorkExperience WorkExperienceObject
 
 derive instance Generic WorkExperience _
 derive instance Eq WorkExperience

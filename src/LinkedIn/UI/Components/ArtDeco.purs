@@ -17,22 +17,14 @@ import LinkedIn.QueryRunner (ignoreNotFound, queryList, queryOne)
 import LinkedIn.Queryable (class Queryable)
 import Type.Proxy (Proxy(..))
 
+type ArtDecoPvsEntityObject a = { side :: Unit, center :: ArtDecoCenter a }
+data ArtDecoPvsEntity a = ArtDecoPvsEntity (ArtDecoPvsEntityObject a)
 
-data ArtDecoPvsEntity a = ArtDecoPvsEntity {
-  side :: Unit,
-  center :: ArtDecoCenter a
-}
+type ArtDecoCenterObject a = { header :: ArtDecoCenterHeader a, content :: ArtDecoCenterContent a}
+data ArtDecoCenter a = ArtDecoCenter (ArtDecoCenterObject a)
 
-data ArtDecoCenter a = ArtDecoCenter {
-  header :: ArtDecoCenterHeader a,
-  content :: ArtDecoCenterContent a
-}
-
-data ArtDecoCenterHeader a = ArtDecoCenterHeader {
-  bold :: a,
-  normal :: Maybe a,
-  light :: List a
-}
+type ArtDecoCenterHeaderObject a = { bold :: a, normal :: Maybe a, light :: List a}
+data ArtDecoCenterHeader a = ArtDecoCenterHeader (ArtDecoCenterHeaderObject a)
 
 data ArtDecoCenterContent a = ArtDecoCenterContent (NonEmptyList (ArtDecoPvsEntitySubComponent a))
 

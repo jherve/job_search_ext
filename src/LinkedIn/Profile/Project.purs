@@ -16,11 +16,12 @@ import LinkedIn.UI.Components.ArtDecoCard (ArtDecoCardElement, toCenterContent, 
 import LinkedIn.UI.Elements.Types (UIElement(..))
 import LinkedIn.UI.Strings.Types (UIString(..))
 
-data Project = Project {
+type ProjectObject = {
   name :: String,
   timeSpan :: Maybe TimeSpan,
   description :: Maybe String
 }
+data Project = Project ProjectObject
 
 derive instance Generic Project _
 derive instance Eq Project

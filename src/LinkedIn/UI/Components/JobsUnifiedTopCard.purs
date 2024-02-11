@@ -19,23 +19,19 @@ import LinkedIn.Queryable (class Queryable, toNode)
 import Type.Proxy (Proxy(..))
 import Web.DOM.Node as N
 
-data JobsUnifiedTopCardElement a = JobsUnifiedTopCardElement {
+type JobsUnifiedTopCardElementObject a = {
   header :: a,
   primaryDescription :: TopCardPrimaryDescription a,
   insights :: List (TopCardInsight a),
   actions :: List (TopCardAction a)
 }
+data JobsUnifiedTopCardElement a = JobsUnifiedTopCardElement (JobsUnifiedTopCardElementObject a)
 
-data TopCardPrimaryDescription a = TopCardPrimaryDescription {
-  link :: a,
-  text :: a,
-  tvmText :: List a
-}
+type TopCardPrimaryDescriptionObject a = { link :: a, text :: a, tvmText :: List a }
+data TopCardPrimaryDescription a = TopCardPrimaryDescription (TopCardPrimaryDescriptionObject a)
 
-data TopCardInsight a = TopCardInsight {
-  icon :: a,
-  content :: TopCardInsightContent a
-}
+type TopCardInsightObject a = { icon :: a, content :: TopCardInsightContent a }
+data TopCardInsight a = TopCardInsight (TopCardInsightObject a)
 
 data TopCardInsightContent a =
   TopCardInsightContentSingle a

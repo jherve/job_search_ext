@@ -12,9 +12,8 @@ import LinkedIn.UI.Components.ArtDecoTab (ArtDecoTabElement, toHeaderBold)
 import LinkedIn.UI.Elements.Types (UIElement(..))
 import LinkedIn.UI.Strings.Types (UIString(..))
 
-data Skill = Skill {
-  name :: String
-}
+type SkillObject = { name :: String }
+data Skill = Skill SkillObject
 
 derive instance Generic Skill _
 derive instance Eq Skill

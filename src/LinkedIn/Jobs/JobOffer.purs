@@ -17,7 +17,7 @@ import LinkedIn.UI.Components.JobsUnifiedTopCard (JobsUnifiedTopCardElement, Top
 import LinkedIn.UI.Elements.Types (UIElement(..))
 import LinkedIn.UI.Strings.Types (UIString(..))
 
-data JobOffer = JobOffer {
+type JobOfferObject = {
   title :: String,
   companyName :: String,
   companyLink :: String,
@@ -27,6 +27,7 @@ data JobOffer = JobOffer {
   companySize :: Maybe String,
   hasSimplifiedApplicationProcess :: Boolean
 }
+data JobOffer = JobOffer JobOfferObject
 
 derive instance Eq JobOffer
 derive instance Generic JobOffer _

@@ -2,9 +2,11 @@ module ExampleWebExt.RuntimeMessage where
 
 import Prelude
 
-import Browser.Runtime (Listener, mkListener)
+import Browser.WebExt.Listener (Listener, mkListener)
 import Browser.WebExt.Message (Message, mkMessage, unwrapMessage)
 import Browser.WebExt.Runtime as Runtime
+import Browser.WebExt.Tabs (TabId)
+import Browser.WebExt.Tabs as Tabs
 import Data.Argonaut.Core (Json)
 import Data.Argonaut.Decode (class DecodeJson, printJsonDecodeError)
 import Data.Argonaut.Decode.Generic (genericDecodeJson)
@@ -20,6 +22,7 @@ import LinkedIn.PageUrl (PageUrl)
 data RuntimeMessage =
   RuntimeMessageContentInit
   | RuntimeMessageContext PageUrl
+  | RuntimeMessageRequestPageContent
 
 derive instance Generic RuntimeMessage _
 instance Show RuntimeMessage where show = genericShow
@@ -29,6 +32,11 @@ instance DecodeJson RuntimeMessage where decodeJson a = genericDecodeJson a
 sendMessageToBackground ∷ RuntimeMessage → Effect Unit
 sendMessageToBackground msg = do
   _ <- Runtime.sendMessage $ mkMessage msg
+  pure unit
+
+sendMessageToContent :: TabId -> RuntimeMessage -> Effect Unit
+sendMessageToContent tabId msg = do
+  _ <- Tabs.sendMessage tabId $ mkMessage msg
   pure unit
 
 decodeRuntimeMessage ∷ Message → Either String RuntimeMessage

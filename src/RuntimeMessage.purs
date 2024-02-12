@@ -2,13 +2,12 @@ module ExampleWebExt.RuntimeMessage where
 
 import Prelude
 
-import Browser.WebExt.Listener (Listener, mkListener)
+import Browser.WebExt.Listener (mkListener)
 import Browser.WebExt.Message (Message, mkMessage, unwrapMessage)
 import Browser.WebExt.Runtime (onMessageAddListener)
 import Browser.WebExt.Runtime as Runtime
 import Browser.WebExt.Tabs (TabId)
 import Browser.WebExt.Tabs as Tabs
-import Data.Argonaut.Core (Json)
 import Data.Argonaut.Decode (class DecodeJson, printJsonDecodeError)
 import Data.Argonaut.Decode.Generic (genericDecodeJson)
 import Data.Argonaut.Encode (class EncodeJson)

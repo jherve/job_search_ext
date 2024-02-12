@@ -9,7 +9,7 @@ import Effect (Effect)
 import Effect.Uncurried (EffectFn2,runEffectFn2)
 import Promise (Promise)
 
-type Tab = { id :: Int, index :: Int }
+type Tab = { id :: Int, index :: Int, title :: String, url :: String }
 type TabId = Int
 
 foreign import sendMessageImpl :: EffectFn2 TabId Message (Promise Message)

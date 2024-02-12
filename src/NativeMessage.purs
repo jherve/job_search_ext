@@ -17,11 +17,23 @@ import Data.Generic.Rep (class Generic)
 import Data.Show.Generic (genericShow)
 import Effect (Effect)
 import Effect.Class.Console (log)
+import Record (union)
 
 data NativeMessage =
   NativeMessageBackground String
   | NativeMessageLog {level :: String, content :: String}
   | NativeMessageInitialConfiguration {jobsPath :: String}
+  | NativeMessageVisitedJobPage {
+    url :: String,
+    jobTitle :: String,
+    pageTitle :: String,
+    company :: String,
+    companyDomain :: String,
+    companyUrl :: String,
+    location :: String,
+    hasSimplifiedProcess :: Boolean,
+    flexibility :: String
+  }
 
 type NativePythonMessage m = {tag :: String | m}
 type NativePythonMessageLog = NativePythonMessage (level :: String, content :: String)
@@ -31,6 +43,7 @@ derive instance Generic NativeMessage _
 instance Show NativeMessage where show = genericShow
 instance EncodeJson NativeMessage where
   encodeJson (NativeMessageInitialConfiguration r) = encodeJson {tag: "initial_configuration", jobsPath: r.jobsPath}
+  encodeJson (NativeMessageVisitedJobPage r) = encodeJson $ union {tag: "visited_linkedin_job_page"} r
   encodeJson a = genericEncodeJson a
 
 instance DecodeJson NativeMessage where

@@ -9,16 +9,28 @@ import Effect (Effect)
 import Effect.Class.Console (logShow, warn)
 import Effect.Console (log)
 import ExampleWebExt.RuntimeMessage (RuntimeMessage(..), mkRuntimeMessageHandler, sendMessageToBackground)
-import LinkedIn (extractFromDocument)
+import LinkedIn (extractFromDocument, getContext)
+import LinkedIn.PageUrl (PageUrl(..))
 
 main :: Effect Unit
 main = do
   log "[content] starting up"
 
+  dom <- getBrowserDom
+  ctx <- getContext dom
+
   onMessageAddListener $ mkRuntimeMessageHandler backgroundMessageHandler
   _ <- sendMessageToBackground RuntimeMessageContentInit
 
-  extractDataAndSendToBackground
+  case ctx of
+    Right (UrlJobOffer _) -> extractDataAndSendToBackground
+    Right (UrlListRecommendedJobOffers) -> colorAlreadyVisitedOffers
+    Right (UrlSearchJobOffers) -> colorAlreadyVisitedOffers
+    _ -> log "[content] Nothing to do"
+
+-- TODO : Implement that function once local storage is updated by background
+colorAlreadyVisitedOffers ∷ Effect Unit
+colorAlreadyVisitedOffers = log "[content] Coloring of job offers is not implemented yet"
 
 backgroundMessageHandler ∷ RuntimeMessage → Effect Unit
 backgroundMessageHandler = case _ of

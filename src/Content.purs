@@ -3,12 +3,11 @@ module ExampleWebExt.Content where
 import Prelude
 
 import Browser.DOM (getBrowserDom)
-import Browser.WebExt.Runtime (onMessageAddListener)
 import Data.Either (Either(..))
 import Effect (Effect)
 import Effect.Class.Console (logShow, warn)
 import Effect.Console (log)
-import ExampleWebExt.RuntimeMessage (RuntimeMessage(..), mkRuntimeMessageHandler, sendMessageToBackground)
+import ExampleWebExt.RuntimeMessage (RuntimeMessage(..), onRuntimeMessageAddListener, sendMessageToBackground)
 import LinkedIn (extractFromDocument, getContext)
 import LinkedIn.PageUrl (PageUrl(..))
 
@@ -19,7 +18,7 @@ main = do
   dom <- getBrowserDom
   ctx <- getContext dom
 
-  onMessageAddListener $ mkRuntimeMessageHandler backgroundMessageHandler
+  onRuntimeMessageAddListener backgroundMessageHandler
   _ <- sendMessageToBackground RuntimeMessageContentInit
 
   case ctx of

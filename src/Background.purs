@@ -5,7 +5,6 @@ import Prelude
 import Browser.WebExt.BrowserAction (onClickedAddListener)
 import Browser.WebExt.Listener (mkListener)
 import Browser.WebExt.Port (Port)
-import Browser.WebExt.Runtime (onMessageAddListener)
 import Browser.WebExt.Tabs (Tab)
 import Data.Argonaut.Decode (printJsonDecodeError)
 import Data.Either (Either(..))
@@ -14,7 +13,7 @@ import Effect.Aff (launchAff_)
 import Effect.Class (class MonadEffect, liftEffect)
 import Effect.Class.Console (log, logShow)
 import ExampleWebExt.NativeMessage (NativeMessage(..), connectToNativeApplication, onNativeMessageAddListener, sendMessageToNative)
-import ExampleWebExt.RuntimeMessage (RuntimeMessage(..), mkRuntimeMessageHandler, sendMessageToContent)
+import ExampleWebExt.RuntimeMessage (RuntimeMessage(..), onRuntimeMessageAddListener, sendMessageToContent)
 import ExampleWebExt.Storage (getJobsPath)
 
 main :: Effect Unit
@@ -26,7 +25,7 @@ main = do
   sendConfigurationToNative port
 
   onClickedAddListener $ mkListener browserActionOnClickedHandler
-  onMessageAddListener $ mkRuntimeMessageHandler contentScriptMessageHandler
+  onRuntimeMessageAddListener contentScriptMessageHandler
 
 browserActionOnClickedHandler :: Tab -> Effect Unit
 browserActionOnClickedHandler tab = do

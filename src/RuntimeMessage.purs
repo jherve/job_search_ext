@@ -4,6 +4,7 @@ import Prelude
 
 import Browser.WebExt.Listener (Listener, mkListener)
 import Browser.WebExt.Message (Message, mkMessage, unwrapMessage)
+import Browser.WebExt.Runtime (onMessageAddListener)
 import Browser.WebExt.Runtime as Runtime
 import Browser.WebExt.Tabs (TabId)
 import Browser.WebExt.Tabs as Tabs
@@ -47,8 +48,10 @@ decodeRuntimeMessage m =
     Left err -> Left $ printJsonDecodeError err
     Right m' -> Right m'
 
-mkRuntimeMessageHandler ∷ (RuntimeMessage → Effect Unit) → Listener Json
-mkRuntimeMessageHandler f = mkListener \m -> do
-  case decodeRuntimeMessage m of
-    Left err -> log err
-    Right m' -> f m'
+onRuntimeMessageAddListener ∷ (RuntimeMessage → Effect Unit) → Effect Unit
+onRuntimeMessageAddListener f = onMessageAddListener runtimeMessageHandler
+  where
+    runtimeMessageHandler = mkListener \m -> do
+      case decodeRuntimeMessage m of
+        Left err -> log err
+        Right m' -> f m'

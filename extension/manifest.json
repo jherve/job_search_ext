@@ -21,5 +21,8 @@
     "scripts": ["background.js"],
     "persistent": true
   },
+  "options_ui": {
+    "page": "settings.html"
+  },
   "permissions": ["activeTab", "tabs", "storage", "nativeMessaging"]
 }

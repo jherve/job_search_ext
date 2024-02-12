@@ -15,7 +15,7 @@ import Effect.Class (class MonadEffect, liftEffect)
 import Effect.Class.Console (log, logShow)
 import ExampleWebExt.NativeMessage (NativeMessage(..), connectToNativeApplication, onNativeMessageAddListener, sendMessageToNative)
 import ExampleWebExt.RuntimeMessage (RuntimeMessage(..), mkRuntimeMessageHandler, sendMessageToContent)
-import ExampleWebExt.Storage (getJobsPath, setJobsPath)
+import ExampleWebExt.Storage (getJobsPath)
 
 main :: Effect Unit
 main = do
@@ -23,7 +23,6 @@ main = do
   port <- connectToNativeApplication "job_search_writer"
   onNativeMessageAddListener port nativeMessageHandler
 
-  setJobsPath "/tmp/dummy/path/value"
   sendConfigurationToNative port
 
   onClickedAddListener $ mkListener browserActionOnClickedHandler

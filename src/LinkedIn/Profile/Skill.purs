@@ -2,6 +2,8 @@ module LinkedIn.Profile.Skill where
 
 import Prelude
 
+import Data.Argonaut.Decode (class DecodeJson)
+import Data.Argonaut.Decode.Generic (genericDecodeJson)
 import Data.Argonaut.Encode (class EncodeJson)
 import Data.Argonaut.Encode.Generic (genericEncodeJson)
 import Data.Either (Either, note)
@@ -19,6 +21,7 @@ derive instance Generic Skill _
 derive instance Eq Skill
 instance Show Skill where show = genericShow
 instance EncodeJson Skill where encodeJson a = genericEncodeJson a
+instance DecodeJson Skill where decodeJson a = genericDecodeJson a
 
 fromUI ∷ ArtDecoTabElement UIElement → Either String Skill
 fromUI tab = ado

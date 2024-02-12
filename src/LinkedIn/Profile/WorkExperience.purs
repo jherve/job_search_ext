@@ -2,6 +2,8 @@ module LinkedIn.Profile.WorkExperience where
 
 import Prelude
 
+import Data.Argonaut.Decode (class DecodeJson)
+import Data.Argonaut.Decode.Generic (genericDecodeJson)
 import Data.Argonaut.Encode (class EncodeJson)
 import Data.Argonaut.Encode.Generic (genericEncodeJson)
 import Data.Either (Either, note)
@@ -32,6 +34,7 @@ derive instance Generic WorkExperience _
 derive instance Eq WorkExperience
 instance Show WorkExperience where show = genericShow
 instance EncodeJson WorkExperience where encodeJson a = genericEncodeJson a
+instance DecodeJson WorkExperience where decodeJson a = genericDecodeJson a
 
 fromUI ∷ ArtDecoCardElement UIElement → Either String WorkExperience
 fromUI card = ado

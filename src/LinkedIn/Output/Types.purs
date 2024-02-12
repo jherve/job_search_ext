@@ -2,6 +2,8 @@ module LinkedIn.Output.Types where
 
 import Prelude
 
+import Data.Argonaut.Decode (class DecodeJson)
+import Data.Argonaut.Decode.Generic (genericDecodeJson)
 import Data.Argonaut.Encode (class EncodeJson)
 import Data.Argonaut.Encode.Generic (genericEncodeJson)
 import Data.Generic.Rep (class Generic)
@@ -24,6 +26,7 @@ derive instance Generic Output _
 derive instance Eq Output
 instance Show Output where show = genericShow
 instance EncodeJson Output where encodeJson a = genericEncodeJson a
+instance DecodeJson Output where decodeJson a = genericDecodeJson a
 
 
 data OutputError =

@@ -2,6 +2,8 @@ module LinkedIn.Jobs.JobOffer where
 
 import Prelude
 
+import Data.Argonaut.Decode (class DecodeJson, decodeJson)
+import Data.Argonaut.Decode.Generic (genericDecodeJson)
 import Data.Argonaut.Encode (class EncodeJson)
 import Data.Argonaut.Encode.Generic (genericEncodeJson)
 import Data.Either (Either, note)
@@ -33,6 +35,7 @@ derive instance Eq JobOffer
 derive instance Generic JobOffer _
 instance Show JobOffer where show = genericShow
 instance EncodeJson JobOffer where encodeJson a = genericEncodeJson a
+instance DecodeJson JobOffer where decodeJson a = genericDecodeJson a
 
 fromUI ∷ JobsUnifiedTopCardElement UIElement → Either String JobOffer
 fromUI card = ado

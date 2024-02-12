@@ -6,10 +6,13 @@ import Browser.DOM (getBrowserDom)
 import Browser.WebExt.Runtime (MessageSender)
 import Data.Either (Either(..))
 import Effect (Effect)
+import Effect.Aff (launchAff_)
+import Effect.Class (liftEffect)
 import Effect.Class.Console (logShow, warn)
 import Effect.Console (log)
 import ExampleWebExt.RuntimeMessage (RuntimeMessage(..), onRuntimeMessageAddListener, sendMessageToBackground)
 import LinkedIn (extractFromDocument, getContext)
+import LinkedIn.Loadable (waitFor)
 import LinkedIn.PageUrl (PageUrl(..))
 
 main :: Effect Unit
@@ -34,7 +37,12 @@ colorAlreadyVisitedOffers = log "[content] Coloring of job offers is not impleme
 
 backgroundMessageHandler ∷ RuntimeMessage -> MessageSender → Effect Unit
 backgroundMessageHandler m _ = case m of
-  RuntimeMessageRequestPageContent -> extractDataAndSendToBackground
+  RuntimeMessageRequestPageContent -> launchAff_ do
+    dom <- liftEffect getBrowserDom
+    -- If we are here we know that we are looking for a job offer.
+    -- TODO: Remove this dirty hack once "Loadable" typeclass is integrated
+    _ <- waitFor 200 50 ".job-details-jobs-unified-top-card__job-insight span[aria-hidden]" dom
+    liftEffect extractDataAndSendToBackground
 
   m -> logShow m
 

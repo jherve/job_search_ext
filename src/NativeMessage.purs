@@ -10,7 +10,7 @@ import Browser.WebExt.Runtime (Application, connectNative)
 import Data.Argonaut.Core (Json)
 import Data.Argonaut.Decode (class DecodeJson, JsonDecodeError, decodeJson, printJsonDecodeError)
 import Data.Argonaut.Decode.Generic (genericDecodeJson)
-import Data.Argonaut.Encode (class EncodeJson)
+import Data.Argonaut.Encode (class EncodeJson, encodeJson)
 import Data.Argonaut.Encode.Generic (genericEncodeJson)
 import Data.Either (Either(..))
 import Data.Generic.Rep (class Generic)
@@ -21,13 +21,18 @@ import Effect.Class.Console (log)
 data NativeMessage =
   NativeMessageBackground String
   | NativeMessageLog {level :: String, content :: String}
+  | NativeMessageInitialConfiguration {jobsPath :: String}
 
 type NativePythonMessage m = {tag :: String | m}
 type NativePythonMessageLog = NativePythonMessage (level :: String, content :: String)
+type NativePythonMessageInitialConfiguration = NativePythonMessage (jobsPath :: String)
 
 derive instance Generic NativeMessage _
 instance Show NativeMessage where show = genericShow
-instance EncodeJson NativeMessage where encodeJson a = genericEncodeJson a
+instance EncodeJson NativeMessage where
+  encodeJson (NativeMessageInitialConfiguration r) = encodeJson {tag: "initial_configuration", jobsPath: r.jobsPath}
+  encodeJson a = genericEncodeJson a
+
 instance DecodeJson NativeMessage where
   decodeJson json = case decodeNative json of
     Right {level, content} -> Right (NativeMessageLog {level, content})

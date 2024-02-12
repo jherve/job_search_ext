@@ -7,10 +7,12 @@ import Browser.WebExt.Listener (mkListener)
 import Browser.WebExt.Runtime (onMessageAddListener)
 import Browser.WebExt.Tabs (Tab)
 import Effect (Effect)
+import Effect.Aff (launchAff_)
 import Effect.Class (class MonadEffect)
 import Effect.Class.Console (log, logShow)
 import ExampleWebExt.NativeMessage (NativeMessage(..), connectToNativeApplication, onNativeMessageAddListener, sendMessageToNative)
 import ExampleWebExt.RuntimeMessage (RuntimeMessage(..), mkRuntimeMessageHandler, sendMessageToContent)
+import ExampleWebExt.Storage (getJobsPath, setJobsPath)
 
 main :: Effect Unit
 main = do
@@ -19,6 +21,10 @@ main = do
   onNativeMessageAddListener port nativeMessageHandler
 
   sendMessageToNative port $ NativeMessageBackground "hello"
+  setJobsPath "/path/to/jobs"
+  launchAff_ do
+    path <- getJobsPath
+    log $ "Read value of jobsPath : " <> show path
 
   onClickedAddListener $ mkListener browserActionOnClickedHandler
   onMessageAddListener $ mkRuntimeMessageHandler contentScriptMessageHandler

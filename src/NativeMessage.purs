@@ -4,7 +4,7 @@ import Prelude
 
 import Browser.WebExt.Listener (mkListener)
 import Browser.WebExt.Message (Message, mkMessage, unwrapMessage)
-import Browser.WebExt.Port (Port, onMessageAddListener)
+import Browser.WebExt.Port (Port, onDisconnectAddListener, onMessageAddListener)
 import Browser.WebExt.Port as Port
 import Browser.WebExt.Runtime (Application, connectNative)
 import Data.Argonaut.Core (Json)
@@ -57,6 +57,9 @@ onNativeMessageAddListener port f = onMessageAddListener port $ runtimeMessageHa
       case decodeNativeMessage m of
         Left err -> log err
         Right m' -> f m'
+
+onNativeDisconnectAddListener :: Port -> (Port -> Effect Unit) -> Effect Unit
+onNativeDisconnectAddListener port f = onDisconnectAddListener port $ mkListener f
 
 sendMessageToNative :: Port -> NativeMessage -> Effect Unit
 sendMessageToNative port msg = do

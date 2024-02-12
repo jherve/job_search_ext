@@ -12,7 +12,7 @@ import Effect (Effect)
 import Effect.Aff (launchAff_)
 import Effect.Class (class MonadEffect, liftEffect)
 import Effect.Class.Console (log, logShow)
-import ExampleWebExt.NativeMessage (NativeMessage(..), connectToNativeApplication, onNativeMessageAddListener, sendMessageToNative)
+import ExampleWebExt.NativeMessage (NativeMessage(..), connectToNativeApplication, onNativeDisconnectAddListener, onNativeMessageAddListener, sendMessageToNative)
 import ExampleWebExt.RuntimeMessage (RuntimeMessage(..), onRuntimeMessageAddListener, sendMessageToContent)
 import ExampleWebExt.Storage (getJobsPath)
 
@@ -21,6 +21,7 @@ main = do
   log "[bg] starting up"
   port <- connectToNativeApplication "job_search_writer"
   onNativeMessageAddListener port nativeMessageHandler
+  onNativeDisconnectAddListener port \_ -> log "disconnected from native"
 
   sendConfigurationToNative port
 

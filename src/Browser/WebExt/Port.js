@@ -5,3 +5,7 @@ export function postMessageImpl (port, message) {
 export function onMessageAddListenerImpl (port, fn) {
   return port.onMessage.addListener(fn);
 }
+
+export function onDisconnectAddListenerImpl (port, fn) {
+  return port.onDisconnect.addListener(fn);
+}

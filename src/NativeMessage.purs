@@ -8,7 +8,7 @@ import Browser.WebExt.Port (Port, onDisconnectAddListener, onMessageAddListener)
 import Browser.WebExt.Port as Port
 import Browser.WebExt.Runtime (Application, connectNative)
 import Data.Argonaut.Core (Json)
-import Data.Argonaut.Decode (class DecodeJson, JsonDecodeError, decodeJson, printJsonDecodeError)
+import Data.Argonaut.Decode (class DecodeJson, JsonDecodeError(..), decodeJson, printJsonDecodeError)
 import Data.Argonaut.Decode.Generic (genericDecodeJson)
 import Data.Argonaut.Encode (class EncodeJson, encodeJson)
 import Data.Argonaut.Encode.Generic (genericEncodeJson)
@@ -34,10 +34,16 @@ data NativeMessage =
     hasSimplifiedProcess :: Boolean,
     flexibility :: String
   }
+  | NativeMessageJobAlreadyExists {job_id :: String}
+  | NativeMessageJobAdded {job :: Unit}
+  | NativeMessageJobOfferList {job_offers :: Unit}
 
 type NativePythonMessage m = {tag :: String | m}
 type NativePythonMessageLog = NativePythonMessage (level :: String, content :: String)
 type NativePythonMessageInitialConfiguration = NativePythonMessage (jobsPath :: String)
+type NativePythonMessageJobAlreadyExists = NativePythonMessage (job_id :: String)
+type NativePythonMessageJobOfferList = NativePythonMessage (job_offers :: Json)
+type NativePythonMessageJobAdded = NativePythonMessage (job :: Json)
 
 derive instance Generic NativeMessage _
 instance Show NativeMessage where show = genericShow
@@ -47,12 +53,18 @@ instance EncodeJson NativeMessage where
   encodeJson a = genericEncodeJson a
 
 instance DecodeJson NativeMessage where
-  decodeJson json = case decodeNative json of
-    Right {level, content} -> Right (NativeMessageLog {level, content})
+  decodeJson json = case decodeJson @(NativePythonMessage ()) json of
+    Right {tag: "log_message"} ->
+      map (\{level, content} -> NativeMessageLog {level, content}) $ decodeJson @NativePythonMessageLog json
+    Right {tag: "job_already_exists"} ->
+      map (\{job_id} -> NativeMessageJobAlreadyExists {job_id}) $ decodeJson @NativePythonMessageJobAlreadyExists json
+    Right {tag: "job_offer_list"} ->
+      map (\_ -> NativeMessageJobOfferList {job_offers: unit}) $ decodeJson @NativePythonMessageJobOfferList json
+    Right {tag: "job_added"} ->
+      map (\_ -> NativeMessageJobAdded {job: unit}) $ decodeJson @NativePythonMessageJobAdded json
+
+    Right _r -> Left $ UnexpectedValue json
     Left _ -> genericDecodeJson json
-    where
-      decodeNative :: Json -> Either JsonDecodeError NativePythonMessageLog
-      decodeNative = decodeJson
 
 connectToNativeApplication ∷ Application → Effect Port
 connectToNativeApplication = connectNative

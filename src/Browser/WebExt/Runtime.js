@@ -5,3 +5,7 @@ export function onMessageAddListenerImpl(fn) {
 export function runtimeSendMessageImpl (message) {
   return browser.runtime.sendMessage(message);
 }
+
+export function connectNativeImpl (application) {
+  return browser.runtime.connectNative(application);
+}

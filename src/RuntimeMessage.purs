@@ -23,9 +23,8 @@ import LinkedIn.PageUrl (PageUrl)
 
 data RuntimeMessage =
   RuntimeMessageContentInit
-  | RuntimeMessageContext PageUrl
   | RuntimeMessageRequestPageContent
-  | RuntimeMessagePageContent Output
+  | RuntimeMessagePageContent PageUrl Output
 
 derive instance Generic RuntimeMessage _
 instance Show RuntimeMessage where show = genericShow

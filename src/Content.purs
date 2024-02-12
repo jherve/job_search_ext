@@ -40,8 +40,10 @@ backgroundMessageHandler = case _ of
 extractDataAndSendToBackground ∷ Effect Unit
 extractDataAndSendToBackground = do
   dom <- getBrowserDom
+  ctx <- getContext dom
   data_ <- extractFromDocument dom
   sendMessageToBackground RuntimeMessageContentInit
-  case data_ of
-    Left err -> warn $ "[content] " <> show err
-    Right data_' -> sendMessageToBackground $ RuntimeMessagePageContent data_'
+  case data_, ctx of
+    Left err, _ -> warn $ "[content] " <> show err
+    _, Left err -> warn $ "[content] " <> show err
+    Right data_', Right ctx' -> sendMessageToBackground $ RuntimeMessagePageContent ctx' data_'

@@ -5,6 +5,7 @@ import Prelude
 import Browser.WebExt.BrowserAction (onClickedAddListener)
 import Browser.WebExt.Listener (mkListener)
 import Browser.WebExt.Port (Port)
+import Browser.WebExt.Runtime (MessageSender)
 import Browser.WebExt.Tabs (Tab)
 import Data.Argonaut.Decode (printJsonDecodeError)
 import Data.Either (Either(..))
@@ -34,8 +35,10 @@ browserActionOnClickedHandler tab = do
   _ <- sendMessageToContent tab.id RuntimeMessageRequestPageContent
   pure unit
 
-contentScriptMessageHandler ∷ ∀ m. MonadEffect m => RuntimeMessage → m Unit
-contentScriptMessageHandler m = logShow m
+contentScriptMessageHandler ∷ ∀ m. MonadEffect m => RuntimeMessage -> MessageSender → m Unit
+contentScriptMessageHandler m sender = do
+  logShow m
+  logShow sender
 
 nativeMessageHandler ∷ ∀ m. MonadEffect m ⇒ NativeMessage → m Unit
 nativeMessageHandler m = logShow m

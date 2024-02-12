@@ -3,6 +3,7 @@ module ExampleWebExt.Content where
 import Prelude
 
 import Browser.DOM (getBrowserDom)
+import Browser.WebExt.Runtime (MessageSender)
 import Data.Either (Either(..))
 import Effect (Effect)
 import Effect.Class.Console (logShow, warn)
@@ -31,8 +32,8 @@ main = do
 colorAlreadyVisitedOffers ∷ Effect Unit
 colorAlreadyVisitedOffers = log "[content] Coloring of job offers is not implemented yet"
 
-backgroundMessageHandler ∷ RuntimeMessage → Effect Unit
-backgroundMessageHandler = case _ of
+backgroundMessageHandler ∷ RuntimeMessage -> MessageSender → Effect Unit
+backgroundMessageHandler m _ = case m of
   RuntimeMessageRequestPageContent -> extractDataAndSendToBackground
 
   m -> logShow m

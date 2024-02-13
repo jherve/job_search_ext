@@ -25,7 +25,7 @@ import LinkedIn.UI.Basic.Types (JobFlexibility(..))
 main :: Effect Unit
 main = do
   log "[bg] starting up"
-  port <- connectToNativeApplication "job_search_writer"
+  port <- connectToNativeApplication "job_search_background"
   onNativeMessageAddListener port nativeMessageHandler
   onNativeDisconnectAddListener port \_ -> log "disconnected from native"
 

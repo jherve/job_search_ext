@@ -14,3 +14,7 @@
 /tags
 /extension
 /pure_tabs.xpi
+
+**/*.egg-info/
+**/__pycache__/
+**/.pdm-python

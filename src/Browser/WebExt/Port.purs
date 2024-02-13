@@ -7,7 +7,7 @@ import Browser.WebExt.Message (Message)
 import Effect (Effect)
 import Effect.Uncurried (EffectFn2, runEffectFn2)
 
-foreign import data Port :: Type
+type Port = {name :: String, error :: String}
 
 foreign import postMessageImpl :: EffectFn2 Port Message Unit
 foreign import onMessageAddListenerImpl :: EffectFn2 Port (Listener Message) Unit

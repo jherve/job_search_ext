@@ -27,7 +27,7 @@ main = do
   log "[bg] starting up"
   port <- connectToNativeApplication "job_search_background"
   onNativeMessageAddListener port nativeMessageHandler
-  onNativeDisconnectAddListener port \_ -> log "disconnected from native"
+  onNativeDisconnectAddListener port \p -> log $ "disconnected from native port " <> p.name <> " (" <> p.error <> ")"
 
   sendConfigurationToNative port
 

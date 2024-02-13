@@ -7,11 +7,11 @@
   },
   "scripts": {
     "parcel": "parcel",
-    "dev": "concurrently --kill-others \"spago build --watch\" \"parcel watch src/background.js src/content.js src/settings.html src/settings.js --dist-dir extension/\"",
-    "build": "spago build && parcel build src/background.js src/content.js src/settings.html src/settings.js --dist-dir extension/",
+    "dev": "concurrently --kill-others \"spago build --watch\" \"parcel watch manifest.json --config @parcel/config-webextension --dist-dir extension/\"",
+    "build": "spago build && parcel build manifest.json --config @parcel/config-webextension --dist-dir extension/",
     "build-lib": "spago bundle-module -m LinkedIn",
     "test": "spago test",
-    "clean": "rm -rf .cache .psci_modules modules dist extension/background.js extension/background.js.map extension/content.js extension/content.js.map",
+    "clean": "rm -rf .cache .psci_modules modules dist extension",
     "start:firefox": "web-ext run --source-dir ./extension",
     "sign": "web-ext sign --source-dir ./extension",
     "postinstall": "npm run build-lib"
@@ -19,6 +19,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@parcel/config-webextension": "^2.11.0",
     "concurrently": "^5.2.0",
     "jsdom": "^23.2.0",
     "parcel": "^2.11.0",

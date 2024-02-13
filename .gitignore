@@ -12,9 +12,5 @@
 /.parcel-cache
 /dist
 /tags
-/extension/background.js
-/extension/background.js.map
-/extension/content.js
-/extension/content.js.map
-/extension/settings.*
+/extension/*
 /pure_tabs.xpi

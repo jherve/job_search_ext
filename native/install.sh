@@ -24,8 +24,7 @@ cat << EOF > ${NATIVE_MESSAGING_MANIFEST}
     "path": "${EXTENSION_BIN}",
     "type": "stdio",
     "allowed_extensions": [
-        "job_search@herve.info",
-        "new_ext@mozilla.org"
+        "job_search_ps@herve.info"
     ]
 }
 EOF

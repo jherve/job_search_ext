@@ -1,11 +1,11 @@
 {
   "manifest_version": 2,
-  "name": "Firefox extension example",
-  "description": " extension written in PureScript",
+  "name": "Job Search",
+  "description": "Assistant for LinkedIn job search",
   "version": "0.1.0",
   "browser_specific_settings": {
     "gecko": {
-      "id": "new_ext@mozilla.org"
+      "id": "job_search_ps@herve.info"
     }
   },
   "icons": {

@@ -23,6 +23,7 @@ class CompanyKind(Enum):
 class ApplicationProcess(Enum):
     LINKED_IN_SIMPLIFIED = "linked_in_simplified"
     REGULAR = "regular"
+    CAREER_SITE = "career_site"
     SPURIOUS = "spurious"
 
 
@@ -109,6 +110,25 @@ class JobOffer:
         ]:
             if field in dict:
                 dict[field] = converter(dict[field])
+
+        # For now we simply ignore application-related fields
+        # read from the storage.
+        for k in [
+            "application_date",
+            "application_rejection_date",
+            "application_first_seen_date",
+            "application_first_response_date",
+            "application_cv_version",
+            "application_appointments",
+            "application_message",
+            "application_questions",
+            "application_url",
+            "application_contacts",
+        ]:
+            try:
+                del dict[k]
+            except KeyError:
+                pass
 
         return JobOffer(**dict)
 

@@ -12,5 +12,5 @@
 /.parcel-cache
 /dist
 /tags
-/extension/*
+/extension
 /pure_tabs.xpi

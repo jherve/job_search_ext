@@ -9,14 +9,15 @@ import Browser.WebExt.Runtime (MessageSender(..))
 import Browser.WebExt.Tabs (Tab)
 import Data.Argonaut.Decode (printJsonDecodeError)
 import Data.Either (Either(..))
+import Data.Foldable (for_)
 import Data.Maybe (Maybe(..))
 import Effect (Effect)
 import Effect.Aff (launchAff_)
-import Effect.Class (class MonadEffect, liftEffect)
+import Effect.Class (liftEffect)
 import Effect.Class.Console (error, log, logShow)
 import ExampleWebExt.NativeMessage (NativeMessage(..), connectToNativeApplication, onNativeDisconnectAddListener, onNativeMessageAddListener, sendMessageToNative)
 import ExampleWebExt.RuntimeMessage (RuntimeMessage(..), onRuntimeMessageAddListener, sendMessageToContent)
-import ExampleWebExt.Storage (getJobsPath)
+import ExampleWebExt.Storage (clearAllJobs, getJobsPath, storeJob)
 import LinkedIn.Jobs.JobOffer (JobOffer(..))
 import LinkedIn.Output.Types (Output(..))
 import LinkedIn.UI.Basic.Types (JobFlexibility(..))
@@ -73,7 +74,12 @@ contentScriptMessageHandler _ m sender = do
   logShow m
   logShow sender
 
-nativeMessageHandler ∷ ∀ m. MonadEffect m ⇒ NativeMessage → m Unit
+nativeMessageHandler ∷ NativeMessage → Effect Unit
+nativeMessageHandler (NativeMessageJobOfferList {job_offers}) = do
+  clearAllJobs
+  for_ job_offers \jo -> do
+    storeJob jo
+
 nativeMessageHandler m = logShow m
 
 sendConfigurationToNative ∷ Port → Effect Unit

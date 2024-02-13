@@ -14,7 +14,7 @@ import Data.Maybe (Maybe(..))
 import Effect (Effect)
 import Effect.Aff (launchAff_)
 import Effect.Class (liftEffect)
-import Effect.Class.Console (error, log, logShow)
+import Effect.Class.Console (debug, error, log, logShow)
 import ExampleWebExt.NativeMessage (NativeMessage(..), connectToNativeApplication, onNativeDisconnectAddListener, onNativeMessageAddListener, sendMessageToNative)
 import ExampleWebExt.RuntimeMessage (RuntimeMessage(..), onRuntimeMessageAddListener, sendMessageToContent)
 import ExampleWebExt.Storage (clearAllJobs, getJobsPath, storeJob)
@@ -70,9 +70,14 @@ contentScriptMessageHandler
         JobFlexFullRemote -> "full_remote"
     }
 
-contentScriptMessageHandler _ m sender = do
-  logShow m
-  logShow sender
+contentScriptMessageHandler _ m (MessageSender {tab, id}) = do
+  let
+    senderMsg = case tab of
+      Just {url} -> "tab " <> url
+      Nothing -> "unknown " <> id
+    msg = "[bg] received " <> show m <> " from " <> senderMsg
+
+  debug msg
 
 nativeMessageHandler ∷ NativeMessage → Effect Unit
 nativeMessageHandler (NativeMessageJobOfferList {job_offers}) = do

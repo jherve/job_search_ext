@@ -14,6 +14,7 @@ import Data.Argonaut.Encode (class EncodeJson, encodeJson)
 import Data.Argonaut.Encode.Generic (genericEncodeJson)
 import Data.Either (Either(..))
 import Data.Generic.Rep (class Generic)
+import Data.Maybe (Maybe)
 import Data.Show.Generic (genericShow)
 import Effect (Effect)
 import Effect.Class.Console (log)
@@ -28,7 +29,7 @@ data NativeMessage =
     jobTitle :: String,
     pageTitle :: String,
     company :: String,
-    companyDomain :: String,
+    companyDomain :: Maybe String,
     companyUrl :: String,
     location :: String,
     hasSimplifiedProcess :: Boolean,

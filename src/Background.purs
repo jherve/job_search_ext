@@ -53,14 +53,12 @@ contentScriptMessageHandler
     maybeMsg (JobOffer jo) = ado
       location <- jo.location
       flexibility <- jo.flexibility
-      companyDomain <- jo.companyDomain
-      _companySize <- jo.companySize
     in NativeMessageVisitedJobPage {
       url: url,
       jobTitle: jo.title,
       pageTitle: title,
       company: jo.companyName,
-      companyDomain,
+      companyDomain: jo.companyDomain,
       companyUrl: jo.companyLink,
       location,
       hasSimplifiedProcess: jo.hasSimplifiedApplicationProcess,

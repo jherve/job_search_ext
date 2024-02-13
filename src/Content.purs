@@ -6,7 +6,7 @@ import Browser.DOM (getBrowserDom)
 import Browser.WebExt.Runtime (MessageSender)
 import Data.Either (Either(..))
 import Effect (Effect)
-import Effect.Aff (launchAff_)
+import Effect.Aff (Aff, launchAff_)
 import Effect.Class (liftEffect)
 import Effect.Class.Console (logShow, warn)
 import Effect.Console (log)
@@ -29,21 +29,24 @@ main = do
   _ <- sendMessageToBackground RuntimeMessageContentInit
 
   case ctx of
-    Right (UrlJobOffer _) -> extractDataAndSendToBackground
+    Right (UrlJobOffer _) -> launchAff_ waitForDataAndSend
     Right (UrlListRecommendedJobOffers) -> colorVisitedJobsLoopImpl
     Right (UrlSearchJobOffers) -> colorVisitedJobsLoopImpl
     _ -> log "[content] Nothing to do"
 
 backgroundMessageHandler ∷ RuntimeMessage -> MessageSender → Effect Unit
 backgroundMessageHandler m _ = case m of
-  RuntimeMessageRequestPageContent -> launchAff_ do
-    dom <- liftEffect getBrowserDom
-    -- If we are here we know that we are looking for a job offer.
-    -- TODO: Remove this dirty hack once "Loadable" typeclass is integrated
-    _ <- waitFor 200 50 ".job-details-jobs-unified-top-card__job-insight span[aria-hidden]" dom
-    liftEffect extractDataAndSendToBackground
+  RuntimeMessageRequestPageContent -> launchAff_ waitForDataAndSend
 
   m -> logShow m
+
+waitForDataAndSend ∷ Aff Unit
+waitForDataAndSend = do
+  dom <- liftEffect getBrowserDom
+  -- If we are here we know that we are looking for a job offer.
+  -- TODO: Remove this dirty hack once "Loadable" typeclass is integrated
+  _ <- waitFor 200 50 ".job-details-jobs-unified-top-card__job-insight span[aria-hidden]" dom
+  liftEffect extractDataAndSendToBackground
 
 extractDataAndSendToBackground ∷ Effect Unit
 extractDataAndSendToBackground = do

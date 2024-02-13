@@ -15,6 +15,9 @@ import LinkedIn (extractFromDocument, getContext)
 import LinkedIn.Loadable (waitFor)
 import LinkedIn.PageUrl (PageUrl(..))
 
+-- TODO: This function should be implemented in PS as well
+foreign import colorVisitedJobsLoopImpl :: Effect Unit
+
 main :: Effect Unit
 main = do
   log "[content] starting up"
@@ -27,13 +30,9 @@ main = do
 
   case ctx of
     Right (UrlJobOffer _) -> extractDataAndSendToBackground
-    Right (UrlListRecommendedJobOffers) -> colorAlreadyVisitedOffers
-    Right (UrlSearchJobOffers) -> colorAlreadyVisitedOffers
+    Right (UrlListRecommendedJobOffers) -> colorVisitedJobsLoopImpl
+    Right (UrlSearchJobOffers) -> colorVisitedJobsLoopImpl
     _ -> log "[content] Nothing to do"
-
--- TODO : Implement that function once local storage is updated by background
-colorAlreadyVisitedOffers ∷ Effect Unit
-colorAlreadyVisitedOffers = log "[content] Coloring of job offers is not implemented yet"
 
 backgroundMessageHandler ∷ RuntimeMessage -> MessageSender → Effect Unit
 backgroundMessageHandler m _ = case m of

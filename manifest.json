@@ -8,7 +8,11 @@
       "id": "new_ext@mozilla.org"
     }
   },
+  "icons": {
+    "48": "assets/job-promotion.png"
+  },
   "browser_action": {
+    "default_icon": "assets/job-promotion.png",
     "default_title": "Test"
   },
   "content_scripts": [

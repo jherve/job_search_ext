@@ -175,7 +175,7 @@ class JobStorage:
                 f.write("%type: first_seen_date date\n")
                 f.write("%auto: first_seen_date\n")
 
-    def read_all(self) -> list[JobOffer]:
+    def read_all(self) -> dict[str, JobOffer]:
         return {r["id"]: JobOffer.from_storage(r) for r in self.select_all("job_offer")}
 
     def add_job(self, offer: JobOffer):

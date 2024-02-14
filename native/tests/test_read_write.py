@@ -129,8 +129,8 @@ class TestReadWriter:
     @pytest.fixture(
         params=[
             (
-                JobOfferListMessage(job_offers=["job_offer_1", "job_offer_2"]),
-                {"tag": "NativeMessageJobOfferList", "values": {"job_offers": ["job_offer_1", "job_offer_2"]}},
+                JobOfferListMessage(job_offers=[{"id": "job_offer_1"}, {"id": "job_offer_2"}]),
+                {"tag": "NativeMessageJobOfferList", "values": [[{"id": "job_offer_1"}, {"id": "job_offer_2"}]]},
             ),
             (
                 JobAddedMessage(job="job"),

@@ -10,7 +10,7 @@ import Browser.WebExt.Runtime (Application, connectNative)
 import Data.Argonaut.Core (Json)
 import Data.Argonaut.Decode (class DecodeJson, JsonDecodeError(..), decodeJson, printJsonDecodeError)
 import Data.Argonaut.Decode.Generic (genericDecodeJson)
-import Data.Argonaut.Encode (class EncodeJson, encodeJson)
+import Data.Argonaut.Encode (class EncodeJson)
 import Data.Argonaut.Encode.Generic (genericEncodeJson)
 import Data.Either (Either(..))
 import Data.Generic.Rep (class Generic)
@@ -18,7 +18,6 @@ import Data.Maybe (Maybe)
 import Data.Show.Generic (genericShow)
 import Effect (Effect)
 import Effect.Class.Console (log)
-import Record (union)
 
 data NativeMessage =
   NativeMessageBackground String
@@ -55,10 +54,7 @@ type NativePythonMessageJobAdded = NativePythonMessage (job :: NativePythonJobOf
 
 derive instance Generic NativeMessage _
 instance Show NativeMessage where show = genericShow
-instance EncodeJson NativeMessage where
-  encodeJson (NativeMessageInitialConfiguration r) = encodeJson {tag: "initial_configuration", jobsPath: r.jobsPath}
-  encodeJson (NativeMessageVisitedJobPage r) = encodeJson $ union {tag: "visited_linkedin_job_page"} r
-  encodeJson a = genericEncodeJson a
+instance EncodeJson NativeMessage where encodeJson a = genericEncodeJson a
 
 -- A function used to transform some messages sent by the native application that are in the form
 -- of an object with unknown keys to an array of objects. The long-term solution is probably to 

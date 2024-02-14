@@ -82,21 +82,23 @@ class TestReadWriter:
     @pytest.fixture(
         params=[
             (
-                {"tag": "initial_configuration", "jobsPath": "jobs_path"},
+                {"tag": "NativeMessageInitialConfiguration", "values": [{"jobsPath": "jobs_path"}]},
                 InitialConfigurationMessage(jobs_path="jobs_path"),
             ),
             (
                 {
-                    "tag": "visited_linkedin_job_page",
-                    "url": "url",
-                    "jobTitle": "job_title",
-                    "pageTitle": "page_title",
-                    "company": "company",
-                    "companyUrl": "company_url",
-                    "companyDomain": "company_domain",
-                    "location": "location",
-                    "hasSimplifiedProcess": True,
-                    "flexibility": "hybrid",
+                    "tag": "NativeMessageVisitedJobPage",
+                    "values": [{
+                        "url": "url",
+                        "jobTitle": "job_title",
+                        "pageTitle": "page_title",
+                        "company": "company",
+                        "companyUrl": "company_url",
+                        "companyDomain": "company_domain",
+                        "location": "location",
+                        "hasSimplifiedProcess": True,
+                        "flexibility": "hybrid"
+                    }]
                 },
                 VisitedLinkedInJobPageMessage(
                     url="url",

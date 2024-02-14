@@ -27,16 +27,17 @@ class BackgroundScriptMessage(Message):
 
         try:
             tag = message.pop("tag")
+            [values] = message.pop("values")
         except KeyError:
-            raise ValueError("message should contain a tag")
+            raise ValueError("messages from background script should contain a tag and values")
 
-        message = {to_snake_case(k): v for k, v in message.items()}
+        values = {to_snake_case(k): v for k, v in values.items()}
 
         match tag:
-            case "visited_linkedin_job_page":
-                return VisitedLinkedInJobPageMessage(**message)
-            case "initial_configuration":
-                return InitialConfigurationMessage(**message)
+            case "NativeMessageVisitedJobPage":
+                return VisitedLinkedInJobPageMessage(**values)
+            case "NativeMessageInitialConfiguration":
+                return InitialConfigurationMessage(**values)
             case _:
                 raise ValueError(f"Got message with unknown tag {tag}")
 

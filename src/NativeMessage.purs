@@ -17,6 +17,7 @@ import Data.Maybe (Maybe)
 import Data.Show.Generic (genericShow)
 import Effect (Effect)
 import Effect.Class.Console (log)
+import LinkedIn.UI.Basic.Types (JobFlexibility)
 
 data NativeMessage =
   NativeMessageBackground String
@@ -31,7 +32,7 @@ data NativeMessage =
     companyUrl :: String,
     location :: String,
     hasSimplifiedProcess :: Boolean,
-    flexibility :: String
+    flexibility :: Maybe JobFlexibility
   }
   | NativeMessageJobAlreadyExists {job_id :: String}
   | NativeMessageJobAdded {job :: NativePythonJobOffer}

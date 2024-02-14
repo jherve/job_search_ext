@@ -3,13 +3,13 @@ module LinkedIn.UI.Basic.Types where
 import Prelude
 
 import Data.Argonaut.Decode (class DecodeJson, JsonDecodeError(..))
-import Data.Argonaut.Decode.Decoders (decodeNumber)
+import Data.Argonaut.Decode.Decoders (decodeNumber, decodeString)
 import Data.Argonaut.Decode.Generic (genericDecodeJson)
-import Data.Argonaut.Encode (class EncodeJson)
+import Data.Argonaut.Encode (class EncodeJson, encodeJson)
 import Data.Argonaut.Encode.Encoders (encodeNumber, encodeString)
 import Data.Argonaut.Encode.Generic (genericEncodeJson)
 import Data.Date (Month(..), Year)
-import Data.Either (note)
+import Data.Either (Either(..), note)
 import Data.Enum (toEnum)
 import Data.Generic.Rep (class Generic)
 import Data.Int64 (Int64)
@@ -69,5 +69,15 @@ data JobFlexibility = JobFlexHybrid | JobFlexOnSite | JobFlexFullRemote
 derive instance Eq JobFlexibility
 derive instance Generic JobFlexibility _
 instance Show JobFlexibility where show = genericShow
-instance EncodeJson JobFlexibility where encodeJson a = genericEncodeJson a
-instance DecodeJson JobFlexibility where decodeJson a = genericDecodeJson a
+instance EncodeJson JobFlexibility where
+  encodeJson = case _ of
+    JobFlexHybrid -> encodeJson "hybrid"
+    JobFlexOnSite -> encodeJson "on_site"
+    JobFlexFullRemote -> encodeJson "full_remote"
+
+instance DecodeJson JobFlexibility where
+  decodeJson j = case decodeString j of
+    Right "hybrid" -> Right JobFlexHybrid
+    Right "on_site" -> Right JobFlexOnSite
+    Right "full_remote" -> Right JobFlexFullRemote
+    _ -> Left $ UnexpectedValue j

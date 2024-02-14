@@ -20,7 +20,6 @@ import ExampleWebExt.RuntimeMessage (RuntimeMessage(..), onRuntimeMessageAddList
 import ExampleWebExt.Storage (clearAllJobs, getJobsPath, storeJob)
 import LinkedIn.Jobs.JobOffer (JobOffer(..))
 import LinkedIn.Output.Types (Output(..))
-import LinkedIn.UI.Basic.Types (JobFlexibility(..))
 
 main :: Effect Unit
 main = do
@@ -52,7 +51,6 @@ contentScriptMessageHandler
   where
     maybeMsg (JobOffer jo) = ado
       location <- jo.location
-      flexibility <- jo.flexibility
     in NativeMessageVisitedJobPage {
       url: url,
       jobTitle: jo.title,
@@ -62,10 +60,7 @@ contentScriptMessageHandler
       companyUrl: jo.companyLink,
       location,
       hasSimplifiedProcess: jo.hasSimplifiedApplicationProcess,
-      flexibility: case flexibility of
-        JobFlexOnSite -> "on_site"
-        JobFlexHybrid -> "hybrid"
-        JobFlexFullRemote -> "full_remote"
+      flexibility: jo.flexibility
     }
 
 contentScriptMessageHandler _ m (MessageSender {tab, id}) = do

@@ -65,6 +65,8 @@ class JobOffer:
     publication_date: date = None
     xp_required: int | None = None
     first_seen_date: datetime | None = None
+    application_date: date | None = None
+    application_rejection_date: date | None = None
     contract_type: ContractType | None = ContractType.CDI
     flexibility: Flexibility | None = None
     alternate_url: str = None
@@ -107,6 +109,8 @@ class JobOffer:
             ("xp_required", int),
             ("first_seen_date", parsedate_to_datetime),
             ("publication_date", date.fromisoformat),
+            ("application_date", date.fromisoformat),
+            ("application_rejection_date", date.fromisoformat),
         ]:
             if field in dict:
                 dict[field] = converter(dict[field])
@@ -114,8 +118,6 @@ class JobOffer:
         # For now we simply ignore application-related fields
         # read from the storage.
         for k in [
-            "application_date",
-            "application_rejection_date",
             "application_first_seen_date",
             "application_first_response_date",
             "application_cv_version",

@@ -39,7 +39,13 @@ data NativeMessage =
   | NativeMessageJobAdded {job :: NativePythonJobOffer}
   | NativeMessageJobOfferList {job_offers :: Array NativePythonJobOffer}
 
-type NativePythonJobOffer = {id :: String, title :: String, url :: String}
+type NativePythonJobOffer = {
+  id :: String,
+  title :: String,
+  url :: String,
+  application_date :: Maybe String,
+  application_rejection_date :: Maybe String
+}
 type NativePythonMessage m = {tag :: String | m}
 type NativePythonMessageLog = NativePythonMessage (level :: String, content :: String)
 type NativePythonMessageInitialConfiguration = NativePythonMessage (jobsPath :: String)

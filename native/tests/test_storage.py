@@ -48,6 +48,8 @@ def job_storage(request, tmp_path):
             contract_type=ContractType.CDD,
             flexibility=Flexibility.HYBRID,
             alternate_url="https://www.anothersite.com/with/the/offer.html",
+            application_date=date.today(),
+            application_rejection_date=date.today(),
         ),
         JobOffer(
             url="https://www.linkedin.com/jobs/view/3755217595",

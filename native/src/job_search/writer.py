@@ -41,9 +41,8 @@ class Application:
                 self.handle_message(received_message)
 
                 if self.job_storage:
-                    self.read_writer.send_message(
-                        JobOfferListMessage(self.job_storage.read_all())
-                    )
+                    offers = list(self.job_storage.read_all().values())
+                    self.read_writer.send_message(JobOfferListMessage(offers))
 
             except Exception as e:
                 exc_info = sys.exc_info()

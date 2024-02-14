@@ -7,8 +7,7 @@ import Browser.WebExt.Message (Message, mkMessage, unwrapMessage)
 import Browser.WebExt.Port (Port, onDisconnectAddListener, onMessageAddListener)
 import Browser.WebExt.Port as Port
 import Browser.WebExt.Runtime (Application, connectNative)
-import Data.Argonaut.Core (Json)
-import Data.Argonaut.Decode (class DecodeJson, decodeJson, printJsonDecodeError)
+import Data.Argonaut.Decode (class DecodeJson, printJsonDecodeError)
 import Data.Argonaut.Decode.Generic (genericDecodeJson)
 import Data.Argonaut.Encode (class EncodeJson)
 import Data.Argonaut.Encode.Generic (genericEncodeJson)
@@ -45,22 +44,13 @@ type NativePythonJobOffer = {
   application_date :: Maybe String,
   application_rejection_date :: Maybe String
 }
-type NativePythonMessage m = {tag :: String | m}
 
 derive instance Generic NativeMessage _
 instance Show NativeMessage where show = genericShow
 instance EncodeJson NativeMessage where encodeJson a = genericEncodeJson a
 
--- A function used to transform some messages sent by the native application that are in the form
--- of an object with unknown keys to an array of objects. The long-term solution is probably to 
--- change the format of the native message, but we'll probably need this function as well when
--- we read data storage in storage.local which is stored as a giant object with unknown keys.
-foreign import toArrayOfObjects :: String -> Json -> Json
-
 instance DecodeJson NativeMessage where
-  decodeJson json = case decodeJson @(NativePythonMessage ()) json of
-    Right {tag: "NativeMessageJobOfferList"} -> genericDecodeJson $ toArrayOfObjects "job_offers" json
-    _ -> genericDecodeJson json
+  decodeJson json = genericDecodeJson json
 
 connectToNativeApplication ∷ Application → Effect Port
 connectToNativeApplication = connectNative

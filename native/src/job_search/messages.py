@@ -44,22 +44,7 @@ class BackgroundScriptMessage(Message):
 
 class NativeMessage(Message):
     def serialize(self):
-        if isinstance(self, JobOfferListMessage):
-            tag = "NativeMessageJobOfferList"
-            values = asdict(self)
-        elif isinstance(self, JobAddedMessage):
-            tag = "NativeMessageJobAdded"
-            values = [asdict(self)]
-        elif isinstance(self, JobAlreadyExistsMessage):
-            tag = "NativeMessageJobAlreadyExists"
-            values = [asdict(self)]
-        elif isinstance(self, LogMessage):
-            tag = "NativeMessageLog"
-            values = [asdict(self)]
-        else:
-            raise TypeError(f"No tag was associated to {type(self)} for serialization")
-
-        return {"tag": tag, "values": values}
+        raise NotImplementedError(f"No tag was associated to {type(self)} for serialization")
 
 
 @dataclass
@@ -108,15 +93,24 @@ class InitialConfigurationMessage(BackgroundScriptMessage):
 class JobOfferListMessage(NativeMessage):
     job_offers: list[JobOffer]
 
+    def serialize(self):
+        return {"tag": "NativeMessageJobOfferList", "values": [self.job_offers]}
+
 
 @dataclass
 class JobAddedMessage(NativeMessage):
     job: JobOffer
 
+    def serialize(self):
+        return {"tag": "NativeMessageJobAdded", "values": [asdict(self)]}
+
 
 @dataclass
 class JobAlreadyExistsMessage(NativeMessage):
     job_id: str
+
+    def serialize(self):
+        return {"tag": "NativeMessageJobAlreadyExists", "values": [asdict(self)]}
 
 
 class LogLevel(Enum):
@@ -141,3 +135,6 @@ class LogMessage(NativeMessage):
     @staticmethod
     def error(**kwargs):
         return LogMessage(level=LogLevel.ERROR, **kwargs)
+
+    def serialize(self):
+        return {"tag": "NativeMessageLog", "values": [asdict(self)]}

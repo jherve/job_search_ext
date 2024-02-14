@@ -130,27 +130,27 @@ class TestReadWriter:
         params=[
             (
                 JobOfferListMessage(job_offers=["job_offer_1", "job_offer_2"]),
-                {"tag": "job_offer_list", "job_offers": ["job_offer_1", "job_offer_2"]},
+                {"tag": "NativeMessageJobOfferList", "values": {"job_offers": ["job_offer_1", "job_offer_2"]}},
             ),
             (
                 JobAddedMessage(job="job"),
-                {"tag": "job_added", "job": "job"},
+                {"tag": "NativeMessageJobAdded", "values": [{"job": "job"}]},
             ),
             (
                 JobAlreadyExistsMessage(job_id="job_id"),
-                {"tag": "job_already_exists", "job_id": "job_id"},
+                {"tag": "NativeMessageJobAlreadyExists", "values": [{"job_id": "job_id"}]},
             ),
             (
                 LogMessage.debug(content="debug_content"),
-                {"tag": "log_message", "level": "debug", "content": "debug_content"},
+                {"tag": "NativeMessageLog", "values": [{"level": "debug", "content": "debug_content"}]},
             ),
             (
                 LogMessage.info(content={"message": "info"}),
-                {"tag": "log_message", "level": "info", "content": {"message": "info"}},
+                {"tag": "NativeMessageLog", "values": [{"level": "info", "content": {"message": "info"}}]},
             ),
             (
                 LogMessage.error(content="error_content"),
-                {"tag": "log_message", "level": "error", "content": "error_content"},
+                {"tag": "NativeMessageLog", "values": [{"level": "error", "content": "error_content"}]},
             ),
         ]
     )

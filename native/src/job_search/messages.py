@@ -45,17 +45,21 @@ class BackgroundScriptMessage(Message):
 class NativeMessage(Message):
     def serialize(self):
         if isinstance(self, JobOfferListMessage):
-            tag = "job_offer_list"
+            tag = "NativeMessageJobOfferList"
+            values = asdict(self)
         elif isinstance(self, JobAddedMessage):
-            tag = "job_added"
+            tag = "NativeMessageJobAdded"
+            values = [asdict(self)]
         elif isinstance(self, JobAlreadyExistsMessage):
-            tag = "job_already_exists"
+            tag = "NativeMessageJobAlreadyExists"
+            values = [asdict(self)]
         elif isinstance(self, LogMessage):
-            tag = "log_message"
+            tag = "NativeMessageLog"
+            values = [asdict(self)]
         else:
             raise TypeError(f"No tag was associated to {type(self)} for serialization")
 
-        return asdict(self) | {"tag": tag}
+        return {"tag": tag, "values": values}
 
 
 @dataclass

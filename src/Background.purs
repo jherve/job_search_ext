@@ -78,7 +78,7 @@ contentScriptMessageHandler _ m (MessageSender {tab, id}) = do
   debug msg
 
 nativeMessageHandler ∷ NativeMessage → Effect Unit
-nativeMessageHandler (NativeMessageJobOfferList {job_offers}) = do
+nativeMessageHandler (NativeMessageJobOfferList job_offers) = do
   clearAllJobs
   for_ job_offers \jo -> do
     storeJob jo

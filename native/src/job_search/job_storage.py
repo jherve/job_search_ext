@@ -245,7 +245,9 @@ class JobStorage:
         for r in process.stdout.split("\n\n"):
             dict = {"skills": [], "tags": []}
 
-            lines = re.split(r"\n(?!\+)", r)[:-1]
+            # For some reason the last record always gets an extra line break which translates
+            # as an extra empty line in the split
+            lines = [l for l in re.split(r"\n(?!\+)", r) if l != ""]
             for l in lines:
                 # We assume fields are not empty
                 [field, value] = l.split(": ", 1)

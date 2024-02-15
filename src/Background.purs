@@ -20,6 +20,7 @@ import ExampleWebExt.RuntimeMessage (RuntimeMessage(..), onRuntimeMessageAddList
 import ExampleWebExt.Storage (clearAllJobs, getJobsPath, storeJob)
 import LinkedIn.Jobs.JobOffer (JobOffer(..))
 import LinkedIn.Output.Types (Output(..))
+import Web.URL as URL
 
 main :: Effect Unit
 main = do
@@ -51,6 +52,7 @@ contentScriptMessageHandler
   where
     maybeMsg (JobOffer jo) = ado
       location <- jo.location
+      url <- cleanUpUrl url
     in NativeMessageVisitedJobPage {
       url: url,
       jobTitle: jo.title,
@@ -71,6 +73,11 @@ contentScriptMessageHandler _ m (MessageSender {tab, id}) = do
     msg = "[bg] received " <> show m <> " from " <> senderMsg
 
   debug msg
+
+cleanUpUrl :: String -> Maybe String
+cleanUpUrl u = do
+  url <- URL.fromAbsolute u
+  pure $ URL.toString $ URL.setSearch "" url
 
 nativeMessageHandler ∷ NativeMessage → Effect Unit
 nativeMessageHandler (NativeMessageJobOfferList job_offers) = do

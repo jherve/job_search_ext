@@ -29,8 +29,8 @@ main :: Effect Unit
 main = do
   log "[bg] starting up"
   port <- connectToNativeApplication "job_search_background"
-  -- TODO: This is redundant to send "port" to both addListener and the handler
-  onNativeMessageAddListener port $ nativeMessageHandler port
+
+  onNativeMessageAddListener port nativeMessageHandler
   onNativeDisconnectAddListener port \p -> log $ "disconnected from native port " <> p.name <> " (" <> p.error <> ")"
 
   sendConfigurationToNative port

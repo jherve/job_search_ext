@@ -21,6 +21,6 @@ index b73fd21..86d7396 100644
    log "[bg] starting up"
 -  port <- connectToNativeApplication "job_search_background"
 +  port <- connectToNativeApplication "job_search_background.prod"
-   -- TODO: This is redundant to send "port" to both addListener and the handler
-   onNativeMessageAddListener port $ nativeMessageHandler port
+
+   onNativeMessageAddListener port nativeMessageHandler
    onNativeDisconnectAddListener port \p -> log $ "disconnected from native port " <> p.name <> " (" <> p.error <> ")"

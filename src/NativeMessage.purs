@@ -86,13 +86,13 @@ decodeNativeMessage m =
     Left err -> Left $ printJsonDecodeError err
     Right m' -> Right m'
 
-onNativeMessageAddListener ∷ Port → (NativeMessage → Effect Unit) → Effect Unit
+onNativeMessageAddListener ∷ Port → (Port -> NativeMessage → Effect Unit) → Effect Unit
 onNativeMessageAddListener port f = onMessageAddListener port $ runtimeMessageHandler
   where
     runtimeMessageHandler = mkListener \m -> do
       case decodeNativeMessage m of
         Left err -> log err
-        Right m' -> f m'
+        Right m' -> f port m'
 
 onNativeDisconnectAddListener :: Port -> (Port -> Effect Unit) -> Effect Unit
 onNativeDisconnectAddListener port f = onDisconnectAddListener port $ mkListener f

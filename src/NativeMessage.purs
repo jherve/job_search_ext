@@ -72,6 +72,7 @@ type NativePythonJobOffer = {
   company_url :: Maybe String,
   flexibility :: Maybe JobFlexibility,
   application_process :: Maybe ApplicationProcess,
+  application_considered :: Maybe Boolean,
   application_date :: Maybe String,
   application_rejection_date :: Maybe String
 }

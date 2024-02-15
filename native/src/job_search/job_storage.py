@@ -45,6 +45,9 @@ def convert_to_parse_result(url):
     elif isinstance(url, ParseResult):
         return url
 
+def convert_to_bool(s: str) -> bool:
+    return s == "true" or s == "yes" or s == "1"
+
 
 @dataclass
 class JobOffer:
@@ -65,6 +68,7 @@ class JobOffer:
     publication_date: date = None
     xp_required: int | None = None
     first_seen_date: datetime | None = None
+    application_considered: bool | None = None
     application_date: date | None = None
     application_rejection_date: date | None = None
     contract_type: ContractType | None = ContractType.CDI
@@ -109,6 +113,7 @@ class JobOffer:
             ("xp_required", int),
             ("first_seen_date", parsedate_to_datetime),
             ("publication_date", date.fromisoformat),
+            ("application_considered", convert_to_bool),
             ("application_date", date.fromisoformat),
             ("application_rejection_date", date.fromisoformat),
         ]:

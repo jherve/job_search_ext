@@ -1,6 +1,8 @@
 const rejected_color = "rgb(255, 108, 108)";
 const applied_color = "rgb(236, 253, 207)";
 const seen_color = "rgb(204, 241, 255)";
+const considered_color = "rgb(255, 247, 204)";
+const dismissed_color = "rgb(255, 195, 177)";
 
 export function colorVisitedJobsLoopImpl () {
     // Add a div on the left side that displays a legend of the color used in the UI
@@ -9,6 +11,8 @@ export function colorVisitedJobsLoopImpl () {
         <div id="jobs-search-legend" style="position: absolute; top: 50%; background: white;">
             <p style="background: ${seen_color}">Seen</p>
             <p style="background: ${applied_color}">Applied</p>
+            <p style="background: ${considered_color}">Application considered</p>
+            <p style="background: ${dismissed_color}">Application dismissed</p>
             <p style="background: ${rejected_color}">Rejected</p>
         </div>
     `;
@@ -34,6 +38,10 @@ function getBackgroundColor(job) {
         return rejected_color;
     else if (job.application_date)
         return applied_color;
+    else if (job.application_considered === true)
+        return considered_color;
+    else if (job.application_considered === false)
+        return dismissed_color;
     else
         return seen_color;
 }

@@ -32,7 +32,6 @@ You can edit this file as you like.
   , "partial"
   , "prelude"
   , "profunctor-lenses"
-  , "record"
   , "spec"
   , "strings"
   , "transformers"

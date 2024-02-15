@@ -12,15 +12,15 @@ index f3c3aca..e365fca 100755
  EXTENSION_BIN=${EXTENSION_BACKEND_PATH}/run.sh
  
 diff --git a/src/Background.purs b/src/Background.purs
-index 885ac8e..a742a65 100644
+index b73fd21..86d7396 100644
 --- a/src/Background.purs
 +++ b/src/Background.purs
-@@ -24,7 +24,7 @@ import LinkedIn.Output.Types (Output(..))
+@@ -28,7 +28,7 @@ import Web.URL as URL
  main :: Effect Unit
  main = do
    log "[bg] starting up"
 -  port <- connectToNativeApplication "job_search_background"
 +  port <- connectToNativeApplication "job_search_background.prod"
-   onNativeMessageAddListener port nativeMessageHandler
+   -- TODO: This is redundant to send "port" to both addListener and the handler
+   onNativeMessageAddListener port $ nativeMessageHandler port
    onNativeDisconnectAddListener port \p -> log $ "disconnected from native port " <> p.name <> " (" <> p.error <> ")"
- 

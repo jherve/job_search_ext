@@ -7,7 +7,6 @@ from dataclasses import asdict
 from job_search.read_write import StdReadWriter, ReadWriter
 from job_search.messages import (
     InitialConfigurationMessage,
-    VisitedLinkedInJobPageMessage,
     JobOfferListMessage,
     JobAddedMessage,
     JobAlreadyExistsMessage,
@@ -84,34 +83,7 @@ class TestReadWriter:
             (
                 {"tag": "NativeMessageInitialConfiguration", "values": [{"jobsPath": "jobs_path"}]},
                 InitialConfigurationMessage(jobs_path="jobs_path"),
-            ),
-            (
-                {
-                    "tag": "NativeMessageVisitedJobPage",
-                    "values": [{
-                        "url": "url",
-                        "jobTitle": "job_title",
-                        "pageTitle": "page_title",
-                        "company": "company",
-                        "companyUrl": "company_url",
-                        "companyDomain": "company_domain",
-                        "location": "location",
-                        "hasSimplifiedProcess": True,
-                        "flexibility": "hybrid"
-                    }]
-                },
-                VisitedLinkedInJobPageMessage(
-                    url="url",
-                    job_title="job_title",
-                    page_title="page_title",
-                    company="company",
-                    company_url="company_url",
-                    company_domain="company_domain",
-                    location="location",
-                    has_simplified_process=True,
-                    flexibility="hybrid",
-                ),
-            ),
+            )
         ]
     )
     def input_message(self, request):
@@ -133,8 +105,8 @@ class TestReadWriter:
                 {"tag": "NativeMessageJobOfferList", "values": [[{"id": "job_offer_1"}, {"id": "job_offer_2"}]]},
             ),
             (
-                JobAddedMessage(job="job"),
-                {"tag": "NativeMessageJobAdded", "values": [{"job": "job"}]},
+                JobAddedMessage(job_id="job_id"),
+                {"tag": "NativeMessageJobAdded", "values": [{"job_id": "job_id"}]},
             ),
             (
                 JobAlreadyExistsMessage(job_id="job_id"),

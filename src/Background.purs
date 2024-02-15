@@ -10,23 +10,27 @@ import Browser.WebExt.Tabs (Tab)
 import Data.Argonaut.Decode (printJsonDecodeError)
 import Data.Either (Either(..))
 import Data.Foldable (for_)
+import Data.Int64 as I64
 import Data.Maybe (Maybe(..))
 import Effect (Effect)
 import Effect.Aff (launchAff_)
 import Effect.Class (liftEffect)
 import Effect.Class.Console (debug, error, log, logShow)
-import ExampleWebExt.NativeMessage (NativeMessage(..), connectToNativeApplication, onNativeDisconnectAddListener, onNativeMessageAddListener, sendMessageToNative)
+import ExampleWebExt.NativeMessage (ApplicationProcess(..), NativeMessage(..), connectToNativeApplication, onNativeDisconnectAddListener, onNativeMessageAddListener, sendMessageToNative)
 import ExampleWebExt.RuntimeMessage (RuntimeMessage(..), onRuntimeMessageAddListener, sendMessageToContent)
 import ExampleWebExt.Storage (clearAllJobs, getJobsPath, storeJob)
 import LinkedIn.Jobs.JobOffer (JobOffer(..))
 import LinkedIn.Output.Types (Output(..))
+import LinkedIn.PageUrl (PageUrl(..))
+import LinkedIn.UI.Basic.Types (JobOfferId(..))
 import Web.URL as URL
 
 main :: Effect Unit
 main = do
   log "[bg] starting up"
   port <- connectToNativeApplication "job_search_background"
-  onNativeMessageAddListener port nativeMessageHandler
+  -- TODO: This is redundant to send "port" to both addListener and the handler
+  onNativeMessageAddListener port $ nativeMessageHandler port
   onNativeDisconnectAddListener port \p -> log $ "disconnected from native port " <> p.name <> " (" <> p.error <> ")"
 
   sendConfigurationToNative port
@@ -43,7 +47,7 @@ browserActionOnClickedHandler tab = do
 contentScriptMessageHandler ∷ Port -> RuntimeMessage -> MessageSender → Effect Unit
 contentScriptMessageHandler
   port
-  (RuntimeMessagePageContent _ (OutJobOffer offer))
+  (RuntimeMessagePageContent (UrlJobOffer (JobOfferId jobId)) (OutJobOffer offer))
   (MessageSender {tab: Just {url, title}}) =
     case maybeMsg offer of
       Just msg -> sendMessageToNative port msg
@@ -51,19 +55,22 @@ contentScriptMessageHandler
 
   where
     maybeMsg (JobOffer jo) = ado
-      location <- jo.location
       url <- cleanUpUrl url
-    in NativeMessageVisitedJobPage {
-      url: url,
-      jobTitle: jo.title,
-      pageTitle: title,
-      company: jo.companyName,
-      companyDomain: jo.companyDomain,
-      companyUrl: jo.companyLink,
-      location,
-      hasSimplifiedProcess: jo.hasSimplifiedApplicationProcess,
-      flexibility: jo.flexibility
-    }
+    in NativeMessageAddJob {
+        id: "linked_in_" <> I64.toString jobId,
+        origin: "linked_in",
+        title: jo.title,
+        url,
+        company: jo.companyName,
+        location: jo.location,
+        company_domain: jo.companyDomain,
+        company_url: Just jo.companyLink,
+        flexibility: jo.flexibility,
+        application_process: Just $ if jo.hasSimplifiedApplicationProcess then ApplicationProcessLinkedInSimplified else ApplicationProcessRegular,
+        application_date: Nothing,
+        application_rejection_date: Nothing,
+        application_considered: Nothing
+      }
 
 contentScriptMessageHandler _ m (MessageSender {tab, id}) = do
   let
@@ -79,13 +86,15 @@ cleanUpUrl u = do
   url <- URL.fromAbsolute u
   pure $ URL.toString $ URL.setSearch "" url
 
-nativeMessageHandler ∷ NativeMessage → Effect Unit
-nativeMessageHandler (NativeMessageJobOfferList job_offers) = do
+nativeMessageHandler ∷ Port -> NativeMessage → Effect Unit
+nativeMessageHandler _ (NativeMessageJobOfferList job_offers) = do
   clearAllJobs
   for_ job_offers \jo -> do
     storeJob jo
 
-nativeMessageHandler m = logShow m
+nativeMessageHandler port NativeMessageStorageReady = sendMessageToNative port $ NativeMessageListJobsRequest
+nativeMessageHandler port (NativeMessageJobAdded _) = sendMessageToNative port $ NativeMessageListJobsRequest
+nativeMessageHandler _ m = logShow m
 
 sendConfigurationToNative ∷ Port → Effect Unit
 sendConfigurationToNative port = launchAff_ do

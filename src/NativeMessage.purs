@@ -24,19 +24,11 @@ data NativeMessage =
   NativeMessageBackground String
   | NativeMessageLog {level :: String, content :: String}
   | NativeMessageInitialConfiguration {jobsPath :: String}
-  | NativeMessageVisitedJobPage {
-    url :: String,
-    jobTitle :: String,
-    pageTitle :: String,
-    company :: String,
-    companyDomain :: Maybe String,
-    companyUrl :: String,
-    location :: String,
-    hasSimplifiedProcess :: Boolean,
-    flexibility :: Maybe JobFlexibility
-  }
+  | NativeMessageStorageReady
+  | NativeMessageAddJob NativePythonJobOffer
+  | NativeMessageListJobsRequest
   | NativeMessageJobAlreadyExists {job_id :: String}
-  | NativeMessageJobAdded {job :: NativePythonJobOffer}
+  | NativeMessageJobAdded {job_id :: String}
   | NativeMessageJobOfferList (Array NativePythonJobOffer)
 
 data ApplicationProcess
@@ -64,6 +56,7 @@ instance DecodeJson ApplicationProcess where
 
 type NativePythonJobOffer = {
   id :: String,
+  origin :: String,
   title :: String,
   url :: String,
   company :: String,
@@ -78,7 +71,7 @@ type NativePythonJobOffer = {
 }
 
 derive instance Generic NativeMessage _
-instance Show NativeMessage where show = genericShow
+instance Show NativeMessage where show a = genericShow a
 instance EncodeJson NativeMessage where encodeJson a = genericEncodeJson a
 
 instance DecodeJson NativeMessage where

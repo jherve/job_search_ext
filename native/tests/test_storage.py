@@ -19,6 +19,7 @@ def job_storage(request, tmp_path):
 @pytest.fixture(
     params=[
         JobOffer(
+            id="linked_in_3755217595",
             url="https://www.linkedin.com/jobs/view/3755217595",
             title="Job title",
             company="Company",
@@ -30,6 +31,7 @@ def job_storage(request, tmp_path):
             publication_date=date.today(),
         ),
         JobOffer(
+            id="linked_in_3755217595",
             url="https://www.linkedin.com/jobs/view/3755217595",
             title="Job title",
             company="Company",
@@ -52,6 +54,7 @@ def job_storage(request, tmp_path):
             application_rejection_date=date.today(),
         ),
         JobOffer(
+            id="linked_in_3755217595",
             url="https://www.linkedin.com/jobs/view/3755217595",
             title="Job title",
             company="Company",
@@ -78,7 +81,7 @@ class TestJobStorage:
         assert job_storage.read_all() == {}
 
     def test_job_addition(self, job_storage, linked_in_job_offer):
-        job_storage.add_job(linked_in_job_offer)
+        job_storage.insert_record("job_offer", linked_in_job_offer.to_storage())
 
         all_items = job_storage.read_all().items()
         assert len(all_items) == 1
@@ -92,9 +95,9 @@ class TestJobStorage:
         assert stored_job == linked_in_job_offer
 
     def test_job_duplicate_addition(self, job_storage, linked_in_job_offer):
-        job_storage.add_job(linked_in_job_offer)
+        job_storage.insert_record("job_offer", linked_in_job_offer.to_storage())
 
         with pytest.raises(FileExistsError) as excinfo:
-            job_storage.add_job(linked_in_job_offer)
+            job_storage.insert_record("job_offer", linked_in_job_offer.to_storage())
 
         assert linked_in_job_offer.id in str(excinfo.value)

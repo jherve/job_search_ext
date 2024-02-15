@@ -1,12 +1,15 @@
 import sys
 import traceback
 from pathlib import Path
+from dataclasses import asdict
 
 from job_search.read_write import ReadWriter
 from job_search.job_storage import JobStorage
 from job_search.messages import (
-    VisitedLinkedInJobPageMessage,
+    AddJobMessage,
     InitialConfigurationMessage,
+    StorageReadyMessage,
+    ListJobsRequestMessage,
     JobOfferListMessage,
     LogMessage,
     Message,
@@ -22,27 +25,26 @@ class Application:
 
     def handle_message(self, message: Message):
         match message:
-            case VisitedLinkedInJobPageMessage():
-                offer = message.extract_job_offer()
-
+            case AddJobMessage():
                 try:
-                    self.job_storage.add_job(offer)
-                    self.read_writer.send_message(JobAddedMessage(offer))
+                    self.job_storage.insert_record("job_offer", asdict(message))
+                    self.read_writer.send_message(JobAddedMessage(message.id))
                 except FileExistsError as e:
-                    self.read_writer.send_message(JobAlreadyExistsMessage(offer.id))
+                    self.read_writer.send_message(JobAlreadyExistsMessage(message.id))
+
+            case ListJobsRequestMessage():
+                offers = list(self.job_storage.read_all().values())
+                self.read_writer.send_message(JobOfferListMessage(offers))
 
             case InitialConfigurationMessage(jobs_path):
                 self.job_storage = JobStorage(base_dir=Path(jobs_path))
+                self.read_writer.send_message(StorageReadyMessage())
 
     def loop(self):
         while True:
             try:
                 received_message = self.read_writer.get_message()
                 self.handle_message(received_message)
-
-                if self.job_storage:
-                    offers = list(self.job_storage.read_all().values())
-                    self.read_writer.send_message(JobOfferListMessage(offers))
 
             except Exception as e:
                 exc_info = sys.exc_info()

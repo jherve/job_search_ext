@@ -41,7 +41,7 @@ class Flexibility(Enum):
 
 def convert_to_parse_result(url):
     if isinstance(url, str):
-        return urlparse(url)._replace(query=None)
+        return urlparse(url)
     elif isinstance(url, ParseResult):
         return url
 
@@ -51,7 +51,7 @@ def convert_to_bool(s: str) -> bool:
 
 @dataclass
 class JobOffer:
-    id: str = field(init=False)
+    id: str
     url: str = field(repr=False)
     title: str
     company: str
@@ -89,10 +89,6 @@ class JobOffer:
             self._alternate_url = convert_to_parse_result(self.alternate_url)
             self.alternate_url = self._alternate_url.geturl()
 
-        if self.origin == JobOfferOrigin.LINKED_IN:
-            path = Path(self._url.path)
-            self.id = f"linked_in_{path.name}"
-
     def to_storage(self):
         return {
             k: v
@@ -102,8 +98,6 @@ class JobOffer:
 
     @staticmethod
     def from_storage(dict: dict):
-        id = dict.pop("id")
-
         for field, converter in [
             ("origin", JobOfferOrigin),
             ("application_process", ApplicationProcess),
@@ -182,12 +176,6 @@ class JobStorage:
 
     def read_all(self) -> dict[str, JobOffer]:
         return {r["id"]: JobOffer.from_storage(r) for r in self.select_all("job_offer")}
-
-    def add_job(self, offer: JobOffer):
-        self.insert(offer)
-
-    def insert(self, offer: JobOffer):
-        self.insert_record("job_offer", offer.to_storage())
 
     def insert_record(self, type_, fields):
         cmd_args = [

@@ -28,5 +28,10 @@
   "options_ui": {
     "page": "src/settings.html"
   },
+  "sidebar_action": {
+    "default_icon": "assets/job-promotion.png",
+    "default_title": "Job helper",
+    "default_panel": "src/sidebar.html"
+  },
   "permissions": ["activeTab", "tabs", "storage", "nativeMessaging"]
 }

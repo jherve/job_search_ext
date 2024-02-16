@@ -64,6 +64,8 @@ class AddJobMessage(BackgroundScriptMessage):
     company_domain: Optional[str] = None
     company_url: Optional[str] = None
     flexibility: Optional[Flexibility] = None
+    alternate_url: Optional[str] = None
+    comment: Optional[str] = None
     application_process: Optional[ApplicationProcess] = None
     application_considered: Optional[bool] = None
     application_date: Optional[str] = None

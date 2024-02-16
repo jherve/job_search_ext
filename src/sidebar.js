@@ -18,10 +18,13 @@ function createJob (job) {
 
     li.appendChild(elWithText("h2", job.title));
     li.appendChild(elWithText("h3", job.company));
-    li.appendChild(link("linkedIn Url", job.url));
+    li.appendChild(link("Job offer link", job.url));
+
+    if (job.company_url)
+        li.appendChild(link("Company page", job.company_url));
 
     if (job.alternate_url)
-        li.appendChild(link("URL to company's site", job.alternate_url));
+        li.appendChild(link("Job offer on company website", job.alternate_url));
 
     if (job.comment)
         li.appendChild(elWithText("p", job.comment));

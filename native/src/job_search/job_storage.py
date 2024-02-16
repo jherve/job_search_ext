@@ -5,7 +5,6 @@ from urllib.parse import urlparse, ParseResult
 from dataclasses import dataclass, field, asdict
 from enum import Enum
 from datetime import date, datetime
-from email.utils import parsedate_to_datetime
 
 
 class JobOfferOrigin(Enum):
@@ -37,108 +36,6 @@ class Flexibility(Enum):
     ON_SITE = "on_site"
     HYBRID = "hybrid"
     FULL_REMOTE = "full_remote"
-
-
-def convert_to_parse_result(url):
-    if isinstance(url, str):
-        return urlparse(url)
-    elif isinstance(url, ParseResult):
-        return url
-
-def convert_to_bool(s: str) -> bool:
-    return s == "true" or s == "yes" or s == "1"
-
-
-@dataclass
-class JobOffer:
-    id: str
-    url: str = field(repr=False)
-    title: str
-    company: str
-    origin: JobOfferOrigin
-    location: str
-    application_process: ApplicationProcess | None = None
-    company_url: str = ""
-    description: str = ""
-    company_kind: CompanyKind | None = None
-    company_domain: str = ""
-    comment: str = ""
-    tags: list[str] = field(default_factory=list)
-    skills: list[str] = field(default_factory=list)
-    publication_date: date = None
-    xp_required: int | None = None
-    first_seen_date: datetime | None = None
-    application_considered: bool | None = None
-    application_date: date | None = None
-    application_rejection_date: date | None = None
-    contract_type: ContractType | None = ContractType.CDI
-    flexibility: Flexibility | None = None
-    alternate_url: str = None
-    _url: ParseResult = field(init=False, repr=False)
-    _company_url: ParseResult = field(init=False, repr=False)
-    _alternate_url: ParseResult = field(init=False, repr=False, default=None)
-
-    def __post_init__(self):
-        self._url = convert_to_parse_result(self.url)
-        self.url = self._url.geturl()
-
-        self._company_url = convert_to_parse_result(self.company_url)
-        self.company_url = self._company_url.geturl()
-
-        if self.alternate_url:
-            self._alternate_url = convert_to_parse_result(self.alternate_url)
-            self.alternate_url = self._alternate_url.geturl()
-
-    def to_storage(self):
-        return {
-            k: v
-            for k, v in asdict(self).items()
-            if k not in ["_url", "_company_url", "_alternate_url"]
-        }
-
-    @staticmethod
-    def from_storage(dict: dict):
-        for field, converter in [
-            ("origin", JobOfferOrigin),
-            ("application_process", ApplicationProcess),
-            ("company_kind", CompanyKind),
-            ("contract_type", ContractType),
-            ("flexibility", Flexibility),
-            ("xp_required", int),
-            ("first_seen_date", parsedate_to_datetime),
-            ("publication_date", date.fromisoformat),
-            ("application_considered", convert_to_bool),
-            ("application_date", date.fromisoformat),
-            ("application_rejection_date", date.fromisoformat),
-        ]:
-            if field in dict:
-                dict[field] = converter(dict[field])
-
-        # For now we simply ignore application-related fields
-        # read from the storage.
-        for k in [
-            "application_first_seen_date",
-            "application_first_response_date",
-            "application_cv_version",
-            "application_appointments",
-            "application_message",
-            "application_questions",
-            "application_url",
-            "application_contacts",
-            "application_text",
-        ]:
-            try:
-                del dict[k]
-            except KeyError:
-                pass
-
-        return JobOffer(**dict)
-
-
-def remove_whitespace(s):
-    s = re.sub(r"[^\w\s]", "", s)
-    s = re.sub(r"\s+", "_", s)
-    return s
 
 
 @dataclass
@@ -175,8 +72,8 @@ class JobStorage:
                 f.write("%type: first_seen_date date\n")
                 f.write("%auto: first_seen_date\n")
 
-    def read_all(self) -> dict[str, JobOffer]:
-        return {r["id"]: JobOffer.from_storage(r) for r in self.select_all("job_offer")}
+    def read_all(self) -> dict[str, dict]:
+        return {r["id"]: r for r in self.select_all("job_offer")}
 
     def insert_record(self, type_, fields):
         cmd_args = [

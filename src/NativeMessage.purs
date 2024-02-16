@@ -7,8 +7,9 @@ import Browser.WebExt.Message (Message, mkMessage, unwrapMessage)
 import Browser.WebExt.Port (Port, onDisconnectAddListener, onMessageAddListener)
 import Browser.WebExt.Port as Port
 import Browser.WebExt.Runtime (Application, connectNative)
+import Control.Alt ((<|>))
 import Data.Argonaut.Decode (class DecodeJson, JsonDecodeError(..), printJsonDecodeError)
-import Data.Argonaut.Decode.Decoders (decodeString)
+import Data.Argonaut.Decode.Decoders (decodeBoolean, decodeString)
 import Data.Argonaut.Decode.Generic (genericDecodeJson)
 import Data.Argonaut.Encode (class EncodeJson, encodeJson)
 import Data.Argonaut.Encode.Generic (genericEncodeJson)
@@ -55,6 +56,21 @@ instance DecodeJson ApplicationProcess where
     Right "spurious" -> Right ApplicationProcessSpurious
     _ -> Left $ UnexpectedValue json
 
+newtype BooleanStr = BooleanStr Boolean
+derive instance Generic BooleanStr _
+instance Show BooleanStr where show = genericShow
+instance EncodeJson BooleanStr where encodeJson (BooleanStr bool) = encodeJson bool
+
+instance DecodeJson BooleanStr where
+  decodeJson json = decodedAsBoolean <|> decodedAsString
+    where
+      decodedAsBoolean = map (\b -> BooleanStr b) $ decodeBoolean json
+      decodedAsString =
+        case decodeString json of
+          Right "true" -> Right (BooleanStr true)
+          Right "false" -> Right (BooleanStr false)
+          _ -> Left $ UnexpectedValue json
+
 type NativePythonJobOffer = {
   id :: String,
   origin :: String,
@@ -68,7 +84,7 @@ type NativePythonJobOffer = {
   flexibility :: Maybe JobFlexibility,
   comment :: Maybe String,
   application_process :: Maybe ApplicationProcess,
-  application_considered :: Maybe Boolean,
+  application_considered :: Maybe BooleanStr,
   application_date :: Maybe String,
   application_rejection_date :: Maybe String
 }

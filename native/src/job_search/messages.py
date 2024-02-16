@@ -4,7 +4,6 @@ from dataclasses import dataclass, asdict
 from enum import Enum
 from typing import Optional, Any
 from job_search.job_storage import (
-    JobOffer,
     ApplicationProcess,
     JobOfferOrigin,
     Flexibility,
@@ -87,7 +86,7 @@ class InitialConfigurationMessage(BackgroundScriptMessage):
 
 @dataclass
 class JobOfferListMessage(NativeMessage):
-    job_offers: list[JobOffer]
+    job_offers: list[dict]
 
     def serialize(self):
         return {"tag": "NativeMessageJobOfferList", "values": [self.job_offers]}

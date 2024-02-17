@@ -100,6 +100,12 @@ class StorageReadyMessage(NativeMessage):
 
 
 @dataclass
+class StorageUpdatedMessage(NativeMessage):
+    def serialize(self):
+        return {"tag": "NativeMessageStorageUpdated", "values": []}
+
+
+@dataclass
 class JobAddedMessage(NativeMessage):
     job_id: str
 

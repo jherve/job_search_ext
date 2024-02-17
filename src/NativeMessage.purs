@@ -25,6 +25,7 @@ data NativeMessage =
   | NativeMessageLog {level :: String, content :: String}
   | NativeMessageInitialConfiguration {jobsPath :: String}
   | NativeMessageStorageReady
+  | NativeMessageStorageUpdated
   | NativeMessageAddJob NativePythonJobOffer
   | NativeMessageListJobsRequest
   | NativeMessageJobAlreadyExists {job_id :: String}

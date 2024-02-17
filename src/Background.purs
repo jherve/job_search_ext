@@ -95,6 +95,7 @@ nativeMessageHandler _ (NativeMessageJobOfferList job_offers) = do
     storeJob jo
 
 nativeMessageHandler port NativeMessageStorageReady = sendMessageToNative port $ NativeMessageListJobsRequest
+nativeMessageHandler port NativeMessageStorageUpdated = sendMessageToNative port $ NativeMessageListJobsRequest
 nativeMessageHandler port (NativeMessageJobAdded _) = sendMessageToNative port $ NativeMessageListJobsRequest
 nativeMessageHandler _ m = logShow m
 

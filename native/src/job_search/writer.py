@@ -1,7 +1,9 @@
 import sys
 import traceback
+import asyncio
 from pathlib import Path
 from dataclasses import asdict
+from watchfiles import awatch
 
 from job_search.read_write import ReadWriter
 from job_search.job_storage import JobStorage
@@ -9,6 +11,7 @@ from job_search.messages import (
     AddJobMessage,
     InitialConfigurationMessage,
     StorageReadyMessage,
+    StorageUpdatedMessage,
     ListJobsRequestMessage,
     JobOfferListMessage,
     LogMessage,
@@ -40,10 +43,13 @@ class Application:
                 self.job_storage = JobStorage(base_dir=Path(jobs_path))
                 self.read_writer.send_message(StorageReadyMessage())
 
-    def loop(self):
+    async def loop_on_messages(self):
+        loop = asyncio.get_running_loop()
         while True:
             try:
-                received_message = self.read_writer.get_message()
+                received_message = await loop.run_in_executor(
+                    None, self.read_writer.get_message
+                )
                 self.handle_message(received_message)
 
             except Exception as e:
@@ -51,7 +57,19 @@ class Application:
                 tb = "".join(traceback.format_exception(*exc_info))
                 self.read_writer.send_message(LogMessage.error(content=tb))
 
+    async def watch_changes(self):
+        while True:
+            await asyncio.sleep(1)
+            if self.job_storage:
+                async for changes in awatch(self.job_storage.rec_file_path):
+                    self.read_writer.send_message(StorageUpdatedMessage())
+
+    async def aloop(self):
+        async with asyncio.TaskGroup() as tg:
+            task1 = tg.create_task(self.loop_on_messages())
+            task2 = tg.create_task(self.watch_changes())
+
 
 if __name__ == "__main__":
     app = Application(sys.stdin, sys.stdout)
-    app.loop()
+    asyncio.run(app.aloop())

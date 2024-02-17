@@ -125,6 +125,7 @@ class JobOffer:
             "application_questions",
             "application_url",
             "application_contacts",
+            "application_text",
         ]:
             try:
                 del dict[k]

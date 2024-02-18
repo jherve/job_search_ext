@@ -39,3 +39,4 @@ derive instance Generic OutputError _
 derive instance Eq OutputError
 instance Show OutputError where show = genericShow
 instance EncodeJson OutputError where encodeJson a = genericEncodeJson a
+instance DecodeJson OutputError where decodeJson a = genericDecodeJson a

@@ -3,6 +3,8 @@ module LinkedIn.QueryRunner where
 import Prelude
 
 import Control.Monad.Except (ExceptT(..), except, mapExceptT, runExceptT)
+import Data.Argonaut.Decode (class DecodeJson)
+import Data.Argonaut.Decode.Generic (genericDecodeJson)
 import Data.Argonaut.Encode (class EncodeJson)
 import Data.Argonaut.Encode.Generic (genericEncodeJson)
 import Data.Array as A
@@ -23,6 +25,7 @@ data QueryError =
   | QTextNotFoundError
   | QChooseError
 instance EncodeJson QueryError where encodeJson a = genericEncodeJson a
+instance DecodeJson QueryError where decodeJson a = genericDecodeJson a
 
 derive instance Generic QueryError _
 derive instance Eq QueryError

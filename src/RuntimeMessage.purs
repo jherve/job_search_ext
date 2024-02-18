@@ -17,6 +17,7 @@ import Data.Generic.Rep (class Generic)
 import Data.Show.Generic (genericShow)
 import Effect (Effect)
 import Effect.Class.Console (log)
+import LinkedIn (APIError)
 import LinkedIn.Output (Output)
 import LinkedIn.PageUrl (PageUrl)
 
@@ -24,6 +25,7 @@ data RuntimeMessage =
   RuntimeMessageContentInit
   | RuntimeMessageRequestPageContent
   | RuntimeMessagePageContent PageUrl Output
+  | RuntimeMessageError APIError
 
 derive instance Generic RuntimeMessage _
 instance Show RuntimeMessage where show = genericShow

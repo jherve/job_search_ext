@@ -4,6 +4,8 @@ import Prelude
 
 import Control.Monad.Except (ExceptT, lift, runExceptT, throwError, withExceptT)
 import Data.Argonaut.Core (Json)
+import Data.Argonaut.Decode (class DecodeJson, decodeJson)
+import Data.Argonaut.Decode.Generic (genericDecodeJson)
 import Data.Argonaut.Encode (class EncodeJson, encodeJson)
 import Data.Argonaut.Encode.Generic (genericEncodeJson)
 import Data.Either (Either(..))
@@ -33,6 +35,7 @@ data APIError =
 derive instance Generic APIError _
 instance Show APIError where show = genericShow
 instance EncodeJson APIError where encodeJson a = genericEncodeJson a
+instance DecodeJson APIError where decodeJson a = genericDecodeJson a
 
 getContext ∷ Document → Effect (Either APIError PageUrl)
 getContext = runExceptT <<< getContext'

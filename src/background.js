@@ -1,7 +1,3 @@
-var Background = require("../output/ExampleWebExt.Background");
-
-function main() {
-  Background.main();
-}
+import { main } from "../output/ExampleWebExt.Background";
 
 main();

@@ -58,17 +58,12 @@ contentScriptMessageHandler
         origin: "linked_in",
         title: jo.title,
         url,
-        alternate_url: Nothing,
         company: jo.companyName,
         location: jo.location,
-        comment: Nothing,
         company_domain: jo.companyDomain,
         company_url: Just jo.companyLink,
         flexibility: jo.flexibility,
-        application_process: Just $ if jo.hasSimplifiedApplicationProcess then ApplicationProcessLinkedInSimplified else ApplicationProcessRegular,
-        application_date: Nothing,
-        application_rejection_date: Nothing,
-        application_considered: Nothing
+        application_process: Just $ if jo.hasSimplifiedApplicationProcess then ApplicationProcessLinkedInSimplified else ApplicationProcessRegular
       }
 
 contentScriptMessageHandler

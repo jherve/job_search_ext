@@ -27,7 +27,7 @@ data NativeMessage =
   | NativeMessageInitialConfiguration {jobsPath :: String}
   | NativeMessageStorageReady
   | NativeMessageStorageUpdated
-  | NativeMessageAddJob NativePythonJobOffer
+  | NativeMessageAddJob NewJobOffer
   | NativeMessageListJobsRequest
   | NativeMessageJobAlreadyExists {job_id :: String}
   | NativeMessageJobAdded {job_id :: String}
@@ -71,6 +71,7 @@ instance DecodeJson BooleanStr where
           Right "false" -> Right (BooleanStr false)
           _ -> Left $ UnexpectedValue json
 
+-- Offers as they are sent by native, after having been stored
 type NativePythonJobOffer = {
   id :: String,
   origin :: String,
@@ -87,6 +88,20 @@ type NativePythonJobOffer = {
   application_considered :: Maybe BooleanStr,
   application_date :: Maybe String,
   application_rejection_date :: Maybe String
+}
+
+-- Offers as they are sent by background to native
+type NewJobOffer = {
+  id :: String,
+  origin :: String,
+  title :: String,
+  url :: String,
+  company :: String,
+  location :: Maybe String,
+  company_domain :: Maybe String,
+  company_url :: Maybe String,
+  flexibility :: Maybe JobFlexibility,
+  application_process :: Maybe ApplicationProcess
 }
 
 derive instance Generic NativeMessage _

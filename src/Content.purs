@@ -35,7 +35,7 @@ main = do
     _ -> log "[content] Nothing to do"
 
 backgroundMessageHandler ∷ RuntimeMessage -> MessageSender → Effect Unit
-backgroundMessageHandler m _ = case m of
+backgroundMessageHandler msg _ = case msg of
   RuntimeMessageRequestPageContent -> launchAff_ waitForDataAndSend
 
   m -> logShow m

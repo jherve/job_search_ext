@@ -7,7 +7,6 @@ import Data.List as L
 import Data.List.NonEmpty (NonEmptyList)
 import Data.List.NonEmpty as NEL
 import Data.Maybe (Maybe(..), fromJust)
-import Data.Traversable (traverse)
 import Effect (Effect)
 import Partial.Unsafe (unsafePartial)
 import Web.DOM (Document, Node, ParentNode)

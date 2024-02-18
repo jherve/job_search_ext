@@ -48,7 +48,7 @@ contentScriptMessageHandler ∷ Port -> RuntimeMessage -> MessageSender → Effe
 contentScriptMessageHandler
   port
   (RuntimeMessagePageContent (UrlJobOffer (JobOfferId jobId)) (OutJobOffer offer))
-  (MessageSender {tab: Just {url, title}}) =
+  (MessageSender {tab: Just {url}}) =
     case maybeMsg offer of
       Just msg -> sendMessageToNative port msg
       Nothing -> error "Job offer sent by content script could not be sent"

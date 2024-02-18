@@ -163,10 +163,10 @@ instance Traversable TopCardInsightContent where
   traverse = \x -> traverseDefault x
 
 instance Queryable q => CanBeQueried q TopCardInsightContent where
-  query n =
-    queryTopCardInsightContentSecondary n
-    <|> queryTopCardInsightContentButton n
-    <|> queryTopCardInsightContentSingle n
+  query node =
+    queryTopCardInsightContentSecondary node
+    <|> queryTopCardInsightContentButton node
+    <|> queryTopCardInsightContentSingle node
 
     where
       queryTopCardInsightContentSingle n = do
@@ -206,7 +206,7 @@ instance Traversable TopCardSecondaryInsight where
   traverse = \x -> traverseDefault x
 
 instance Queryable q => CanBeQueried q TopCardSecondaryInsight where
-  query n = queryTopCardSecondaryInsightNested n <|> queryTopCardSecondaryInsightPlain n
+  query node = queryTopCardSecondaryInsightNested node <|> queryTopCardSecondaryInsightPlain node
     where
       queryTopCardSecondaryInsightNested n = do
         nested <- queryOne ":scope span[aria-hidden=true]" n

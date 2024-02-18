@@ -2,11 +2,11 @@ module ExampleWebExt.Background where
 
 import Prelude
 
-import Browser.WebExt.BrowserAction (onClickedAddListener)
+import Browser.WebExt.BrowserAction (onClickedAddListener, setBadgeBackgroundColor, setBadgeText)
 import Browser.WebExt.Listener (mkListener)
 import Browser.WebExt.Port (Port)
 import Browser.WebExt.Runtime (MessageSender(..))
-import Browser.WebExt.Tabs (Tab)
+import Browser.WebExt.Tabs (TabId)
 import Data.Argonaut.Decode (printJsonDecodeError)
 import Data.Either (Either(..))
 import Data.Foldable (for_)
@@ -17,7 +17,7 @@ import Effect.Aff (launchAff_)
 import Effect.Class (liftEffect)
 import Effect.Class.Console (debug, error, log, logShow)
 import ExampleWebExt.NativeMessage (ApplicationProcess(..), NativeMessage(..), connectToNativeApplication, onNativeDisconnectAddListener, onNativeMessageAddListener, sendMessageToNative)
-import ExampleWebExt.RuntimeMessage (RuntimeMessage(..), onRuntimeMessageAddListener, sendMessageToContent)
+import ExampleWebExt.RuntimeMessage (RuntimeMessage(..), onRuntimeMessageAddListener)
 import ExampleWebExt.Storage (clearAllJobs, getJobsPath, storeJob)
 import LinkedIn.Jobs.JobOffer (JobOffer(..))
 import LinkedIn.Output.Types (Output(..))
@@ -35,23 +35,20 @@ main = do
 
   sendConfigurationToNative port
 
-  onClickedAddListener $ mkListener browserActionOnClickedHandler
   onRuntimeMessageAddListener $ contentScriptMessageHandler port
-
-browserActionOnClickedHandler :: Tab -> Effect Unit
-browserActionOnClickedHandler tab = do
-  logShow tab
-  _ <- sendMessageToContent tab.id RuntimeMessageRequestPageContent
-  pure unit
 
 contentScriptMessageHandler ∷ Port -> RuntimeMessage -> MessageSender → Effect Unit
 contentScriptMessageHandler
   port
   (RuntimeMessagePageContent (UrlJobOffer (JobOfferId jobId)) (OutJobOffer offer))
-  (MessageSender {tab: Just {url}}) =
+  (MessageSender {tab: Just {id, url}}) =
     case maybeMsg offer of
-      Just msg -> sendMessageToNative port msg
-      Nothing -> error "Job offer sent by content script could not be sent"
+      Just msg -> do
+        sendMessageToNative port msg
+        displayBadgeUntilClick id "OK" "green"
+      Nothing -> do
+        error "Job offer sent by content script could not be sent"
+        displayBadgeUntilClick id "KO" "red"
 
   where
     maybeMsg (JobOffer jo) = ado
@@ -74,6 +71,13 @@ contentScriptMessageHandler
         application_considered: Nothing
       }
 
+contentScriptMessageHandler
+  _
+  (RuntimeMessageError err)
+  (MessageSender {tab: Just {id, url}}) = do
+    displayBadgeUntilClick id "KO" "red"
+    error $ "tab " <> show url <> " sent an error : " <> show err
+
 contentScriptMessageHandler _ m (MessageSender {tab, id}) = do
   let
     senderMsg = case tab of
@@ -82,6 +86,12 @@ contentScriptMessageHandler _ m (MessageSender {tab, id}) = do
     msg = "[bg] received " <> show m <> " from " <> senderMsg
 
   debug msg
+
+displayBadgeUntilClick ∷ TabId → String → String → Effect Unit
+displayBadgeUntilClick tabId text color = do
+  setBadgeText text tabId
+  setBadgeBackgroundColor color tabId
+  onClickedAddListener $ mkListener $ const $ setBadgeText "" tabId
 
 cleanUpUrl :: String -> Maybe String
 cleanUpUrl u = do

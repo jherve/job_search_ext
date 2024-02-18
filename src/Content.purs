@@ -8,7 +8,7 @@ import Data.Either (Either(..))
 import Effect (Effect)
 import Effect.Aff (Aff, launchAff_)
 import Effect.Class (liftEffect)
-import Effect.Class.Console (logShow, warn)
+import Effect.Class.Console (logShow)
 import Effect.Console (log)
 import ExampleWebExt.RuntimeMessage (RuntimeMessage(..), onRuntimeMessageAddListener, sendMessageToBackground)
 import LinkedIn (extractFromDocument, getContext)
@@ -54,7 +54,10 @@ extractDataAndSendToBackground = do
   ctx <- getContext dom
   data_ <- extractFromDocument dom
 
-  case data_, ctx of
-    Left err, _ -> warn $ "[content] " <> show err
-    _, Left err -> warn $ "[content] " <> show err
-    Right data_', Right ctx' -> sendMessageToBackground $ RuntimeMessagePageContent ctx' data_'
+  let
+    msg = case data_, ctx of
+      Left err, _ -> RuntimeMessageError err
+      _, Left err -> RuntimeMessageError err
+      Right data_', Right ctx' -> RuntimeMessagePageContent ctx' data_'
+
+  sendMessageToBackground msg

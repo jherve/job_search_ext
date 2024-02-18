@@ -28,12 +28,12 @@ class Application:
 
     def handle_message(self, message: Message):
         match message:
-            case AddJobMessage():
+            case AddJobMessage(values=values):
                 try:
-                    self.job_storage.insert_record("job_offer", asdict(message))
-                    self.read_writer.send_message(JobAddedMessage(message.id))
+                    self.job_storage.insert_record("job_offer", values)
+                    self.read_writer.send_message(JobAddedMessage(values["id"]))
                 except FileExistsError as e:
-                    self.read_writer.send_message(JobAlreadyExistsMessage(message.id))
+                    self.read_writer.send_message(JobAlreadyExistsMessage(values["id"]))
 
             case ListJobsRequestMessage():
                 offers = list(self.job_storage.read_all().values())

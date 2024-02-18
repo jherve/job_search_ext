@@ -1,13 +1,6 @@
-import re
-from datetime import date
 from dataclasses import dataclass, asdict
 from enum import Enum
-from typing import Optional, Any
-from job_search.job_storage import (
-    ApplicationProcess,
-    JobOfferOrigin,
-    Flexibility,
-)
+from typing import Any
 
 
 def to_snake_case(string):
@@ -40,7 +33,7 @@ class BackgroundScriptMessage(Message):
             case "NativeMessageInitialConfiguration":
                 return InitialConfigurationMessage(**values)
             case "NativeMessageAddJob":
-                return AddJobMessage(**values)
+                return AddJobMessage(values=values)
             case "NativeMessageListJobsRequest":
                 return ListJobsRequestMessage(**values)
             case _:
@@ -54,24 +47,14 @@ class NativeMessage(Message):
 
 @dataclass
 class AddJobMessage(BackgroundScriptMessage):
-    id: str
-    origin: str
-    title: str
-    url: str
-    company: str
-    location: Optional[str] = None
-    company_domain: Optional[str] = None
-    company_url: Optional[str] = None
-    flexibility: Optional[Flexibility] = None
-    alternate_url: Optional[str] = None
-    comment: Optional[str] = None
-    application_process: Optional[ApplicationProcess] = None
-    application_considered: Optional[bool] = None
-    application_date: Optional[str] = None
-    application_rejection_date: Optional[str] = None
+    """
+    Only for this message we trust the frontend to send data in an appropriate
+    format.
+    """
+    values: dict
 
     def serialize(self):
-        return {"tag": "NativeMessageAddJob", "values": [asdict(self)]}
+        return {"tag": "NativeMessageAddJob", "values": [self.values]}
 
 
 @dataclass

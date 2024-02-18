@@ -40,10 +40,15 @@ function createListOfJobs (jobs) {
     return ul;
 }
 
-(async () => {
+async function updateContent () {
     const content = document.querySelector("#content");
     const allJobs = Object.entries(await browser.storage.local.get()).map(a => a[1]);
     const stillToApplyJobs = allJobs.filter(j => j.application_date === null && j.application_considered);
 
     content.innerHTML = createListOfJobs(stillToApplyJobs).innerHTML;
+}
+
+(async () => {
+    updateContent();
+    browser.storage.local.onChanged.addListener(updateContent);
 })();

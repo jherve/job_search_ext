@@ -28,10 +28,13 @@ data NativeMessage =
   | NativeMessageStorageReady
   | NativeMessageStorageUpdated
   | NativeMessageAddJob NewJobOffer
+  | NativeMessageAddCompany NewCompany
   | NativeMessageListJobsRequest
   | NativeMessageJobAlreadyExists {job_id :: String}
   | NativeMessageJobAdded {job_id :: String}
   | NativeMessageJobOfferList (Array NativePythonJobOffer)
+  | NativeMessageCompanyAlreadyExists {name :: String}
+  | NativeMessageCompanyAdded {name :: String}
 
 data ApplicationProcess
   = ApplicationProcessLinkedInSimplified
@@ -78,9 +81,10 @@ type NativePythonJobOffer = {
   title :: String,
   url :: String,
   alternate_url :: Maybe String,
-  company :: String,
+  company_name :: String,
   location :: Maybe String,
   company_domain :: Maybe String,
+  company_kind :: Maybe String,
   company_url :: Maybe String,
   flexibility :: Maybe JobFlexibility,
   comment :: Maybe String,
@@ -98,10 +102,14 @@ type NewJobOffer = {
   url :: String,
   company :: String,
   location :: Maybe String,
-  company_domain :: Maybe String,
-  company_url :: Maybe String,
   flexibility :: Maybe JobFlexibility,
   application_process :: Maybe ApplicationProcess
+}
+
+type NewCompany = {
+  name :: String,
+  domain :: Maybe String,
+  url :: Maybe String
 }
 
 derive instance Generic NativeMessage _

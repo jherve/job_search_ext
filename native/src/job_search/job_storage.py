@@ -71,9 +71,18 @@ class JobStorage:
                 f.write("%type: flexibility enum on_site hybrid full_remote\n")
                 f.write("%type: first_seen_date date\n")
                 f.write("%auto: first_seen_date\n")
+                f.write("\n")
+                f.write("%rec: company")
+                f.write("%key: name")
+                f.write("%allowed: kind url domain")
+                f.write("%type: kind enum regular head_hunter ssii start_up")
+                f.write("%unique: kind")
+                f.write("%unique: url")
+                f.write("%unique: domain")
+                f.write("\n")
 
     def read_all(self) -> dict[str, dict]:
-        return {r["id"]: r for r in self.select_all("job_offer")}
+        return {r["id"]: r for r in self.select_all("job_offer", "company")}
 
     def insert_record(self, type_, fields):
         cmd_args = [
@@ -97,6 +106,8 @@ class JobStorage:
                 raise ValueError(f"Found invalid enum value in {fields}")
             elif "error: duplicated key value in field 'id' in record" in first:
                 raise FileExistsError(f"Duplicate value {fields['id']}")
+            elif "error: duplicated key value in field 'name' in record" in first:
+                raise FileExistsError(f"Duplicate value {fields['name']}")
             else:
                 raise ValueError(
                     f"insert command failed with code {code} :\n{process.stderr}"
@@ -118,8 +129,8 @@ class JobStorage:
                 args += [(k, v)]
         return args
 
-    def select_all(self, type_):
-        cmd = ["recsel", "-t", type_, str(self.rec_file_path)]
+    def select_all(self, type_, join):
+        cmd = ["recsel", "-t", type_, "-j", join, str(self.rec_file_path)]
         process = subprocess.run(cmd, stdout=subprocess.PIPE, universal_newlines=True)
 
         if (code := process.returncode) != 0:

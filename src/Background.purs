@@ -42,11 +42,12 @@ contentScriptMessageHandler
   port
   (RuntimeMessagePageContent (UrlJobOffer (JobOfferId jobId)) (OutJobOffer offer))
   (MessageSender {tab: Just {id, url}}) =
-    case maybeMsg offer of
-      Just msg -> do
-        sendMessageToNative port msg
+    case maybeMsg offer, maybeCompany offer of
+      Just msgJob, Just msgCompany -> do
+        sendMessageToNative port msgJob
+        sendMessageToNative port msgCompany
         displayBadgeUntilClick id "OK" "green"
-      Nothing -> do
+      _, _ -> do
         error "Job offer sent by content script could not be sent"
         displayBadgeUntilClick id "KO" "red"
 
@@ -60,10 +61,14 @@ contentScriptMessageHandler
         url,
         company: jo.companyName,
         location: jo.location,
-        company_domain: jo.companyDomain,
-        company_url: Just jo.companyLink,
         flexibility: jo.flexibility,
         application_process: Just $ if jo.hasSimplifiedApplicationProcess then ApplicationProcessLinkedInSimplified else ApplicationProcessRegular
+      }
+
+    maybeCompany (JobOffer jo) = Just $ NativeMessageAddCompany {
+        name: jo.companyName,
+        domain: jo.companyDomain,
+        url: Just jo.companyLink
       }
 
 contentScriptMessageHandler

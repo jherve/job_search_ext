@@ -17,7 +17,7 @@ function createJob (job) {
     const li = document.createElement("li");
 
     li.appendChild(elWithText("h2", job.title));
-    li.appendChild(elWithText("h3", job.company));
+    li.appendChild(elWithText("h3", job.company_name));
     li.appendChild(link("Job offer link", job.url));
 
     if (job.company_url)

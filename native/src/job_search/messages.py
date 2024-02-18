@@ -34,6 +34,8 @@ class BackgroundScriptMessage(Message):
                 return InitialConfigurationMessage(**values)
             case "NativeMessageAddJob":
                 return AddJobMessage(values=values)
+            case "NativeMessageAddCompany":
+                return AddCompanyMessage(values=values)
             case "NativeMessageListJobsRequest":
                 return ListJobsRequestMessage(**values)
             case _:
@@ -48,13 +50,25 @@ class NativeMessage(Message):
 @dataclass
 class AddJobMessage(BackgroundScriptMessage):
     """
-    Only for this message we trust the frontend to send data in an appropriate
+    For this message we trust the frontend to send data in an appropriate
     format.
     """
     values: dict
 
     def serialize(self):
         return {"tag": "NativeMessageAddJob", "values": [self.values]}
+
+
+@dataclass
+class AddCompanyMessage(BackgroundScriptMessage):
+    """
+    For this message we trust the frontend to send data in an appropriate
+    format.
+    """
+    values: dict
+
+    def serialize(self):
+        return {"tag": "NativeMessageAddCompany", "values": [self.values]}
 
 
 @dataclass
@@ -100,6 +114,22 @@ class JobAlreadyExistsMessage(NativeMessage):
 
     def serialize(self):
         return {"tag": "NativeMessageJobAlreadyExists", "values": [asdict(self)]}
+
+
+@dataclass
+class CompanyAddedMessage(NativeMessage):
+    name: str
+
+    def serialize(self):
+        return {"tag": "NativeMessageCompanyAdded", "values": [asdict(self)]}
+
+
+@dataclass
+class CompanyAlreadyExistsMessage(NativeMessage):
+    name: str
+
+    def serialize(self):
+        return {"tag": "NativeMessageCompanyAlreadyExists", "values": [asdict(self)]}
 
 
 class LogLevel(Enum):

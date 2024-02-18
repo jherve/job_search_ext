@@ -9,6 +9,7 @@ from job_search.read_write import ReadWriter
 from job_search.job_storage import JobStorage
 from job_search.messages import (
     AddJobMessage,
+    AddCompanyMessage,
     InitialConfigurationMessage,
     StorageReadyMessage,
     StorageUpdatedMessage,
@@ -18,6 +19,8 @@ from job_search.messages import (
     Message,
     JobAddedMessage,
     JobAlreadyExistsMessage,
+    CompanyAddedMessage,
+    CompanyAlreadyExistsMessage,
 )
 
 
@@ -35,6 +38,13 @@ class Application:
                 except FileExistsError as e:
                     self.read_writer.send_message(JobAlreadyExistsMessage(values["id"]))
 
+            case AddCompanyMessage(values=values):
+                try:
+                    self.job_storage.insert_record("company", values)
+                    self.read_writer.send_message(CompanyAddedMessage(values["name"]))
+                except FileExistsError as e:
+                    self.read_writer.send_message(CompanyAlreadyExistsMessage(values["name"]))
+
             case ListJobsRequestMessage():
                 offers = list(self.job_storage.read_all().values())
                 self.read_writer.send_message(JobOfferListMessage(offers))
@@ -42,6 +52,11 @@ class Application:
             case InitialConfigurationMessage(jobs_path):
                 self.job_storage = JobStorage(base_dir=Path(jobs_path))
                 self.read_writer.send_message(StorageReadyMessage())
+
+            case _:
+                self.read_writer.send_message(
+                    LogMessage.error(content=f"Received unhandled message : {message}")
+                )
 
     async def loop_on_messages(self):
         loop = asyncio.get_running_loop()

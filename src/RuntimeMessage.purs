@@ -1,4 +1,4 @@
-module ExampleWebExt.RuntimeMessage where
+module JobSearchExtension.RuntimeMessage where
 
 import Prelude
 

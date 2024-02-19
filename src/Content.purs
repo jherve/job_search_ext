@@ -1,4 +1,4 @@
-module ExampleWebExt.Content where
+module JobSearchExtension.Content where
 
 import Prelude
 
@@ -10,7 +10,7 @@ import Effect.Aff (Aff, launchAff_)
 import Effect.Class (liftEffect)
 import Effect.Class.Console (logShow)
 import Effect.Console (log)
-import ExampleWebExt.RuntimeMessage (RuntimeMessage(..), onRuntimeMessageAddListener, sendMessageToBackground)
+import JobSearchExtension.RuntimeMessage (RuntimeMessage(..), onRuntimeMessageAddListener, sendMessageToBackground)
 import LinkedIn (extractFromDocument, getContext)
 import LinkedIn.Loadable (waitFor)
 import LinkedIn.PageUrl (PageUrl(..))

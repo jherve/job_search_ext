@@ -1,4 +1,4 @@
-module ExampleWebExt.Background where
+module JobSearchExtension.Background where
 
 import Prelude
 
@@ -16,9 +16,9 @@ import Effect (Effect)
 import Effect.Aff (launchAff_)
 import Effect.Class (liftEffect)
 import Effect.Class.Console (debug, error, log, logShow)
-import ExampleWebExt.NativeMessage (ApplicationProcess(..), NativeMessage(..), connectToNativeApplication, onNativeDisconnectAddListener, onNativeMessageAddListener, sendMessageToNative)
-import ExampleWebExt.RuntimeMessage (RuntimeMessage(..), onRuntimeMessageAddListener)
-import ExampleWebExt.Storage (clearAllJobs, getJobsPath, storeJob)
+import JobSearchExtension.NativeMessage (ApplicationProcess(..), NativeMessage(..), connectToNativeApplication, onNativeDisconnectAddListener, onNativeMessageAddListener, sendMessageToNative)
+import JobSearchExtension.RuntimeMessage (RuntimeMessage(..), onRuntimeMessageAddListener)
+import JobSearchExtension.Storage (clearAllJobs, getJobsPath, storeJob)
 import LinkedIn.Jobs.JobOffer (JobOffer(..))
 import LinkedIn.Output.Types (Output(..))
 import LinkedIn.PageUrl (PageUrl(..))

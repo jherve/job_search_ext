@@ -13,7 +13,7 @@
   },
   "browser_action": {
     "default_icon": "assets/job-promotion.png",
-    "default_title": "Test"
+    "default_title": "Job Search"
   },
   "content_scripts": [
     {

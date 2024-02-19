@@ -1,4 +1,4 @@
-module ExampleWebExt.Storage where
+module JobSearchExtension.Storage where
 
 import Prelude
 
@@ -9,7 +9,7 @@ import Data.Argonaut.Encode (encodeJson)
 import Data.Either (Either)
 import Effect (Effect)
 import Effect.Aff (Aff)
-import ExampleWebExt.NativeMessage (NativePythonJobOffer)
+import JobSearchExtension.NativeMessage (NativePythonJobOffer)
 import Foreign.Object (singleton)
 
 type SyncStorage = { jobsPath :: String }

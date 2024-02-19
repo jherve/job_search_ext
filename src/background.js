@@ -1,3 +1,3 @@
-import { main } from "../output/ExampleWebExt.Background";
+import { main } from "../output/JobSearchExtension.Background";
 
 main();

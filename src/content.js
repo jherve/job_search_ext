@@ -1,3 +1,3 @@
-import { main } from "../output/ExampleWebExt.Content";
+import { main } from "../output/JobSearchExtension.Content";
 
 main();

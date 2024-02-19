@@ -1,4 +1,4 @@
-module ExampleWebExt.NativeMessage where
+module JobSearchExtension.NativeMessage where
 
 import Prelude
 

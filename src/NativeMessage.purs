@@ -25,6 +25,7 @@ data NativeMessage =
   NativeMessageBackground String
   | NativeMessageLog {level :: String, content :: String}
   | NativeMessageInitialConfiguration {jobsPath :: String}
+  | NativeMessageStorageNotReady
   | NativeMessageStorageReady
   | NativeMessageStorageUpdated
   | NativeMessageAddJob NewJobOffer
@@ -35,6 +36,7 @@ data NativeMessage =
   | NativeMessageJobOfferList (Array NativePythonJobOffer)
   | NativeMessageCompanyAlreadyExists {name :: String}
   | NativeMessageCompanyAdded {name :: String}
+  | NativeMessageMessageNotProcessed NativeMessage
 
 data ApplicationProcess
   = ApplicationProcessLinkedInSimplified

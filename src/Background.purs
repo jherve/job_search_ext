@@ -20,6 +20,7 @@ import JobSearchExtension.NativeMessage (ApplicationProcess(..), NativeMessage(.
 import JobSearchExtension.RuntimeMessage (RuntimeMessage(..), onRuntimeMessageAddListener)
 import JobSearchExtension.Storage (clearAllJobs, getJobsPath, storeJob)
 import LinkedIn.Jobs.JobOffer (JobOffer(..))
+import LinkedIn.Loadable (sleep)
 import LinkedIn.Output.Types (Output(..))
 import LinkedIn.PageUrl (PageUrl(..))
 import LinkedIn.UI.Basic.Types (JobOfferId(..))
@@ -32,10 +33,9 @@ main = do
 
   onNativeMessageAddListener port nativeMessageHandler
   onNativeDisconnectAddListener port \p -> log $ "disconnected from native port " <> p.name <> " (" <> p.error <> ")"
+  onRuntimeMessageAddListener $ contentScriptMessageHandler port
 
   sendConfigurationToNative port
-
-  onRuntimeMessageAddListener $ contentScriptMessageHandler port
 
 contentScriptMessageHandler ∷ Port -> RuntimeMessage -> MessageSender → Effect Unit
 contentScriptMessageHandler
@@ -104,9 +104,16 @@ nativeMessageHandler _ (NativeMessageJobOfferList job_offers) = do
   for_ job_offers \jo -> do
     storeJob jo
 
+nativeMessageHandler _ NativeMessageStorageNotReady = log "[bg] waiting for storage"
 nativeMessageHandler port NativeMessageStorageReady = sendMessageToNative port $ NativeMessageListJobsRequest
 nativeMessageHandler port NativeMessageStorageUpdated = sendMessageToNative port $ NativeMessageListJobsRequest
 nativeMessageHandler port (NativeMessageJobAdded _) = sendMessageToNative port $ NativeMessageListJobsRequest
+
+-- TODO : The actual solution is to make the sender stateful
+nativeMessageHandler port (NativeMessageMessageNotProcessed msg) = launchAff_ do
+  sleep 500
+  liftEffect $ sendMessageToNative port msg
+
 nativeMessageHandler _ m = logShow m
 
 sendConfigurationToNative ∷ Port → Effect Unit

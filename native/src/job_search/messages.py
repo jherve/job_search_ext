@@ -90,6 +90,20 @@ class JobOfferListMessage(NativeMessage):
 
 
 @dataclass
+class MessageNotProcessedMessage(NativeMessage):
+    message: NativeMessage
+
+    def serialize(self):
+        return {"tag": "NativeMessageMessageNotProcessed", "values": [self.message]}
+
+
+@dataclass
+class StorageNotReadyMessage(NativeMessage):
+    def serialize(self):
+        return {"tag": "NativeMessageStorageNotReady", "values": []}
+
+
+@dataclass
 class StorageReadyMessage(NativeMessage):
     def serialize(self):
         return {"tag": "NativeMessageStorageReady", "values": []}

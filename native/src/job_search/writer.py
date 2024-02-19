@@ -21,6 +21,8 @@ from job_search.messages import (
     JobAlreadyExistsMessage,
     CompanyAddedMessage,
     CompanyAlreadyExistsMessage,
+    StorageNotReadyMessage,
+    MessageNotProcessedMessage,
 )
 
 
@@ -37,6 +39,8 @@ class Application:
                     self.read_writer.send_message(JobAddedMessage(values["id"]))
                 except FileExistsError as e:
                     self.read_writer.send_message(JobAlreadyExistsMessage(values["id"]))
+                except AttributeError as e:
+                    self.mark_as_not_processed_if_storage_not_ready(message)
 
             case AddCompanyMessage(values=values):
                 try:
@@ -44,10 +48,15 @@ class Application:
                     self.read_writer.send_message(CompanyAddedMessage(values["name"]))
                 except FileExistsError as e:
                     self.read_writer.send_message(CompanyAlreadyExistsMessage(values["name"]))
+                except AttributeError as e:
+                    self.mark_as_not_processed_if_storage_not_ready(message)
 
             case ListJobsRequestMessage():
-                offers = list(self.job_storage.read_all().values())
-                self.read_writer.send_message(JobOfferListMessage(offers))
+                try:
+                    offers = list(self.job_storage.read_all().values())
+                    self.read_writer.send_message(JobOfferListMessage(offers))
+                except AttributeError as e:
+                    self.mark_as_not_processed_if_storage_not_ready(message)
 
             case InitialConfigurationMessage(jobs_path):
                 self.job_storage = JobStorage(base_dir=Path(jobs_path))
@@ -57,6 +66,13 @@ class Application:
                 self.read_writer.send_message(
                     LogMessage.error(content=f"Received unhandled message : {message}")
                 )
+
+    def mark_as_not_processed_if_storage_not_ready(self, message):
+        if self.job_storage is None:
+            self.read_writer.send_message(StorageNotReadyMessage())
+            self.read_writer.send_message(MessageNotProcessedMessage(message))
+        else:
+            raise
 
     async def loop_on_messages(self):
         loop = asyncio.get_running_loop()

@@ -2,8 +2,7 @@ module JobSearchExtension.Background where
 
 import Prelude
 
-import Browser.WebExt.BrowserAction (onClickedAddListener, setBadgeBackgroundColor, setBadgeText)
-import Browser.WebExt.Listener (mkListener)
+import Browser.WebExt.BrowserAction (setBadgeBackgroundColor, setBadgeText)
 import Browser.WebExt.Port (Port)
 import Browser.WebExt.Runtime (MessageSender(..))
 import Browser.WebExt.Tabs (TabId)
@@ -46,10 +45,11 @@ contentScriptMessageHandler
       Just msgJob, Just msgCompany -> do
         sendMessageToNative port msgJob
         sendMessageToNative port msgCompany
-        displayBadgeUntilClick id "OK" "green"
+        setBadgeOk id
+
       _, _ -> do
         error "Job offer sent by content script could not be sent"
-        displayBadgeUntilClick id "KO" "red"
+        setBadgeKo id
 
   where
     maybeMsg (JobOffer jo) = ado
@@ -75,7 +75,7 @@ contentScriptMessageHandler
   _
   (RuntimeMessageError err)
   (MessageSender {tab: Just {id, url}}) = do
-    displayBadgeUntilClick id "KO" "red"
+    setBadgeKo id
     error $ "tab " <> show url <> " sent an error : " <> show err
 
 contentScriptMessageHandler _ m (MessageSender {tab, id}) = do
@@ -87,11 +87,16 @@ contentScriptMessageHandler _ m (MessageSender {tab, id}) = do
 
   debug msg
 
-displayBadgeUntilClick ∷ TabId → String → String → Effect Unit
-displayBadgeUntilClick tabId text color = do
+setBadgeKo ∷ TabId → Effect Unit
+setBadgeKo id = setBadge id "KO" "red"
+
+setBadgeOk ∷ TabId → Effect Unit
+setBadgeOk id = setBadge id "OK" "green"
+
+setBadge ∷ TabId → String → String → Effect Unit
+setBadge tabId text color = do
   setBadgeText text tabId
   setBadgeBackgroundColor color tabId
-  onClickedAddListener $ mkListener $ const $ setBadgeText "" tabId
 
 cleanUpUrl :: String -> Maybe String
 cleanUpUrl u = do
